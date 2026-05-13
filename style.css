@@ -26,7 +26,8 @@ body {
     background: radial-gradient(circle at 50% 0%, #1a1a24 0%, var(--bg-base) 100%);
     color: var(--text-main); 
     font-family: var(--font-ui); 
-    height: 100vh; 
+    height: 100vh;
+    height: 100dvh; 
     overflow: hidden; 
     font-size: 14px; 
     letter-spacing: 0.2px;
@@ -173,7 +174,7 @@ input:focus, select:focus { border-color: var(--accent-purple); background: rgba
 .custom-option.disabled { opacity: 0.6; cursor: not-allowed; color: var(--text-muted); background: rgba(0,0,0,0.15); }
 .custom-option.selected { background: rgba(255, 255, 255, 0.05); color: var(--accent-purple); font-weight: bold; }
 
-#os-environment { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
+#os-environment { display: flex; height: 100vh; height: 100dvh; width: 100vw; overflow: hidden; }
 
 .sidebar { width: 240px; background: rgba(0,0,0, 0.4); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; z-index: 10; flex-shrink: 0; }
 .brand { height: 70px; padding: 25px 20px; font-weight: 800; font-size: 1.3rem; display: flex; align-items: center; gap: 12px; color: #fff; letter-spacing: -0.5px; }
