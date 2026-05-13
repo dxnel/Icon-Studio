@@ -489,6 +489,16 @@ input[type="range"].custom-range::-moz-range-thumb { margin-top: 0; }
     .data-node { padding: 15px; }
     .node-header { font-size: 1rem; }
     button { min-height: 38px; }
+    #profile-name { font-size: 1.8rem !important; }
+    .avatar-wrapper { width: 85px !important; height: 85px !important; }
+    .profile-card .panel-content { padding: 15px !important; gap: 15px !important; }
+    .bio-input { font-size: 0.85rem; }
+    .market-trend-box { min-width: 180px; padding: 12px 15px; }
+    .trend-header { font-size: 0.65rem; margin-bottom: 8px; }
+    .trend-data { font-size: 0.8rem; padding: 4px 8px; }
+    .stat-gauge { padding: 15px !important; } 
+    .stat-gauge .current-val { font-size: 1.5rem !important; margin-top: 5px !important; }
+    .grid-3-col { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
 }
 
 @media screen and (max-height: 700px) {
