@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICON Studio</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="onboarding-modal" class="overlay active-overlay">
+        <div class="modal" style="width: 480px;">
+            <div class="modal-header">Profile selection</div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label>Artist Name</label>
+                    <input type="text" id="artist-name" placeholder="e.g. Kendrick Lamar">
+                </div>
+                <div class="flex-row gap-15">
+                    <div class="input-group" style="flex:1;">
+                        <label>Natural Trait</label>
+                        <select id="player-perk"></select>
+                    </div>
+                    <div class="input-group" style="flex:1;">
+                        <label>Day Job</label>
+                        <select id="player-job"></select>
+                    </div>
+                </div>
+                <button class="btn-primary w-100 mt-10" onclick="Engine.initGame(true)">Initialize Workspace</button>
+                <div class="text-muted" style="text-align:center; font-size: 0.75rem; margin-top: 15px;">
+                    Or <a href="#" onclick="Engine.loadGame(true)" style="color:var(--accent-purple); cursor:pointer;">Load Saved Game</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="os-environment" class="hidden">
+        <aside class="sidebar">
+            <div class="brand"><i data-lucide="disc-3"></i> ICON Studio</div>
+            <nav class="nav-menu">
+                <div class="nav-section-title">Workspace</div>
+                <button class="nav-btn active" onclick="UI.switchTab('dashboard')"><i data-lucide="layout-dashboard"></i> Dashboard</button>
+                <button class="nav-btn" onclick="UI.switchTab('studio')"><i data-lucide="sliders"></i> Studio</button>
+                <button class="nav-btn" onclick="UI.switchTab('vault')"><i data-lucide="hard-drive"></i> Vault</button>
+                <button class="nav-btn" onclick="UI.switchTab('manage')"><i data-lucide="disc"></i> Discography</button>
+                <div class="nav-section-title" style="margin-top: 15px;">Business</div>
+                <button class="nav-btn" onclick="UI.switchTab('hq')"><i data-lucide="building"></i> HQ & Team</button>
+                <button class="nav-btn" onclick="UI.switchTab('merch')"><i data-lucide="shopping-bag"></i> Merch</button>
+                <div class="nav-section-title" style="margin-top: 15px;">Growth</div>
+                <button class="nav-btn" onclick="UI.switchTab('socials')"><i data-lucide="smartphone"></i> Promo</button>
+                <button class="nav-btn" onclick="UI.switchTab('career')"><i data-lucide="target"></i> Career</button>
+                <button class="nav-btn" onclick="UI.switchTab('world')"><i data-lucide="globe"></i> Charts</button>
+            </nav>
+            <div class="sidebar-bottom">
+                <button class="nav-btn" onclick="UI.openModal('settings-modal')"><i data-lucide="settings"></i> System Settings</button>
+            </div>
+        </aside>
+
+        <div class="main-container">
+            <header class="top-hud">
+                <div class="hud-time">
+                    <div id="clock-display" class="time-text">DAY 1 • 08:00</div>
+                    <div class="time-bar-bg"><div id="day-progress" class="time-bar-fill"></div></div>
+                </div>
+                <div class="hud-vitals">
+                    <div id="money-container" class="vitals-money-wrapper">
+                        <i data-lucide="wallet" class="text-green"></i>
+                        <div class="money-text-group">
+                            <span id="vitals-money" class="text-green font-bold">$300.00</span>
+                            <span id="rent-countdown" class="text-muted text-sm">-$0 IN 29D</span>
+                        </div>
+                    </div>
+                    <div class="vital-separator"></div>
+                    <div class="vital-stat">
+                        <i data-lucide="battery"></i>
+                        <div class="stat-bar-container">
+                            <div class="stat-bar-label"><span>Energy</span> <span id="vitals-energy-text">100%</span></div>
+                            <div class="stat-bar-bg"><div id="vitals-energy-bar" class="stat-bar-fill bg-green" style="width: 100%;"></div></div>
+                        </div>
+                    </div>
+                    <div class="vital-separator"></div>
+                    <div class="vital-stat">
+                        <i data-lucide="brain"></i>
+                        <div class="stat-bar-container">
+                            <div class="stat-bar-label"><span>Stress</span> <span id="vitals-burnout-text">0%</span></div>
+                            <div class="stat-bar-bg"><div id="vitals-burnout-bar" class="stat-bar-fill bg-green" style="width: 0%;"></div></div>
+                        </div>
+                    </div>
+                    <div class="vital-separator"></div>
+                    <div id="status-tray" style="display: flex; gap: 10px; align-items: center; min-width: 40px; flex-wrap: wrap;"></div>
+                </div>
+                <div class="hud-actions">
+                    <button id="btn-action-work" class="btn-outline" onclick="PlayerActions.openLifeModal('work')"><i data-lucide="coffee"></i> Work</button>
+                    <button id="btn-action-sleep" class="btn-outline" onclick="PlayerActions.openLifeModal('sleep')"><i data-lucide="bed"></i> Sleep</button>
+                    <button id="btn-action-pass" class="btn-outline" onclick="UI.openPassTimeModal()"><i data-lucide="fast-forward"></i> Wait</button>
+                </div>
+            </header>
+
+            <main class="workspace">
+                <div id="tab-dashboard" class="tab-content active">
+                    <div class="panel grid-span-full profile-card">
+                        <div class="panel-content flex-row gap-20" style="align-items: center; padding: 25px;">
+                            <div class="avatar-wrapper" onclick="document.getElementById('avatar-upload').click()">
+                                <img id="profile-avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23222'/><text x='50' y='60' font-family='sans-serif' font-size='30' fill='%23666' text-anchor='middle'>?</text></svg>" alt="Avatar">
+                                <div class="avatar-overlay"><i data-lucide="camera" style="color: white; left:0px"></i></div>
+                                <input type="file" id="avatar-upload" class="hidden" accept="image/*" onchange="UI.handleAvatarUpload(event)">
+                            </div>
+                            <div class="profile-info flex-col" style="flex-grow: 1;">
+                                <div class="text-muted flex-row gap-10" style="text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; margin-bottom: 6px;">
+                                    <span id="profile-perk-display">Independent Artist</span>
+                                </div>
+                                <h2 id="profile-name" style="margin: 0 0 4px 0; font-size: 2.4rem; font-weight: 800; letter-spacing: -1px; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">Unknown</h2>
+                                <input type="text" id="profile-bio" class="bio-input" placeholder="Write a short bio... (Click to edit)" onchange="Engine.modifyBio(this.value)">
+                            </div>
+                            <div class="market-trend-box">
+                                <div class="trend-header">
+                                    <i data-lucide="radar"></i> ALGORITHM RADAR
+                                </div>
+                                <div id="trend-display" class="trend-data">Pop | Chill | ~120 BPM</div>
+                                <div class="trend-footer">Match for a massive Hype Boost</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid-span-full grid-3-col" style="gap: 20px;">
+                        <div class="stat-gauge data-node" style="padding: 20px;">
+                            <div class="stat-header"><i data-lucide="users" class="text-blue"></i><span class="stat-name">Total Fans</span></div>
+                            <div class="current-val text-blue" style="font-size: 2.2rem; margin-top: 10px;" id="dash-followers">0</div>
+                        </div>
+                        <div class="stat-gauge data-node" style="padding: 20px;">
+                            <div class="stat-header"><i data-lucide="zap" class="text-yellow"></i><span class="stat-name">Hype Multiplier</span></div>
+                            <div class="current-val text-yellow" style="font-size: 2.2rem; margin-top: 10px;"><span id="dash-hype">1.00</span>x</div>
+                        </div>
+                        <div class="stat-gauge data-node" style="padding: 20px;">
+                            <div class="stat-header"><i data-lucide="disc" class="text-purple"></i><span class="stat-name">Latest Release</span></div>
+                            <div class="current-val text-purple" style="font-size: 1.6rem; margin-top: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="dash-latest-drop">None</div>
+                        </div>
+                    </div>
+                    <div class="panel grid-span-2">
+                        <div class="panel-header"><span><i data-lucide="bar-chart-2"></i> Streamlytics Data</span></div>
+                        <div class="panel-content flex-col" style="overflow: hidden; padding-bottom: 15px;">
+                            <div class="chart-wrapper" style="min-height: 0; flex-grow: 1;">
+                                <canvas id="streamsChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="flex-row-between" style="padding: 15px 20px; border-top: 1px solid var(--border-color); background: rgba(0,0,0,0.2); z-index: 10; flex-shrink: 0;">
+                            <div style="font-weight: bold; font-size: 0.9rem;">Lifetime Royalties: <span class="text-green">$<span id="stat-total-revenue">0.00</span></span></div>
+                            <div style="font-weight: bold; font-size: 0.9rem;">Lifetime Streams: <span id="stat-total-streams" class="text-purple">0</span></div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header"><span><i data-lucide="terminal"></i> Console Log</span></div>
+                        <div id="activity-log" class="panel-content scrollable" style="font-family: var(--font-mono); font-size: 0.85rem;"></div>
+                    </div>
+                </div>
+
+                <div id="tab-studio" class="tab-content">
+                    <div class="panel grid-span-2">
+                        <div class="panel-header">
+                            <span><i data-lucide="mic"></i> Active Sessions</span>
+                            <button class="btn-primary btn-small" onclick="UI.openModal('track-modal')">+ ‎ New Session</button>
+                        </div>
+                        <div id="active-tracks" class="panel-content scrollable studio-grid"></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span><i data-lucide="shopping-cart"></i> Marketplace</span>
+                            <span id="gear-capacity-display" class="badge badge-outline" style="margin-top: 0 !important; border-color: rgba(255,255,255,0.2);"><i data-lucide="box"></i> Space: 0 / 0</span>
+                        </div>
+                        <div class="panel-content scrollable">
+                            <div id="gear-list"></div>
+                            <div class="shop-category-header" style="--accent-color: var(--accent-primary); margin-top: 25px;">
+                                <i data-lucide="briefcase" class="text-primary"></i><span>Professionals</span>
+                            </div>
+                            <div id="services-list" class="flex-col gap-15"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-vault" class="tab-content">
+                    <div class="panel grid-span-full">
+                        <div class="panel-header"><span><i data-lucide="folder"></i> Unreleased Masters (Audio Files)</span></div>
+                        <div class="panel-content">
+                            <p class="text-muted" style="margin-bottom: 20px;">These are your finished, mastered audio files. Go to the Discography tab to package them into official releases.</p>
+                            <div id="vault-list" class="grid-3-col gap-10"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-manage" class="tab-content">
+                    <div class="panel grid-span-full" style="margin-bottom: 15px;">
+                        <div class="panel-header">
+                            <span><i data-lucide="upload-cloud"></i> Distribution Pipeline</span>
+                            <button class="btn-primary btn-small" onclick="UI.openReleaseModal()">+ ‎ Package New Release</button>
+                        </div>
+                        <div class="panel-content flex-col">
+                            <div id="pipeline-list" class="flex-col gap-10"></div>
+                        </div>
+                    </div>
+                    <div class="panel grid-span-full">
+                        <div class="panel-header"><span><i data-lucide="library"></i> Active Discography</span></div>
+                        <div class="panel-content flex-col bg-darker">
+                            <div id="live-discography-list" class="flex-col gap-10"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-socials" class="tab-content">
+                    <div class="panel grid-span-full">
+                        <div class="panel-header"><span><i data-lucide="smartphone"></i> Content Creation (Algorithm)</span></div>
+                        <div class="panel-content grid-3-col gap-15">
+                            <div class="data-node flex-col">
+                                <div>
+                                    <strong>Lip-Sync TikTok</strong><br>
+                                    <div style="font-family: var(--font-mono); font-size: 0.8rem; margin: 8px 0;">
+                                        <span class="text-orange">-15 ENERGY</span> | <span class="text-green">+ LOW FANS</span>
+                                    </div>
+                                </div>
+                                <button class="btn-outline w-100 mt-auto" style="margin-top:15px;" onclick="SocialEngine.postContent('low')">Post (1h)</button>
+                            </div>
+                            <div class="data-node flex-col">
+                                <div>
+                                    <strong>Studio Snippet</strong><br>
+                                    <div style="font-family: var(--font-mono); font-size: 0.8rem; margin: 8px 0;">
+                                        <span class="text-orange">-30 ENERGY</span> | <span class="text-green">+ MED HYPE</span>
+                                    </div>
+                                </div>
+                                <button class="btn-outline w-100 mt-auto" style="margin-top:15px;" onclick="SocialEngine.postContent('med')">Post (2h)</button>
+                            </div>
+                            <div class="data-node flex-col" style="border-color: rgba(176, 91, 255, 0.3);">
+                                <div>
+                                    <strong>Teaser Video</strong><br>
+                                    <div style="font-family: var(--font-mono); font-size: 0.8rem; margin: 8px 0;">
+                                        <span class="text-orange">-55 ENERGY</span> | <span class="text-purple">+ VIRAL CHANCE</span>
+                                    </div>
+                                </div>
+                                <button class="btn-outline-purple w-100 mt-auto" style="margin-top:15px;" onclick="SocialEngine.postContent('high')">Shoot (4h)</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel grid-span-full mt-10">
+                        <div class="panel-header"><span><i data-lucide="megaphone"></i> Paid Promotion Campaigns</span></div>
+                        <div id="promo-list" class="panel-content grid-3-col gap-15"></div>
+                    </div>
+                </div>
+
+                <div id="tab-hq" class="tab-content">
+                    <div class="panel grid-span-full">
+                        <div class="panel-header"><span><i data-lucide="home"></i> Real Estate Leases</span></div>
+                        <div class="panel-content">
+                            <p class="text-muted" style="margin-bottom: 20px;">Upgrade your creative space to hold more gear and boost your clout. Rent is deducted automatically every month.</p>
+                            <div id="hq-list" class="grid-3-col gap-15"></div>
+                        </div>
+                    </div>
+                    <div class="panel grid-span-full mt-10">
+                        <div class="panel-header"><span><i data-lucide="users"></i> The Entourage (Staff)</span></div>
+                        <div class="panel-content">
+                            <p class="text-muted" style="margin-bottom: 20px;">Hire professionals to automate your empire. Staff charge a daily wage deducted at the end of the day.</p>
+                            <div id="staff-list" class="grid-4-col gap-15"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-merch" class="tab-content">
+                    <div class="panel grid-span-2">
+                        <div class="panel-header"><span><i data-lucide="bar-chart"></i> Merch Sales & Fulfillment</span></div>
+                        <div class="panel-content flex-col" style="overflow: hidden; padding-bottom: 15px;">
+                            <p class="text-muted" style="margin-bottom: 15px; flex-shrink: 0;">Apparel sells based on your global brand. Physicals must be pressed for specific albums and boost their chart performance (1 sale = 1,500 equivalent streams).</p>
+                            <div class="chart-wrapper" style="min-height: 0; flex-grow: 1;">
+                                <canvas id="merchChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="flex-row-between" style="padding: 15px 20px; border-top: 1px solid var(--border-color); background: rgba(0,0,0,0.2); z-index: 10; flex-shrink: 0;">
+                            <div style="font-weight: bold; font-size: 0.9rem;">Lifetime Revenue: <span class="text-green">$<span id="stat-merch-revenue">0.00</span></span></div>
+                            <div style="font-weight: bold; font-size: 0.9rem;">Items Sold: <span id="stat-merch-items" class="text-yellow">0</span></div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span><i data-lucide="box"></i> Active Inventory</span>
+                            <span id="warehouse-capacity-display" class="badge badge-outline" style="margin-top: 0 !important; border-color: rgba(255,255,255,0.2);"><i data-lucide="box"></i> Space: 0 / 0</span>
+                        </div>
+                        <div class="panel-content scrollable flex-col gap-10" id="inventory-display"></div>
+                    </div>
+                    <div class="panel grid-span-full">
+                        <div class="panel-header"><span><i data-lucide="shopping-bag"></i> Manufacturing Catalog</span></div>
+                        <div id="merch-catalog" class="panel-content grid-4-col gap-15"></div>
+                    </div>
+                </div>
+
+                <div id="tab-career" class="tab-content">
+                    <div class="panel grid-span-full" style="margin-bottom: 15px;">
+                        <div class="panel-header">
+                            <span><i data-lucide="file-text"></i> Active Contract Board</span>
+                            <button class="btn-primary btn-small" onclick="ChallengeEngine.network()"><i data-lucide="users"></i> Network</button>
+                        </div>
+                        <div class="panel-content flex-col gap-15">
+                            <p id="contract-board-desc" class="text-muted">Sign industry contracts to earn cash injections. Missing deadlines incurs heavy penalties. Network manually to find leads. <span class="font-bold">(Costs: <span class="text-orange">15 Energy</span> / <span class="text-blue">2 Hours</span>)</span></p>
+                            <div id="contract-board" class="flex-col gap-10"></div>
+                        </div>
+                    </div>
+                    <div class="panel grid-span-full">
+                        <div class="panel-header"><span><i data-lucide="award"></i> Career Milestones</span></div>
+                        <div id="achievements-list" class="panel-content grid-3-col gap-15"></div>
+                    </div>
+                </div>
+
+                <div id="tab-world" class="tab-content">
+                    <div class="panel grid-span-full">
+                        <div class="panel-header"><span><i data-lucide="trending-up"></i> Global Top 20 Streaming Chart</span></div>
+                        <div class="panel-content scrollable" style="padding: 0;">
+                            <table class="chart-table">
+                                <thead>
+                                    <tr><th>Rank</th><th>Artist</th><th>Daily Streams</th> </tr>
+                                </thead>
+                                <tbody id="leaderboard-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="track-modal" class="overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                Initialize Track
+                <i data-lucide="x" class="close-icon" style="cursor:pointer;" onclick="UI.closeModal('track-modal')"></i>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label>Working Title</label>
+                    <input type="text" id="track-title" placeholder="Leave blank for auto-title">
+                </div>
+                <div class="input-group">
+                    <label>Genre</label>
+                    <select id="track-genre"></select>
+                </div>
+                <div class="flex-row gap-15">
+                    <div class="input-group" style="flex:1;">
+                        <label>BPM (60 - 200)</label>
+                        <input type="number" id="track-bpm" value="120" min="60" max="200">
+                    </div>
+                    <div class="input-group" style="flex:1;">
+                        <label>Mood</label>
+                        <select id="track-vibe"></select>
+                    </div>
+                </div>
+                <button class="btn-primary w-100" onclick="MusicEngine.startTrack()">Create Session</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="release-modal" class="overlay hidden">
+        <div class="modal" style="width: 550px;">
+            <div class="modal-header">
+                <span><i data-lucide="disc"></i> Package Release</span>
+                <i data-lucide="x" class="close-icon" style="cursor:pointer;" onclick="UI.closeModal('release-modal')"></i>
+            </div>
+            <div class="modal-body scrollable" style="padding: 25px; max-height: 50vh;">
+                <div class="data-node flex-row gap-20" style="margin-bottom: 15px; align-items: stretch;">
+                    <div class="art-upload-box" id="art-preview-box" style="width: 120px; height: 120px; border-radius: 8px;">
+                        <input type="file" id="rel-art" accept="image/*" onchange="UI.handleImageUpload(event)">
+                        <span id="art-placeholder" style="flex-direction: column;"><i data-lucide="image"></i> Art</span>
+                    </div>
+                    <div class="flex-col gap-10" style="flex: 1; justify-content: center;">
+                        <div class="input-group" style="margin: 0;">
+                            <label>Release Title</label>
+                            <input type="text" id="rel-title" placeholder="e.g. Midnight Melancholy">
+                        </div>
+                        <div class="input-group" style="margin: 0;">
+                            <label>Format <span id="tracklist-req" class="text-muted">(1)</span></label>
+                            <select id="rel-format" onchange="UI.updateReleaseFormatUI()"></select>
+                        </div>
+                        <div class="input-group" style="margin: 0;">
+                            <label>Visuals Budget</label>
+                            <select id="rel-visuals"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="data-node flex-col" style="margin-bottom: 15px; padding: 20px;">
+                    <h4 style="margin-bottom: 15px; font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px;">Tracklist Selection</h4>
+                    <select id="vault-selector" onchange="DistroEngine.addTrackToPending()"></select>
+                    <div id="pending-tracklist" style="margin-top: 15px;"></div>
+                </div>
+                <div id="distro-options-list" class="data-node flex-col gap-10" style="padding: 20px; margin-bottom: 15px;"></div>
+            </div> 
+            <div class="modal-footer">
+                <button class="btn-primary w-100" style="font-size: 1.05rem; padding: 15px 0;" onclick="DistroEngine.submitRelease()">Sign Off & Deploy <i data-lucide="check-circle"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="overlay hidden" style="z-index: 1500;">
+        <div class="modal">
+            <div class="modal-header">
+                <span><i data-lucide="settings"></i> System Settings</span>
+                <i data-lucide="x" class="close-icon" onclick="UI.closeModal('settings-modal')"></i>
+            </div>
+            <div class="modal-body">
+                <div class="data-node flex-col" style="margin-bottom: 15px; padding: 15px;">
+                    <strong style="margin-bottom: 10px;">Save Data Management</strong>
+                    <button id="btn-toggle-autosave" class="btn-outline-green w-100" style="margin-bottom: 10px;" onclick="UI.toggleAutosave()"><i data-lucide="check-circle"></i> Autosave: ON</button>
+                    <div class="flex-row gap-10">
+                        <button class="btn-outline-purple" style="flex:1;" onclick="Engine.saveGame()"><i data-lucide="save"></i> Save</button>
+                        <button class="btn-outline-purple" style="flex:1;" onclick="Engine.loadGame()"><i data-lucide="download"></i> Load</button>
+                    </div>
+                    <button class="btn-outline-red w-100" style="margin-top: 10px;" onclick="Engine.resetGame()"><i data-lucide="alert-triangle"></i> Hard Reset</button>
+                </div>
+                <div class="input-group" style="margin-bottom: 0;">
+                    <label>Admin Terminal</label>
+                    <div class="flex-row gap-10">
+                        <input type="text" id="admin-code-input" placeholder="Type AUTH <password> to unlock..." style="flex:1;">
+                        <button class="btn-outline-purple" onclick="Engine.executeCheat()">Run</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="life-modal" class="overlay hidden" style="z-index: 1300;">
+        <div class="modal">
+            <div class="modal-header">
+                <span id="life-modal-title"><i data-lucide="activity"></i> Life Action</span>
+                <i data-lucide="x" class="close-icon" onclick="UI.closeModal('life-modal')"></i>
+            </div>
+            <div class="modal-body" style="text-align: center; padding: 25px;">
+                <div id="job-info-box" class="data-node flex-col" style="padding: 15px; margin-bottom: 15px; display: none;">
+                    <div class="flex-row-between">
+                        <div style="text-align: left;">
+                            <strong id="current-job-title" style="font-size: 1.1rem; color: var(--accent-yellow);">Barista</strong><br>
+                            <span id="current-job-desc" class="text-muted" style="font-size: 0.8rem;">$12/h | Low Stress</span>
+                        </div>
+                        <button class="btn-outline btn-small" onclick="PlayerActions.openJobSelector()"><i data-lucide="refresh-cw" style="width: 12px;"></i> Change</button>
+                    </div>
+                </div>
+                <div class="data-node flex-col" style="padding: 20px; margin-bottom: 15px;">
+                    <div class="text-muted" style="margin-bottom: 5px; font-weight: bold; letter-spacing: 1px;">DURATION</div>
+                    <div id="life-hours-display" style="font-size: 3rem; font-weight: 800; color: var(--text-main); font-family: var(--font-mono);">8</div>
+                    <div class="text-muted" style="margin-bottom: 15px;">HOURS</div>
+                    <input type="range" id="life-hours-slider" class="custom-range" min="1" max="12" value="8" step="1" oninput="UI.updateLifeSlider(this.value)">
+                </div>
+                <div class="data-node flex-row-between" style="padding: 15px 20px; margin-bottom: 20px; font-size: 0.9rem;">
+                    <span class="text-muted" style="font-weight:bold;">Projected Impact:</span>
+                    <div style="text-align: right;">
+                        <div id="life-impact-1" style="font-weight:bold; font-family: var(--font-mono);"></div>
+                        <div id="life-impact-2" style="font-size: 0.8rem; margin-top:4px; font-family: var(--font-mono);"></div>
+                    </div>
+                </div>
+                <button id="confirm-life-btn" class="btn-primary w-100">CONFIRM</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="job-modal" class="overlay hidden" style="z-index: 1400;">
+        <div class="modal">
+            <div class="modal-header">
+                <span><i data-lucide="briefcase"></i> Job Market</span>
+                <i data-lucide="x" class="close-icon" onclick="UI.closeModal('job-modal')"></i>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted">Choose your day job to fund your music career.</p>
+                <div id="job-list" class="flex-col gap-10 scrollable"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="event-modal" class="overlay hidden" style="z-index: 1000;">
+        <div id="event-box" class="modal">
+            <div class="modal-header"><span id="event-header-content"></span></div>
+            <div class="modal-body">
+                <p id="event-desc" style="font-size: 1.1rem; margin-bottom: 15px;"></p>
+                <div id="event-choices" class="flex-col gap-15"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="service-modal" class="overlay hidden" style="z-index: 1300;">
+        <div class="modal">
+            <div class="modal-header">
+                <span id="service-modal-title"><i data-lucide="briefcase"></i> Hire Professional</span>
+                <i data-lucide="x" class="close-icon" onclick="UI.closeModal('service-modal')"></i>
+            </div>
+            <div class="modal-body">
+                <p id="service-modal-desc" class="text-muted" style="margin-bottom: 10px;"></p>
+                <div class="input-group">
+                    <label>Target Session</label>
+                    <select id="service-target-select"></select>
+                </div>
+                <button id="confirm-service-btn" class="btn-primary w-100">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="action-blocker" class="overlay hidden" style="z-index: 9999;">
+        <div class="action-blocker-content">
+            <div class="loader-pulse-wrapper"><div class="loader-pulse"></div></div>
+            <div id="blocker-text" class="blocker-text">WORKING...</div>
+        </div>
+    </div>
+
+    <div id="sync-minigame" class="sync-overlay">
+        <div class="sync-container">
+            <div class="sync-label">STUDIO SESSION</div>
+            <div id="sync-track-name" class="sync-track-name"></div>
+            <div class="sync-bar">
+                <div id="sync-target" class="sync-target"></div>
+                <div id="sync-indicator" class="sync-indicator"></div>
+            </div>
+            <div class="sync-hint">Click or Space to Sync!</div>
+            <div id="sync-result" class="sync-result"></div>
+        </div>
+    </div>
+
+    <div id="system-alert-modal" class="overlay hidden" style="z-index: 1600;">
+        <div class="modal">
+            <div class="modal-header">
+                <span id="alert-title">SYSTEM MESSAGE</span>
+                <i data-lucide="x" class="close-icon" onclick="UI.closeModal('system-alert-modal')"></i>
+            </div>
+            <div class="modal-body" style="text-align: center; padding: 30px;">
+                <p id="alert-message" style="font-size: 1.1rem; margin-bottom: 20px; color: var(--text-main);"></p>
+                <button class="btn-primary w-100" onclick="UI.closeModal('system-alert-modal')">ACKNOWLEDGE</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="system-confirm-modal" class="overlay hidden" style="z-index: 1600;">
+        <div class="modal">
+            <div class="modal-header">
+                <span id="confirm-title">CONFIRM ACTION</span>
+                <i data-lucide="x" class="close-icon" onclick="UI.closeModal('system-confirm-modal')"></i>
+            </div>
+            <div class="modal-body" style="text-align: center; padding: 30px;">
+                <p id="confirm-message" style="font-size: 1.1rem; margin-bottom: 20px; color: var(--text-main);"></p>
+                <div class="flex-row gap-15">
+                    <button class="btn-outline w-100" onclick="UI.closeModal('system-confirm-modal')">CANCEL</button>
+                    <button id="confirm-yes-btn" class="btn-outline-red w-100">CONFIRM</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="session-setup-modal" class="overlay hidden" style="z-index: 1100;">
+        <div class="modal">
+            <div class="modal-header">
+                <span><i data-lucide="clock"></i> Studio Session</span>
+                <i data-lucide="x" class="close-icon" onclick="UI.closeModal('session-setup-modal')"></i>
+            </div>
+            <div class="modal-body" style="text-align: center; padding: 25px;">
+                <div class="data-node flex-col" style="padding: 20px; margin-bottom: 15px;">
+                    <div class="text-muted" style="margin-bottom: 5px; font-weight: bold; letter-spacing: 1px;">SESSION DURATION</div>
+                    <div id="session-hours-display" style="font-size: 3rem; font-weight: 800; color: var(--text-main); font-family: var(--font-mono);">3</div>
+                    <div class="text-muted" style="margin-bottom: 15px;">HOURS</div>
+                    <input type="range" id="session-hours-slider" class="custom-range" min="1" max="5" value="3" step="1" oninput="UI.updateSessionSlider(this.value)">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 15px; font-style: italic;"><i data-lucide="info" style="width:12px; height:12px;"></i> 1 Hour = 1 In-Game Tick</div>
+                </div>
+                <div class="data-node flex-row-between" style="padding: 15px 20px; margin-bottom: 20px; font-size: 0.9rem;">
+                    <span class="text-muted" style="font-weight:bold;">Estimated Costs:</span>
+                    <div style="text-align: right;">
+                        <div id="session-energy-cost" style="font-weight:bold; font-family: var(--font-mono);"></div>
+                        <div id="session-stress-cost" style="font-size: 0.8rem; margin-top: 4px; font-family: var(--font-mono);"></div>
+                    </div>
+                </div>
+                <button id="confirm-session-btn" class="btn-primary w-100">START SESSION</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="contract-modal" class="overlay hidden" style="z-index: 1400;">
+        <div class="modal">
+            <div class="modal-header">
+                <span><i data-lucide="file-signature"></i> Review Contract</span>
+                <i data-lucide="x" class="close-icon" onclick="UI.closeModal('contract-modal')"></i>
+            </div>
+            <div class="modal-body" style="text-align: center; padding: 25px;">
+                <h3 id="contract-title">Title</h3>
+                <p id="contract-desc" class="text-muted" style="margin-top: 10px; margin-bottom: 20px;"></p>
+                <div class="flex-row-between" style="font-family: var(--font-mono); margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px;">
+                    <span class="text-green" style="display: inline-flex; align-items: center; gap: 6px;">Reward: $<span id="contract-reward"></span></span>
+                    <span class="text-red" style="display: inline-flex; align-items: center; gap: 6px;">Penalty: -$<span id="contract-penalty"></span></span>
+                    <span class="text-yellow" style="display: inline-flex; align-items: center; gap: 6px;"><i data-lucide="clock" style="width:14px; height:14px;"></i> <span id="contract-time"></span> Days</span>
+                </div>
+                <button class="btn-primary w-100" onclick="ChallengeEngine.acceptContract()">SIGN CONTRACT</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="rename-modal" class="overlay hidden" style="z-index: 1500;">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="flex-row gap-10"><i data-lucide="edit-3"></i> Rename Master</span>
+                <i data-lucide="x" class="close-icon" style="cursor:pointer;" onclick="UI.closeModal('rename-modal')"></i>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label>New Track Title</label>
+                    <input type="text" id="rename-track-input" placeholder="Enter new title...">
+                    <input type="hidden" id="rename-track-id">
+                </div>
+                <button class="btn-primary w-100" onclick="UI.confirmRename()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="visual-modal" class="overlay hidden" style="z-index: 1400;">
+        <div class="modal">
+            <div class="modal-header">
+                <span><i data-lucide="video"></i> Upgrade Visuals</span>
+                <i data-lucide="x" class="close-icon" onclick="UI.closeModal('visual-modal')"></i>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted">Select a new visual format for <span id="visual-modal-release-name" class="text-main font-bold"></span>.</p>
+                <div id="visual-options-list" class="flex-col gap-10 scrollable"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,442 @@
+{
+  "settings": {
+    "streamPayoutRate": 0.0033,
+    "studioProgressPerHour": 15,
+    "studioEnergyCostPerHour": 9,
+    "studioStressGainPerHour": 4,
+    "waitEnergyCostPerHour": 0,
+    "waitStressGainPerHour": 3,
+    "rentIntervalDays": 30,
+    "debtPenaltyStress": 10,
+    "botNames": [
+      "Lil Neural", "The Weekday", "Data Cartel", "AI Drake", "Bedroom Pop Guy",
+      "Jpeg.exe", "Cash Carti Clone", "LoFi Girl", "Synth Lord", "AfroKing V2",
+      "Olivia Dropdrigo", "Industry Plant", "Yeat Clone", "Vaporwave Bot",
+      "Yung Algorithm", "AutoTune Demon", "Spotify Curator 04"
+    ],
+    "genres": ["Hip-Hop", "R&B", "Pop", "Afrobeats", "EDM", "Alternative", "Latin", "Synthwave", "Indie Rock", "Phonk", "Drill", "Hyperpop"],
+    "moods": ["Aggressive", "Bounce", "Chill", "Cinematic", "Dark", "Dreamy", "Euphoric", "Groovy", "Melancholic", "Upbeat", "Nostalgic", "Sad", "Trippy"]
+  },
+
+  "properties": [
+    { "id": "prop_basement", "title": "Parents' Basement", "rent": 0, "maxGear": 2, "maxBoxes": 500, "hypeBoost": 0.8, "reqFans": 0, "desc": "Free, but Mom keeps interrupting your vocal takes. (-20% Hype)" },
+    { "id": "prop_bedroom", "title": "Bedroom Studio", "rent": 800, "maxGear": 5, "maxBoxes": 1500, "hypeBoost": 1.0, "reqFans": 0, "desc": "A standard apartment. Your neighbors hate the bass." },
+    { "id": "prop_garage", "title": "Shared Art Space", "rent": 1350, "maxGear": 7, "maxBoxes": 3500, "hypeBoost": 1.05, "reqFans": 15000, "desc": "A grimy industrial space shared with painters. Good vibes." },
+    { "id": "prop_warehouse", "title": "Warehouse Loft", "rent": 2800, "maxGear": 12, "maxBoxes": 15000, "hypeBoost": 1.25, "reqFans": 50000, "desc": "Exposed brick looks great on TikTok. (+25% Hype)" },
+    { "id": "prop_commercial", "title": "Commercial HQ", "rent": 8500, "maxGear": 99, "maxBoxes": 50000, "hypeBoost": 1.8, "reqFans": 500000, "desc": "A professional compound. Unlimited gear space. (+80% Hype)" }
+  ],
+
+  "jobs": [
+    { "id": "fulltime", "title": "Full-Time Artist", "desc": "Quit your day job. Focus entirely on the music. No wage, but zero energy drain.", "wage": 0, "energyDrain": 0, "stressGain": 0, "reqFans": 10000 },
+    { "id": "barista", "title": "Barista", "desc": "Steady tips, low stress. Good for early days.", "wage": 12, "energyDrain": 4, "stressGain": 2, "reqFans": 0 },
+    { "id": "uber", "title": "Rideshare Driver", "desc": "Decent money, but sitting in traffic drains your soul.", "wage": 14, "energyDrain": 5, "stressGain": 3, "reqFans": 0 },
+    { "id": "data", "title": "Data Entry", "desc": "Mind-numbing but consistent. High mental fatigue.", "wage": 15, "energyDrain": 3, "stressGain": 5, "reqFans": 0 },
+    { "id": "warehouse", "title": "Warehouse Worker", "desc": "Heavy lifting, decent pay. Your body will hate you.", "wage": 18, "energyDrain": 8, "stressGain": 4, "reqFans": 0 },
+    { "id": "audio", "title": "Freelance Audio Tech", "desc": "Live shows and recording sessions. Good money.", "wage": 32, "energyDrain": 5, "stressGain": 5, "reqFans": 15000 },
+    { "id": "jingle", "title": "Corporate Jingle Writer", "desc": "Selling out to write ads. Great pay, soul-crushing.", "wage": 55, "energyDrain": 4, "stressGain": 12, "reqFans": 35000 },
+    { "id": "ghost", "title": "Ghost Producer", "desc": "Making hits for pop stars. No credit, huge checks.", "wage": 120, "energyDrain": 7, "stressGain": 8, "reqFans": 80000 }
+  ],
+
+  "staff": [
+    { "id": "staff_merch", "title": "Fulfillment Manager", "cost": 1500, "wage": 100, "reqFans": 15000, "desc": "Packs and ships all physical orders automatically. Prevents the daily fulfillment energy drain.", "icon": "package" },
+    { "id": "staff_pr", "title": "Publicist", "cost": 3000, "wage": 350, "reqFans": 50000, "desc": "Keeps your name in the blogs. Halves daily Hype decay and boosts all Promo/Social fan gains by 25%.", "icon": "megaphone" },
+    { "id": "staff_manager", "title": "Booking Manager", "cost": 5000, "wage": 400, "reqFans": 100000, "desc": "Hustles for leads. Automatically generates industry contracts on the board without spending energy.", "icon": "briefcase" },
+    { "id": "staff_ghost", "title": "In-House Producer", "cost": 10000, "wage": 1200, "reqFans": 250000, "desc": "Passively adds quality points and progress to your active studio sessions every day.", "icon": "headphones" }
+  ],
+
+  "perks": [
+    { "id": "writer",  "title": "Fast Writer",      "desc": "+25% Lyrics gain in studio" },
+    { "id": "mixer",   "title": "Audio Nerd",       "desc": "+25% Mixing gain in studio" },
+    { "id": "social",  "title": "Social Butterfly", "desc": "+20% Fan gain from all promotions" },
+    { "id": "sleeper", "title": "Deep Sleeper",     "desc": "+20% Energy recovered during sleep" }
+  ],
+
+  "services": [
+    { "id": "writer1", "title": "Session Musician", "desc": "Hired gun to lay down chords. (+15 Writing)", "cost": 150, "capType": "writing", "boost": 15, "icon": "music", "color": "orange" },
+    { "id": "writer2", "title": "Topline Writer", "desc": "Industry pro writes your melodies. (+35 Writing)", "cost": 450, "capType": "writing", "boost": 35, "icon": "pen-tool", "color": "orange" },
+    { "id": "writer3", "title": "Industry Ghostwriter", "desc": "Guaranteed platinum pen. (+55 Writing)", "cost": 1200, "capType": "writing", "boost": 55, "icon": "edit-3", "color": "orange" },
+    { "id": "vocalist", "title": "Vocal Coach", "desc": "Warms up your voice for the take. (+25 Recording)", "cost": 300, "capType": "recording", "boost": 25, "icon": "mic", "color": "green" },
+    { "id": "mixer1", "title": "Mix Engineer", "desc": "Sends stems to a pro mixer. (+35 Mixing)", "cost": 500, "capType": "mixing", "boost": 35, "icon": "sliders", "color": "blue" },
+    { "id": "mixer2", "title": "Mastering House", "desc": "Commercial loudness and analog warmth. (+60 Mixing)", "cost": 1200, "capType": "mixing", "boost": 60, "icon": "layers", "color": "blue" }
+  ],
+
+  "releaseFormats": [
+    { "id": "Single", "title": "Single", "min": 1, "max": 2, "reqSingles": 0, "reqEps": 0, "reqFans": 0, "hypeMult": 1.0 },
+    { "id": "EP", "title": "EP", "min": 3, "max": 6, "reqSingles": 3, "reqEps": 0, "reqFans": 1000, "hypeMult": 1.5 },
+    { "id": "Mixtape", "title": "Mixtape", "min": 7, "max": 12, "reqSingles": 5, "reqEps": 1, "reqFans": 5000, "hypeMult": 2.0 },
+    { "id": "Album", "title": "Studio Album", "min": 10, "max": 20, "reqSingles": 8, "reqEps": 2, "reqFans": 25000, "hypeMult": 3.0 },
+    { "id": "Double", "title": "Double LP", "min": 21, "max": 40, "reqSingles": 15, "reqEps": 3, "reqFans": 100000, "hypeMult": 4.5 }
+  ],
+
+  "distroOptions": [
+    { "id": "sc", "title": "SoundCloud & YouTube", "badge": "FREE", "badgeColor": "green", "desc": "Instant release. Builds early fans. No streaming revenue.", "cost": 0, "delay": 0, "reqFans": 0, "distroBoost": 0.2 },
+    { "id": "dk", "title": "Standard DSP (Spotify / Apple)", "badge": "$35", "badgeColor": "orange", "desc": "+5 Days Delivery. Fully monetized streams.", "cost": 35, "delay": 5, "reqFans": 0, "distroBoost": 1.0 },
+    { "id": "pitch", "title": "Editorial Pitch", "badge": "$150", "badgeColor": "purple", "desc": "+21 Days. Pitched directly to editors. Massive algorithm boost.", "cost": 150, "delay": 21, "reqFans": 5000, "distroBoost": 2.5 },
+    { "id": "major", "title": "Major Label Campaign", "badge": "$4000", "badgeColor": "red", "desc": "+30 Days. Billboards, Radio, Global playlists.", "cost": 4000, "delay": 30, "reqFans": 150000, "distroBoost": 6.5 }
+  ],
+
+  "promos": [
+    { "id": "playlist", "title": "Curator Playlist Pitch", "cost": 150, "reqFans": 0, "fansMin": 200, "fansMax": 500, "hype": 0.1, "desc": "+ STEADY STREAMS", "color": "green" },
+    { "id": "ad", "title": "TikTok Ad Campaign", "cost": 400, "reqFans": 5000, "fansMin": 500, "fansMax": 1500, "hype": 0.6, "desc": "+ MASSIVE HYPE", "color": "purple" },
+    { "id": "meme", "title": "Meme Page Shoutout", "cost": 800, "reqFans": 15000, "fansMin": 1200, "fansMax": 3000, "hype": 0.8, "desc": "+ VIRAL SPREAD", "color": "orange" },
+    { "id": "pr", "title": "PR Agency Stunt", "cost": 1500, "reqFans": 35000, "fansMin": 2000, "fansMax": 5500, "hype": 1.5, "desc": "+ HUGE BOOM", "color": "yellow" },
+    { "id": "billboard", "title": "Times Square Billboard", "cost": 5000, "reqFans": 100000, "fansMin": 5000, "fansMax": 12000, "hype": 3.0, "desc": "+ GLOBAL PRESENCE", "color": "blue" }
+  ],
+
+  "challengeTemplates": [
+    { "id": "speed_track", "title": "Quick Turnaround", "desc": "Finish any studio session within 4 days.", "timeLimitDays": 4, "reward": 800, "penalty": 200, "targetType": "finish_track", "targetValue": null },
+    { "id": "quality_track", "title": "High Fidelity", "desc": "Master a track with a Quality Rating above 50.", "timeLimitDays": 8, "reward": 1500, "penalty": 400, "targetType": "quality_track", "targetValue": 50 },
+    { "id": "radio_hit", "title": "Radio Hit Directive", "desc": "The label needs a smash hit. Master a track with a Quality Rating above 75.", "timeLimitDays": 14, "reward": 5000, "penalty": 1200, "targetType": "quality_track", "targetValue": 75 },
+    { "id": "ep_drop", "title": "Project Rollout", "desc": "Package and deploy a multi-track EP release.", "timeLimitDays": 14, "reward": 3000, "penalty": 1000, "targetType": "release_format", "targetValue": "EP" },
+    { "id": "album_mode", "title": "Album Mode", "desc": "The fans are starving. Package and deploy a full Studio Album.", "timeLimitDays": 30, "reward": 12000, "penalty": 4000, "targetType": "release_format", "targetValue": "Album" }
+  ],
+
+  "visualOptions": [
+    { "id": "none", "title": "No Video", "desc": "Let the music speak.", "cost": 0, "hypeBoost": 1.0, "reqFans": 0 },
+    { "id": "lyric", "title": "Animated Lyric Video", "desc": "Keeps viewers engaged longer.", "cost": 150, "hypeBoost": 1.15, "reqFans": 0 },
+    { "id": "diy", "title": "DIY iPhone Shoot", "desc": "Gritty, authentic, low budget.", "cost": 400, "hypeBoost": 1.35, "reqFans": 0 },
+    { "id": "studio", "title": "Live Studio Performance", "desc": "Showcases your raw talent and gear.", "cost": 900, "hypeBoost": 1.5, "reqFans": 2000 },
+    { "id": "3d", "title": "3D Blender Visualizer", "desc": "Trendy internet aesthetic.", "cost": 1500, "hypeBoost": 1.7, "reqFans": 10000 },
+    { "id": "pro", "title": "Pro Music Video", "desc": "Cinematic. A statement release.", "cost": 3500, "hypeBoost": 2.3, "reqFans": 35000 },
+    { "id": "film", "title": "Short Film Production", "desc": "A cultural moment.", "cost": 15000, "hypeBoost": 3.8, "reqFans": 300000 }
+  ],
+
+  "gear": [
+    { "id": "gw1", "type": "Writing & Comp", "name": "Basic MIDI Keyboard", "capIncrease": 8, "capType": "writing", "cost": 120, "reqFans": 0 },
+    { "id": "gw2", "type": "Writing & Comp", "name": "Hardware Drum Machine", "capIncrease": 15, "capType": "writing", "cost": 450, "reqFans": 0 },
+    { "id": "gw3", "type": "Writing & Comp", "name": "Analog Synthesizer", "capIncrease": 22, "capType": "writing", "cost": 1100, "reqFans": 0 },
+    { "id": "gw4", "type": "Writing & Comp", "name": "Orchestral VST Library", "capIncrease": 30, "capType": "writing", "cost": 3000, "reqFans": 0 },
+    { "id": "gw5", "type": "Writing & Comp", "name": "Vintage Moog Modular", "capIncrease": 45, "capType": "writing", "cost": 8500, "reqFans": 0 },
+    
+    { "id": "gr1", "type": "Recording", "name": "USB Condenser Mic", "capIncrease": 8, "capType": "recording", "cost": 150, "reqFans": 0 },
+    { "id": "gr2", "type": "Recording", "name": "Dynamic Mic (SM7B)", "capIncrease": 15, "capType": "recording", "cost": 400, "reqFans": 0 },
+    { "id": "gr3", "type": "Recording", "name": "Vocal Isolation Shield", "capIncrease": 20, "capType": "recording", "cost": 800, "reqFans": 0 },
+    { "id": "gr4", "type": "Recording", "name": "Tube-Tech CL1B Compressor", "capIncrease": 35, "capType": "recording", "cost": 3500, "reqFans": 0 },
+    { "id": "gr_tube", "type": "Recording", "name": "Vintage Tube Microphone", "capIncrease": 42, "capType": "recording", "cost": 6500, "reqFans": 0 },
+    { "id": "gr5", "type": "Recording", "name": "Sony C800G + Neve 1073", "capIncrease": 50, "capType": "recording", "cost": 12000, "reqFans": 0 },
+
+    { "id": "gm1", "type": "Mixing & Mastering", "name": "Consumer Headphones", "capIncrease": 5, "capType": "mixing", "cost": 80, "reqFans": 0 },
+    { "id": "gm2", "type": "Mixing & Mastering", "name": "Studio Monitors (HS5)", "capIncrease": 12, "capType": "mixing", "cost": 450, "reqFans": 0 },
+    { "id": "gm_sub", "type": "Mixing & Mastering", "name": "Studio Subwoofer", "capIncrease": 16, "capType": "mixing", "cost": 800, "reqFans": 0 },
+    { "id": "gm3", "type": "Mixing & Mastering", "name": "Room Acoustic Panels", "capIncrease": 20, "capType": "mixing", "cost": 1200, "reqFans": 0 },
+    { "id": "gm4", "type": "Mixing & Mastering", "name": "Analog Summing Mixer", "capIncrease": 35, "capType": "mixing", "cost": 4000, "reqFans": 0 },
+    { "id": "gm5", "type": "Mixing & Mastering", "name": "Solid State Logic Console", "capIncrease": 55, "capType": "mixing", "cost": 22000, "reqFans": 0 }
+  ],
+  
+  "merch": [
+    { 
+      "id": "m_cassette", "category": "physical", "title": "Limited Cassette Run", 
+      "desc": "High nostalgia. Must be linked to an EP or Album.", 
+      "batchSize": 100, "costPerBatch": 300, "retailPrice": 12, 
+      "demandFactor": 0.5, "reqFans": 5000, "icon": "cassette-tape"
+    },
+    { 
+      "id": "m_cd", "category": "physical", "title": "Standard Jewel CDs", 
+      "desc": "The bread and butter of physical sales.", 
+      "batchSize": 250, "costPerBatch": 750, "retailPrice": 15, 
+      "demandFactor": 0.8, "reqFans": 15000, "icon": "disc-album"
+    },
+    { 
+      "id": "m_vinyl", "category": "physical", "title": "12\" Colored Vinyl", 
+      "desc": "Expensive to press, but Superfans will buy this instantly.", 
+      "batchSize": 500, "costPerBatch": 4500, "retailPrice": 35, 
+      "demandFactor": 1.5, "reqFans": 75000, "icon": "disc"
+    },
+    { 
+      "id": "m_poster", "category": "apparel", "title": "Signed Posters", 
+      "desc": "Cheap to print, massive margins. Great for early cash flow.", 
+      "batchSize": 200, "costPerBatch": 400, "retailPrice": 25, 
+      "demandFactor": 0.9, "reqFans": 10000, "icon": "image"
+    },
+    { 
+      "id": "m_shirt", "category": "apparel", "title": "Graphic T-Shirts", 
+      "desc": "The classic merch item. Consistent seller.", 
+      "batchSize": 100, "costPerBatch": 1000, "retailPrice": 35, 
+      "demandFactor": 1.1, "reqFans": 25000, "icon": "shirt"
+    },
+    { 
+      "id": "m_apparel", "category": "apparel", "title": "Premium Heavyweight Hoodies", 
+      "desc": "High quality streetwear for your dedicated cult following.", 
+      "batchSize": 50, "costPerBatch": 1500, "retailPrice": 75, 
+      "demandFactor": 1.4, "reqFans": 50000, "icon": "shopping-bag"
+    }
+  ],
+
+  "achievements": [
+    { "id": "a1", "category": "Streaming", "title": "First 10K Streams", "desc": "Hit 10,000 total lifetime streams.", "reward": 1000, "condition": { "target": "stats.totalStreams", "operator": ">=", "value": 10000 } },
+    { "id": "a2", "category": "Streaming", "title": "Buzzing (100K Streams)", "desc": "Hit 100,000 total lifetime streams.", "reward": 3000, "condition": { "target": "stats.totalStreams", "operator": ">=", "value": 100000 } },
+    { "id": "a3", "category": "Streaming", "title": "Platinum (1M Streams)", "desc": "Hit 1,000,000 total lifetime streams.", "reward": 15000, "condition": { "target": "stats.totalStreams", "operator": ">=", "value": 1000000 } },
+    { "id": "a4", "category": "Streaming", "title": "Diamond (10M Streams)", "desc": "Hit 10,000,000 total lifetime streams.", "reward": 100000, "condition": { "target": "stats.totalStreams", "operator": ">=", "value": 10000000 } },
+    { "id": "a5", "category": "Streaming", "title": "Icon Status (100M Streams)", "desc": "Hit 100,000,000 total lifetime streams.", "reward": 500000, "condition": { "target": "stats.totalStreams", "operator": ">=", "value": 100000000 } },
+    
+    { "id": "f1", "category": "Fame", "title": "Local Hero", "desc": "Reach 5,000 fans.", "reward": 500, "condition": { "target": "player.followers", "operator": ">=", "value": 5000 } },
+    { "id": "f2", "category": "Fame", "title": "Cult Following", "desc": "Reach 50,000 fans.", "reward": 5000, "condition": { "target": "player.followers", "operator": ">=", "value": 50000 } },
+    { "id": "f3", "category": "Fame", "title": "Superstar", "desc": "Reach 1,000,000 fans.", "reward": 50000, "condition": { "target": "player.followers", "operator": ">=", "value": 1000000 } },
+    { "id": "f4", "category": "Fame", "title": "Global Phenomenon", "desc": "Reach 5,000,000 fans.", "reward": 250000, "condition": { "target": "player.followers", "operator": ">=", "value": 5000000 } },
+    
+    { "id": "c1", "category": "Collection", "title": "Gearhead", "desc": "Purchase 8 pieces of studio equipment.", "reward": 2500, "condition": { "target": "gear.owned", "operator": ">=", "value": 8 } },
+    { "id": "c2", "category": "Collection", "title": "Studio Executive", "desc": "Purchase 15 pieces of studio equipment.", "reward": 10000, "condition": { "target": "gear.owned", "operator": ">=", "value": 15 } },
+    { "id": "c3", "category": "Collection", "title": "The First Bag", "desc": "Earn $10,000 from music royalties & merch.", "reward": 2000, "condition": { "target": "stats.totalRevenue", "operator": ">=", "value": 10000 } },
+    { "id": "c4", "category": "Collection", "title": "Millionaire", "desc": "Earn $1,000,000 from music royalties & merch.", "reward": 100000, "condition": { "target": "stats.totalRevenue", "operator": ">=", "value": 1000000 } },
+    
+    { "id": "r1", "category": "Releases", "title": "The Grind", "desc": "Release your first Mixtape.", "reward": 1500, "condition": { "target": "stats.mixtapes", "operator": ">=", "value": 1 } },
+    { "id": "r2", "category": "Releases", "title": "Workaholic", "desc": "Release your first Studio Album.", "reward": 5000, "condition": { "target": "stats.albums", "operator": ">=", "value": 1 } },
+    { "id": "r3", "category": "Releases", "title": "Veteran", "desc": "Release 5 Studio Albums.", "reward": 25000, "condition": { "target": "stats.albums", "operator": ">=", "value": 5 } },
+    { "id": "r4", "category": "Releases", "title": "Magnum Opus", "desc": "Release a Double LP.", "reward": 20000, "condition": { "target": "stats.doubles", "operator": ">=", "value": 1 } },
+
+    { "id": "ch1", "category": "Challenges", "title": "First Bounty", "desc": "Complete 1 industry contract.", "reward": 200, "condition": { "target": "stats.completedChallenges", "operator": ">=", "value": 1 } },
+    { "id": "ch2", "category": "Challenges", "title": "Hustler", "desc": "Complete 5 industry contracts.", "reward": 500, "condition": { "target": "stats.completedChallenges", "operator": ">=", "value": 5 } },
+    { "id": "ch3", "category": "Challenges", "title": "Industry Mercenary", "desc": "Complete 15 industry contracts.", "reward": 2500, "condition": { "target": "stats.completedChallenges", "operator": ">=", "value": 15 } }
+  ],
+
+  "statuses": {
+    "creative_flow": { "name": "Creative Flow", "desc": "+50% Studio Progress", "icon": "zap", "color": "yellow", "modifiers": { "studioMult": 1.5 } },
+    "writer_block": { "name": "Writer's Block", "desc": "-50% Studio Progress", "icon": "brain", "color": "orange", "modifiers": { "studioMult": 0.5 } },
+    "wrist_strain": { "name": "Wrist Strain", "desc": "-50% Studio Progress", "icon": "activity", "color": "red", "modifiers": { "studioMult": 0.5 } },
+    "banned_dsp": { "name": "Shadowbanned", "desc": "-90% DSP Streams", "icon": "slash", "color": "red", "modifiers": { "dspMult": 0.1 } },
+    "viral_boost": { "name": "Viral Algorithm", "desc": "2x DSP Algorithm Push", "icon": "trending-up", "color": "purple", "modifiers": { "hypeMult": 2.0 } },
+    "tiktok_trend": { "name": "TikTok Trending Sound", "desc": "2.5x Algorithm Push across all platforms", "icon": "smartphone", "color": "purple", "modifiers": { "hypeMult": 2.5 } },
+    "sync_hype": { "name": "TV Sync Placement", "desc": "3x DSP Algorithm Push", "icon": "tv", "color": "green", "modifiers": { "hypeMult": 3.0 } },
+    "360_deal": { "name": "360 Label Deal", "desc": "Label takes 80% of your streams.", "icon": "file-text", "color": "red", "modifiers": { "dspMult": 0.2 } },
+    "label_marketing": { "name": "Major Marketing", "desc": "Label is pushing your tracks (+2.5x Hype).", "icon": "megaphone", "color": "blue", "modifiers": { "hypeMult": 2.5 } },
+    "cancelled": { "name": "Cancelled Online", "desc": "-70% DSP Algorithm Push. Everyone hates you.", "icon": "thumbs-down", "color": "red", "modifiers": { "hypeMult": 0.3 } },
+    "industry_plant": { "name": "Industry Plant Allegations", "desc": "Hated by purists, but the algorithm LOVES you (4x Hype).", "icon": "leaf", "color": "green", "modifiers": { "hypeMult": 4.0 } }
+  },
+
+  "events": {
+    "job": [
+      {
+        "id": "work_injury",
+        "title": "Work Injury",
+        "type": "bad",
+        "desc": "You strained your wrist on the job. It's going to hurt to produce.",
+        "actions": [
+          { "type": "modify", "stat": "energy", "value": -20 },
+          { "type": "add_status", "statusId": "wrist_strain", "duration": 72 }
+        ]
+      },
+      {
+        "id": "overtime_bonus",
+        "title": "Overtime Bonus",
+        "type": "good",
+        "desc": "Your boss handed you a cash bonus for your hard work.",
+        "actions": [{ "type": "modify_percent", "stat": "money", "percent": 0.1, "min": 100 }]
+      },
+      {
+        "id": "job_fired_threat",
+        "title": "Final Warning",
+        "type": "bad",
+        "desc": "Your manager caught you sleeping in the breakroom. You were docked a day's pay and given a final warning.",
+        "conditions": [{ "target": "player.energy", "operator": "<", "value": 20 }],
+        "actions": [
+          { "type": "modify_percent", "stat": "money", "percent": -0.05, "min": -150 },
+          { "type": "modify", "stat": "burnout", "value": 20 }
+        ]
+      }
+    ],
+
+    "studio": [
+      {
+        "id": "late_night_lock_in",
+        "title": "Late Night Lock-In",
+        "type": "event",
+        "desc": "It's 3 AM. The studio is quiet and the track is almost there. Do you push through or sleep?",
+        "conditions": [
+          { "target": "hour", "operator": ">=", "value": 2 },
+          { "target": "hour", "operator": "<", "value": 5 },
+          { "target": "activeTracks", "operator": ">", "value": 0 }
+        ],
+        "choices": [
+          { "label": "Push Through (+Flow, -Nrg)", "actions": [{ "type": "modify", "stat": "energy", "value": -30 }, { "type": "add_status", "statusId": "creative_flow", "duration": 8 }] },
+          { "label": "Go To Bed", "actions": [{ "type": "modify", "stat": "burnout", "value": -10 }] }
+        ]
+      },
+      {
+        "id": "daw_crash",
+        "title": "DAW Crash",
+        "type": "bad",
+        "desc": "The software froze. You lost significant session progress.",
+        "conditions": [{ "target": "activeTracks", "operator": ">", "value": 0 }],
+        "actions": [{ "type": "daw_crash", "burnout": 15, "progress_loss": 0.4 }]
+      },
+      {
+        "id": "burnout_warning",
+        "title": "Mental Exhaustion",
+        "type": "bad",
+        "desc": "You've been staring at screens too long. You literally cannot write a good melody right now.",
+        "conditions": [{ "target": "player.burnout", "operator": ">=", "value": 75 }],
+        "actions": [{ "type": "add_status", "statusId": "writer_block", "duration": 48 }]
+      }
+    ],
+
+    "social": [
+      {
+        "id": "shady_promoter",
+        "title": "Shady Promoter",
+        "type": "event",
+        "desc": "Someone offers 5,000 streams for $150. It could trigger the algorithm, or get you shadowbanned by Spotify.",
+        "conditions": [
+          { "target": "flag.seen_promoter", "operator": "==", "value": 0 },
+          { "target": "player.followers", "operator": ">", "value": 500 }
+        ],
+        "choices": [
+          { "label": "Pay $150 (50/50 Risk)", "actions": [
+              { "type": "modify", "stat": "money", "value": -150 },
+              { "type": "set_flag", "flag": "seen_promoter", "value": 1 },
+              { "type": "random_pool", "outcomes": [
+                  { "chance": 0.5, "actions": [{ "type": "add_status", "statusId": "viral_boost", "duration": 48 }] },
+                  { "chance": 0.5, "actions": [{ "type": "add_status", "statusId": "banned_dsp", "duration": 168 }] }
+              ]}
+            ] 
+          },
+          { "label": "Ignore", "actions": [{ "type": "set_flag", "flag": "seen_promoter", "value": 1 }] }
+        ]
+      },
+      {
+        "id": "artist_beef",
+        "title": "Internet Beef",
+        "type": "event",
+        "desc": "A slightly larger artist just insulted your latest track on Twitter. The timeline is waiting for your response.",
+        "conditions": [
+          { "target": "player.followers", "operator": ">", "value": 20000 },
+          { "target": "flag.had_beef", "operator": "==", "value": 0 }
+        ],
+        "choices": [
+          { "label": "Drop a Diss Track (-Nrg, +Hype)", "actions": [
+              { "type": "modify", "stat": "energy", "value": -50 },
+              { "type": "modify", "stat": "burnout", "value": 25 },
+              { "type": "add_status", "statusId": "viral_boost", "duration": 72 },
+              { "type": "set_flag", "flag": "had_beef", "value": 1 }
+            ] 
+          },
+          { "label": "Take the High Road (-Hype)", "actions": [
+              { "type": "modify_percent", "stat": "hype", "percent": -0.2, "min": -0.5 },
+              { "type": "set_flag", "flag": "had_beef", "value": 1 }
+            ] 
+          }
+        ]
+      },
+      {
+        "id": "tiktok_trend_event",
+        "title": "Random Viral Audio",
+        "type": "good",
+        "desc": "A random TikToker with 2M followers used your song for a makeup tutorial. It's trending!",
+        "conditions": [
+          { "target": "player.followers", "operator": ">", "value": 15000 },
+          { "target": "stats.totalStreams", "operator": ">", "value": 100000 }
+        ],
+        "actions": [
+          { "type": "add_status", "statusId": "tiktok_trend", "duration": 96 },
+          { "type": "modify", "stat": "followers", "value": 5000 }
+        ]
+      },
+      {
+        "id": "cancel_culture",
+        "title": "Cancel Culture Strikes",
+        "type": "event",
+        "desc": "An old, extremely edgy tweet of yours just resurfaced. People are calling for your music to be removed.",
+        "conditions": [
+          { "target": "player.followers", "operator": ">", "value": 50000 },
+          { "target": "flag.cancelled_once", "operator": "==", "value": 0 }
+        ],
+        "choices": [
+          { "label": "Apologize Publicly", "actions": [
+              { "type": "modify_percent", "stat": "hype", "percent": -0.4, "min": -1.5 },
+              { "type": "modify", "stat": "burnout", "value": 40 },
+              { "type": "set_flag", "flag": "cancelled_once", "value": 1 }
+            ] 
+          },
+          { "label": "Double Down & Troll", "actions": [
+              { "type": "set_flag", "flag": "cancelled_once", "value": 1 },
+              { "type": "random_pool", "outcomes": [
+                  { "chance": 0.3, "actions": [{ "type": "add_status", "statusId": "industry_plant", "duration": 120 }, { "type": "modify_percent", "stat": "followers", "percent": 0.15, "min": 1000 }] },
+                  { "chance": 0.7, "actions": [{ "type": "add_status", "statusId": "cancelled", "duration": 240 }, { "type": "modify_percent", "stat": "followers", "percent": -0.15, "min": -5000 }] }
+              ]}
+            ] 
+          }
+        ]
+      },
+      {
+        "id": "label_deal",
+        "title": "The Devil's Contract",
+        "type": "event",
+        "desc": "A Major Label A&R wants to sign you. They are offering a $50,000 cash advance and massive marketing, but they will take 80% of your royalties for the next 2 months.",
+        "conditions": [
+          { "target": "player.followers", "operator": ">=", "value": 100000 },
+          { "target": "flag.label_offer", "operator": "==", "value": 0 }
+        ],
+        "choices": [
+          { "label": "Sign the 360 Deal (+$50k)", "actions": [
+              { "type": "modify", "stat": "money", "value": 50000 },
+              { "type": "add_status", "statusId": "label_marketing", "duration": 1440 },
+              { "type": "add_status", "statusId": "360_deal", "duration": 1440 },
+              { "type": "set_flag", "flag": "label_offer", "value": 1 }
+            ] 
+          },
+          { "label": "Stay Independent", "actions": [
+              { "type": "modify", "stat": "followers", "value": 15000 },
+              { "type": "set_flag", "flag": "label_offer", "value": 1 }
+            ] 
+          }
+        ]
+      }
+    ],
+
+    "global": [
+      {
+        "id": "equipment_failure",
+        "title": "Equipment Failure",
+        "type": "bad",
+        "desc": "Something in the studio broke. The repair cost scales with how expensive your setup is.",
+        "conditions": [{ "target": "gear.owned", "operator": ">=", "value": 1 }],
+        "actions": [
+          { "type": "modify_percent", "stat": "money", "percent": -0.08, "min": -80 },
+          { "type": "modify", "stat": "burnout", "value": 5 }
+        ]
+      },
+      {
+        "id": "tax_season",
+        "title": "Tax Season",
+        "type": "bad",
+        "desc": "The government noticed your recent success. They just audited you and auto-deducted 15% of your bank account.",
+        "conditions": [
+          { "target": "player.money", "operator": ">", "value": 15000 }
+        ],
+        "actions": [
+          { "type": "modify_percent", "stat": "money", "percent": -0.15, "min": -1000 },
+          { "type": "modify", "stat": "burnout", "value": 25 }
+        ]
+      },
+      {
+        "id": "festival_booking",
+        "title": "Festival Booking",
+        "type": "good",
+        "desc": "A major festival booker loved your momentum and booked you for a 30-minute afternoon slot! You got paid and gained new fans.",
+        "conditions": [
+          { "target": "player.hype", "operator": ">", "value": 1.5 },
+          { "target": "player.followers", "operator": ">", "value": 25000 }
+        ],
+        "actions": [
+          { "type": "modify_percent", "stat": "money", "percent": 0.20, "min": 2500 },
+          { "type": "modify_percent", "stat": "followers", "percent": 0.05, "min": 1500 },
+          { "type": "modify", "stat": "burnout", "value": 30 }
+        ]
+      },
+      {
+        "id": "sync_placement",
+        "title": "TV Sync Placement!",
+        "type": "good",
+        "desc": "A music supervisor heard your track and licensed it for a scene in a new Netflix teen drama! They wired you a sync fee.",
+        "conditions": [
+          { "target": "stats.totalStreams", "operator": ">=", "value": 50000 },
+          { "target": "flag.first_sync", "operator": "==", "value": 0 }
+        ],
+        "actions": [
+          { "type": "modify", "stat": "money", "value": 8500 },
+          { "type": "add_status", "statusId": "sync_hype", "duration": 168 },
+          { "type": "set_flag", "flag": "first_sync", "value": 1 }
+        ]
+      }
+    ]
+  }
+}
