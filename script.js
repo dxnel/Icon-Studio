@@ -1114,7 +1114,7 @@ const MusicEngine = {
                 }
                 function onKey(e) { if (e.code === 'Space') { e.preventDefault(); finish(); } }
                 document.addEventListener('keydown', onKey);
-                overlay.addEventListener('click', finish);
+                overlay.addEventListener('pointerdown', finish);
             });
         });
     },

@@ -53,7 +53,7 @@
                 <button class="nav-btn" onclick="UI.switchTab('world')"><i data-lucide="globe"></i> Charts</button>
             </nav>
             <div class="sidebar-bottom">
-                <button class="nav-btn" onclick="UI.openModal('settings-modal')"><i data-lucide="settings"></i> System Settings</button>
+                <button class="nav-btn" onclick="UI.openModal('settings-modal')"><i data-lucide="settings"></i> Settings</button>
             </div>
         </aside>
 
@@ -64,6 +64,7 @@
                     <div class="time-bar-bg"><div id="day-progress" class="time-bar-fill"></div></div>
                 </div>
                 <div class="hud-vitals">
+                   <div class="vital-separator"></div>
                     <div id="money-container" class="vitals-money-wrapper">
                         <i data-lucide="wallet" class="text-green"></i>
                         <div class="money-text-group">
@@ -238,7 +239,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="panel grid-span-full mt-10">
+                    <div class="panel grid-span-full">
                         <div class="panel-header"><span><i data-lucide="megaphone"></i> Paid Promotion Campaigns</span></div>
                         <div id="promo-list" class="panel-content grid-3-col gap-15"></div>
                     </div>
@@ -252,7 +253,7 @@
                             <div id="hq-list" class="grid-3-col gap-15"></div>
                         </div>
                     </div>
-                    <div class="panel grid-span-full mt-10">
+                    <div class="panel grid-span-full">
                         <div class="panel-header"><span><i data-lucide="users"></i> The Entourage (Staff)</span></div>
                         <div class="panel-content">
                             <p class="text-muted" style="margin-bottom: 20px;">Hire professionals to automate your empire. Staff charge a daily wage deducted at the end of the day.</p>
