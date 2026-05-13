@@ -31,6 +31,9 @@ body {
     overflow: hidden; 
     font-size: 14px; 
     letter-spacing: 0.2px;
+    touch-action: manipulation; /* Improves tap response time */
+    -webkit-text-size-adjust: 100%; /* Prevents font-size jumping */
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 input, select, textarea, button { 
@@ -327,7 +330,7 @@ input:focus, select:focus { border-color: var(--accent-purple); background: rgba
 
 
 .stat-gauge { padding: 15px !important; }
-.stat-gauge .current-val { font-size: 1.6rem !important; margin-top: 5px !important; }
+.stat-gauge .current-val { font-size: 1.4rem !important; margin-top: 5px !important; }
 .stat-gauge .stat-header i { width: 18px; height: 18px; }
 
 .progress-bar-bg { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.05); }
@@ -503,7 +506,7 @@ input[type="range"].custom-range::-moz-range-thumb { margin-top: 0; }
     .trend-header { font-size: 0.65rem; margin-bottom: 8px; }
     .trend-data { font-size: 0.8rem; padding: 4px 8px; }
     .stat-gauge { padding: 15px !important; } 
-    .stat-gauge .current-val { font-size: 1.5rem !important; margin-top: 5px !important; }
+    .stat-gauge .current-val { font-size: 1rem !important; margin-top: 5px !important; }
     .grid-3-col { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
 }
 
@@ -532,44 +535,39 @@ input[type="range"].custom-range::-moz-range-thumb { margin-top: 0; }
     .brand, .nav-section-title { display: none !important; }
     
     .nav-menu { 
-        flex-direction: row; flex: 1; padding: 0 5px; overflow-x: auto; 
-        overflow-y: hidden; align-items: center; gap: 4px; justify-content: space-around;
+        flex-direction: row; flex: 1; padding: 0 10px; overflow-x: auto; 
+        overflow-y: hidden; align-items: center; gap: 8px; justify-content: space-between;
     }
     .nav-menu::-webkit-scrollbar { display: none; }
     
     .nav-btn { 
-        flex-direction: column; min-height: 50px; flex: 1; 
-        padding: 6px 0; justify-content: center; align-items: center;
-        border-radius: 12px; border: none; gap: 0;
-        font-size: 0 !important; /* Text is invisible by default */
+        flex-direction: row; /* Changed to row for a better pill */
+        min-height: 44px; flex: 1; 
+        padding: 0; justify-content: center; align-items: center;
+        border-radius: 22px; border: none; gap: 0;
+        font-size: 0 !important; 
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         color: var(--text-muted);
         background: transparent;
     }
     
-    .nav-btn i, .nav-btn svg { 
-        width: 24px !important; height: 24px !important; margin: 0 !important; 
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
+    .nav-btn i, .nav-btn svg { width: 20px !important; height: 20px !important; margin: 0 !important; transition: all 0.3s ease; }
     .nav-btn.active::before { display: none; } 
     
-    /* ✨ The Magic Active State ✨ */
     .nav-btn.active { 
-        background: rgba(176,91,255,0.1); 
+        background: rgba(176,91,255,0.15); 
         color: var(--accent-purple);
-        font-size: 0.45rem !important; /* Text grows into view */
+        font-size: 0.7rem !important; 
         font-weight: 700;
-        gap: 4px; /* Creates spacing between icon and text */
-        flex: 1.5; /* Makes the active tab smoothly expand wider than the rest */
+        gap: 6px; 
+        flex: 1.8; 
+        padding: 0 15px; /* Gives the pill breathing room */
     }
     
-    .nav-btn.active i, .nav-btn.active svg {
-        width: 20px !important; height: 20px !important; /* Shrinks icon slightly to balance height */
-    }
+    .nav-btn.active i, .nav-btn.active svg { width: 18px !important; height: 18px !important; }
     
-    .sidebar-bottom { padding: 0 5px; border: none; display: flex; align-items: center; }
-    .sidebar-bottom .nav-btn { min-width: 50px; flex: 0 0 auto; }
+    .sidebar-bottom { padding: 0 10px; border: none; display: flex; align-items: center; }
+    .sidebar-bottom .nav-btn { min-width: 44px; flex: 0 0 auto; }
 
     /* 4. COMPACT TOP HUD (NATIVE APP STYLE) */
     .top-hud { height: auto; padding: 12px; flex-direction: column; gap: 10px; align-items: stretch; background: var(--bg-card); }
@@ -598,10 +596,17 @@ input[type="range"].custom-range::-moz-range-thumb { margin-top: 0; }
     .stat-bar-label { font-size: 0.7rem; margin-bottom: 2px; }
     .stat-bar-bg { width: 100%; height: 6px; }
     
-    /* Row 5: Actions */
-    .hud-actions { width: 100%; gap: 8px; margin-top: 4px; display: flex; }
-    .hud-actions button { flex: 1; padding: 8px 4px; font-size: 0.75rem; min-height: 38px; border-radius: 6px; background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); }
-    .hud-actions button i { width: 14px; height: 14px; }
+   /* Row 5: Actions */
+    .hud-actions { width: 100%; gap: 6px; margin-top: 0px; display: flex; }
+    .hud-actions button {     flex: 1;
+    padding: 15px 10px;
+    font-size: 0.9rem;
+    min-height: 32px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.03);
+    border-color: rgba(255,255,255,0.1); }
+    .hud-actions button i { width: 12px; height: 12px; }
+    
 
     /* 5. WORKSPACE & GRID DESTRUCTION */
     .workspace { padding: 15px 10px; overflow-y: auto; overflow-x: hidden; }
@@ -613,30 +618,14 @@ input[type="range"].custom-range::-moz-range-thumb { margin-top: 0; }
     .panel { height: auto; min-height: auto; }
     
     /* 6. SPECIFIC UI FIXES */
-    .profile-card .panel-content { flex-direction: column !important; align-items: center; text-align: center; }
-    .market-trend-box { width: 100%; align-items: center; margin-top: 15px; }
-    .stat-gauge { flex-direction: row; align-items: center; justify-content: space-between; padding: 15px; }
-    .stat-gauge .current-val { font-size: 1.5rem !important; margin: 0 !important; }
+    .profile-card .panel-content { flex-direction: column !important; align-items: center; text-align: center; padding: 15px !important; gap: 10px !important; }
+    .avatar-wrapper { width: 60px !important; height: 60px !important; } /* Tiny mobile avatar */
+    #profile-name { font-size: 1.3rem !important; }
+    .market-trend-box { width: 100%; align-items: center; margin-top: 5px; padding: 10px; min-width: 0; }
+    .sidebar-bottom { margin-top: 0px !important; justify-content: center; }
+    .stat-gauge { flex-direction: row; align-items: center; justify-content: space-between; padding: 12px 15px !important; }
+    .stat-gauge .current-val { font-size: 1.2rem !important; margin: 0 !important; }
     
     /* Force the 3 stat gauges in the Studio to stack vertically so they don't crush */
     .data-node > div[style*="display: flex; gap: 8px;"] { flex-direction: column; gap: 10px !important; }
-    
-    /* Release Card Fixes */
-    .release-manage-card { flex-direction: column; text-align: center; gap: 15px; }
-    .release-stats-group { border-right: none; border-bottom: 1px dashed rgba(255,255,255,0.1); padding: 0 0 15px 0; width: 100%; flex-direction: row; justify-content: space-evenly; }
-    .release-manage-card > .flex-col:last-child { width: 100%; }
-
-    /* Chart Table Fix */
-    .chart-table { font-size: 0.75rem; }
-    .chart-table th, .chart-table td { padding: 10px 5px; }
-    .chart-wrapper { overflow-x: auto; min-height: 250px; }
-
-    /* Modals */
-    .modal { width: 95vw !important; max-height: 85dvh; }
-    .modal-body { padding: 15px; }
-    .modal-header, .modal-footer { padding: 15px; }
-    
-    /* Fix weird overlap in Release Modal */
-    .data-node.flex-row.gap-20 { flex-direction: column !important; align-items: center; text-align: center; }
-    .art-upload-box { width: 100px !important; height: 100px !important; }
 }
