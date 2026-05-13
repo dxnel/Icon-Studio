@@ -176,7 +176,7 @@ input:focus, select:focus { border-color: var(--accent-purple); background: rgba
 #os-environment { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
 
 .sidebar { width: 240px; background: rgba(0,0,0, 0.4); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; z-index: 10; flex-shrink: 0; }
-.brand { padding: 25px 20px; font-weight: 800; font-size: 1.3rem; display: flex; align-items: center; gap: 12px; color: #fff; letter-spacing: -0.5px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+.brand { height: 70px; padding: 25px 20px; font-weight: 800; font-size: 1.3rem; display: flex; align-items: center; gap: 12px; color: #fff; letter-spacing: -0.5px; }
 .brand i { color: var(--accent-purple); }
 .nav-menu { padding: 20px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto;}
 .nav-section-title { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; padding-left: 10px;}
