@@ -403,7 +403,7 @@ input:focus, select:focus { border-color: var(--accent-purple); background: rgba
 
 .modal { 
     background: var(--bg-card); border: 1px solid var(--border-color); 
-    border-radius: var(--radius-l); width: 420px; max-width: 90vw; max-height: 90vh;
+    border-radius: var(--radius-l); width: 420px; max-width: 90vw; max-height: 70vh;
     box-shadow: 0 25px 80px rgba(0,0,0,0.8); display: flex; flex-direction: column;
     transform: scale(0.95) translateY(10px); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
 }
@@ -557,9 +557,7 @@ input[type="range"].custom-range::-moz-range-thumb { margin-top: 0; }
     .nav-btn.active { 
         background: rgba(176,91,255,0.15); 
         color: var(--accent-purple);
-        font-size: 0.7rem !important; 
         font-weight: 700;
-        gap: 6px; 
         flex: 1.8; 
         padding: 0 15px; /* Gives the pill breathing room */
     }
