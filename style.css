@@ -325,6 +325,11 @@ input:focus, select:focus { border-color: var(--accent-purple); background: rgba
 .stat-gauge-track { width: 100%; height: 4px; background: rgba(255, 255, 255, 0.05); border-radius: 2px; overflow: visible; }
 .stat-gauge-fill { height: 100%; border-radius: 2px; transition: width 0.3s ease, background-color 0.3s ease; }
 
+
+.stat-gauge { padding: 15px !important; }
+.stat-gauge .current-val { font-size: 1.6rem !important; margin-top: 5px !important; }
+.stat-gauge .stat-header i { width: 18px; height: 18px; }
+
 .progress-bar-bg { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.05); }
 .progress-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 0 10px rgba(176, 91, 255, 0.3); }
 
@@ -502,8 +507,136 @@ input[type="range"].custom-range::-moz-range-thumb { margin-top: 0; }
     .grid-3-col { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
 }
 
-@media screen and (max-height: 700px) {
-    .top-hud { height: 55px; }
-    .workspace { padding: 10px; }
-   
+/* ======================================================= */
+/* 📱 ULTIMATE MOBILE OVERHAUL (max-width: 768px)          */
+/* ======================================================= */
+
+@media screen and (max-width: 768px) {
+    
+    /* 1. DISABLE APPLE ORIENTATION BLOCKER */
+    #orientation-warning { display: none !important; }
+    #os-environment, #onboarding-modal { display: flex !important; }
+    
+    /* 2. REVERSE LAYOUT (Sidebar moves to bottom) */
+    #os-environment { flex-direction: column; }
+    .main-container { order: 1; flex: 1; min-height: 0; }
+    
+    .sidebar { 
+        order: 2; width: 100%; height: 65px; flex-direction: row; 
+        border-right: none; border-top: 1px solid var(--border-color); 
+        background: rgba(18, 18, 24, 0.98); padding: 0; z-index: 100;
+        flex-shrink: 0;
+    }
+
+    /* 3. HORIZONTAL BOTTOM NAVIGATION (EXPANDING PILL DESIGN) */
+    .brand, .nav-section-title { display: none !important; }
+    
+    .nav-menu { 
+        flex-direction: row; flex: 1; padding: 0 5px; overflow-x: auto; 
+        overflow-y: hidden; align-items: center; gap: 4px; justify-content: space-around;
+    }
+    .nav-menu::-webkit-scrollbar { display: none; }
+    
+    .nav-btn { 
+        flex-direction: column; min-height: 50px; flex: 1; 
+        padding: 6px 0; justify-content: center; align-items: center;
+        border-radius: 12px; border: none; gap: 0;
+        font-size: 0 !important; /* Text is invisible by default */
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        color: var(--text-muted);
+        background: transparent;
+    }
+    
+    .nav-btn i, .nav-btn svg { 
+        width: 24px !important; height: 24px !important; margin: 0 !important; 
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .nav-btn.active::before { display: none; } 
+    
+    /* ✨ The Magic Active State ✨ */
+    .nav-btn.active { 
+        background: rgba(176,91,255,0.1); 
+        color: var(--accent-purple);
+        font-size: 0.45rem !important; /* Text grows into view */
+        font-weight: 700;
+        gap: 4px; /* Creates spacing between icon and text */
+        flex: 1.5; /* Makes the active tab smoothly expand wider than the rest */
+    }
+    
+    .nav-btn.active i, .nav-btn.active svg {
+        width: 20px !important; height: 20px !important; /* Shrinks icon slightly to balance height */
+    }
+    
+    .sidebar-bottom { padding: 0 5px; border: none; display: flex; align-items: center; }
+    .sidebar-bottom .nav-btn { min-width: 50px; flex: 0 0 auto; }
+
+    /* 4. COMPACT TOP HUD (NATIVE APP STYLE) */
+    .top-hud { height: auto; padding: 12px; flex-direction: column; gap: 10px; align-items: stretch; background: var(--bg-card); }
+    
+    /* Row 1: Time & Progress */
+    .hud-time { width: 100%; flex-direction: row; align-items: center; justify-content: space-between; gap: 15px; margin: 0; }
+    .time-text { font-size: 0.85rem; margin: 0; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+    .time-bar-bg { flex: 1; margin: 0; max-width: none; }
+    
+    /* Row 2: Status Tray */
+    #status-tray { width: 100%; justify-content: flex-start; margin: 0; padding: 0 4px; }
+
+    /* Row 3 & 4: Vitals Grid */
+    .hud-vitals { width: 100%; margin: 0; padding: 0; border: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .vital-separator { display: none !important; }
+    
+    /* Money Block (Full Width) */
+    .vitals-money-wrapper { grid-column: span 2; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.25); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); margin: 0; }
+    .money-text-group { flex-direction: row; gap: 10px; align-items: baseline; }
+    #vitals-money { font-size: 1.1rem; }
+    #rent-countdown { font-size: 0.7rem; }
+    
+    /* Energy & Stress Blocks (Side by Side) */
+    .vital-stat { flex-direction: column; align-items: stretch; background: rgba(0,0,0,0.25); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); gap: 6px; min-width: 0; }
+    .vital-stat i { display: none; } /* Hide icons to save space */
+    .stat-bar-label { font-size: 0.7rem; margin-bottom: 2px; }
+    .stat-bar-bg { width: 100%; height: 6px; }
+    
+    /* Row 5: Actions */
+    .hud-actions { width: 100%; gap: 8px; margin-top: 4px; display: flex; }
+    .hud-actions button { flex: 1; padding: 8px 4px; font-size: 0.75rem; min-height: 38px; border-radius: 6px; background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); }
+    .hud-actions button i { width: 14px; height: 14px; }
+
+    /* 5. WORKSPACE & GRID DESTRUCTION */
+    .workspace { padding: 15px 10px; overflow-y: auto; overflow-x: hidden; }
+    .tab-content { display: none; flex-direction: column; gap: 15px !important; height: auto; }
+    .tab-content.active { display: flex !important; }
+    
+    .grid-3-col, .grid-4-col { display: flex; flex-direction: column; gap: 15px; }
+    .grid-span-2, .grid-span-full { grid-column: auto; }
+    .panel { height: auto; min-height: auto; }
+    
+    /* 6. SPECIFIC UI FIXES */
+    .profile-card .panel-content { flex-direction: column !important; align-items: center; text-align: center; }
+    .market-trend-box { width: 100%; align-items: center; margin-top: 15px; }
+    .stat-gauge { flex-direction: row; align-items: center; justify-content: space-between; padding: 15px; }
+    .stat-gauge .current-val { font-size: 1.5rem !important; margin: 0 !important; }
+    
+    /* Force the 3 stat gauges in the Studio to stack vertically so they don't crush */
+    .data-node > div[style*="display: flex; gap: 8px;"] { flex-direction: column; gap: 10px !important; }
+    
+    /* Release Card Fixes */
+    .release-manage-card { flex-direction: column; text-align: center; gap: 15px; }
+    .release-stats-group { border-right: none; border-bottom: 1px dashed rgba(255,255,255,0.1); padding: 0 0 15px 0; width: 100%; flex-direction: row; justify-content: space-evenly; }
+    .release-manage-card > .flex-col:last-child { width: 100%; }
+
+    /* Chart Table Fix */
+    .chart-table { font-size: 0.75rem; }
+    .chart-table th, .chart-table td { padding: 10px 5px; }
+    .chart-wrapper { overflow-x: auto; min-height: 250px; }
+
+    /* Modals */
+    .modal { width: 95vw !important; max-height: 85dvh; }
+    .modal-body { padding: 15px; }
+    .modal-header, .modal-footer { padding: 15px; }
+    
+    /* Fix weird overlap in Release Modal */
+    .data-node.flex-row.gap-20 { flex-direction: column !important; align-items: center; text-align: center; }
+    .art-upload-box { width: 100px !important; height: 100px !important; }
 }
