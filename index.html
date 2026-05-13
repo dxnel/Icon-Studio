@@ -63,8 +63,12 @@
                     <div id="clock-display" class="time-text">DAY 1 • 08:00</div>
                     <div class="time-bar-bg"><div id="day-progress" class="time-bar-fill"></div></div>
                 </div>
+                
+                <div class="vital-separator" style="margin: 0 20px;"></div>
+                <div id="status-tray" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;"></div>
+
                 <div class="hud-vitals">
-                   <div class="vital-separator"></div>
+                  <div class="vital-separator"></div>
                     <div id="money-container" class="vitals-money-wrapper">
                         <i data-lucide="wallet" class="text-green"></i>
                         <div class="money-text-group">
@@ -89,7 +93,6 @@
                         </div>
                     </div>
                     <div class="vital-separator"></div>
-                    <div id="status-tray" style="display: flex; gap: 10px; align-items: center; min-width: 40px; flex-wrap: wrap;"></div>
                 </div>
                 <div class="hud-actions">
                     <button id="btn-action-work" class="btn-outline" onclick="PlayerActions.openLifeModal('work')"><i data-lucide="coffee"></i> Work</button>
