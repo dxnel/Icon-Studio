@@ -1660,6 +1660,17 @@ const UI = {
         el.classList.add('active-overlay');
     },
     closeModal(id) { 
+        
+        if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT')) {
+            document.activeElement.blur();
+        }
+        
+        
+        setTimeout(() => {
+            window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+            document.body.scrollTop = 0;
+        }, 50);
+
         const el = document.getElementById(id);
         el.classList.remove('active-overlay');
         setTimeout(() => el.classList.add('hidden'), 300); 
@@ -2284,4 +2295,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     UI.populateDropdowns();
     UI.renderServices();
     UI.initCustomSelects();
+    
+    document.addEventListener('focusout', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+            }, 100);
+        }
+    });
 });
