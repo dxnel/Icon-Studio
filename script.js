@@ -224,9 +224,25 @@ const Engine = {
             gear: Game.config.gear, 
             achievements: Game.config.achievements
         };
-        localStorage.setItem('studioOS_save', JSON.stringify(saveData));
-        if (!silent) {
-            UI.showAlert("Game Saved", "Your progress has been stored locally.");
+        
+        try {
+            // On essaie de sauvegarder
+            localStorage.setItem('studioOS_save', JSON.stringify(saveData));
+            
+            // Si ça marche et que ce n'est pas silencieux, on affiche le succès
+            if (!silent) {
+                UI.showAlert("Game Saved", "Your progress has been stored locally.");
+            }
+        } catch (error) {
+            // Si ça plante (ex: Stockage plein à cause des images)
+            console.error("Save failed:", error);
+            
+            // On force l'affichage d'une alerte, même si c'était un autosave silencieux
+            if (error.name === 'QuotaExceededError' || error.code === 22) {
+                UI.showAlert("Save Failed: Storage Full", "Your save file is too large! This usually happens when uploading high-resolution custom cover arts. Try using smaller images.");
+            } else {
+                UI.showAlert("Save Failed", "An unknown error prevented the game from saving. Check the console.");
+            }
         }
     },
     loadGame(fromBoot = false) {
