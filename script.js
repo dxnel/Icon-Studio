@@ -17,6 +17,47 @@ const Game = {
         }
     }
 };
+const ImageCompressor = {
+    compress(file, maxDimension, quality, callback) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                // Calcul du ratio pour ne pas déformer l'image
+                if (width > height) {
+                    if (width > maxDimension) {
+                        height = Math.round(height * (maxDimension / width));
+                        width = maxDimension;
+                    }
+                } else {
+                    if (height > maxDimension) {
+                        width = Math.round(width * (maxDimension / height));
+                        height = maxDimension;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                
+                // On remplit le fond en noir au cas où c'est un PNG transparent (car on convertit en JPEG)
+                ctx.fillStyle = "#121218"; 
+                ctx.fillRect(0, 0, width, height);
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // On exporte en JPEG (beaucoup plus léger que PNG) avec la qualité choisie
+                const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+                callback(compressedBase64);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+};
 
 class LogicEvaluator {
     static resolvePath(path, obj) {
@@ -1837,9 +1878,23 @@ const UI = {
         setTimeout(() => floater.remove(), 1500);
     },
     handleAvatarUpload(e) {
-        const file = e.target.files[0]; if(!file) return; const reader = new FileReader();
-        reader.onload = (event) => { Engine.state.player.avatar = event.target.result; UI.updateVitals(); }; 
-        reader.readAsDataURL(file);
+        const file = e.target.files[0]; 
+        if(!file) return; 
+        
+        ImageCompressor.compress(file, 200, 0.8, (compressedData) => {
+            Engine.state.player.avatar = compressedData; 
+            UI.updateVitals(); 
+        });
+    },
+
+    handleImageUpload(e) {
+        const file = e.target.files[0]; 
+        if(!file) return; 
+        
+        ImageCompressor.compress(file, 300, 0.8, (compressedData) => {
+            Engine.artBuffer = compressedData; 
+            document.getElementById('art-preview-box').innerHTML = `<input type="file" id="rel-art" accept="image/*" onchange="UI.handleImageUpload(event)"><img src="${Engine.artBuffer}">`; 
+        });
     },
     updateLifeSlider(val) {
         document.getElementById('life-hours-display').innerText = val;
@@ -2440,10 +2495,7 @@ catalog.innerHTML = catHtml;
             document.getElementById('tracklist-req').innerText = `(${formatObj.min}${formatObj.max > formatObj.min ? '-' + formatObj.max : ''})`;
         }
     },
-    handleImageUpload(e) {
-        const file = e.target.files[0]; if(!file) return; const reader = new FileReader();
-        reader.onload = (event) => { Engine.artBuffer = event.target.result; document.getElementById('art-preview-box').innerHTML = `<input type=\"file\" id=\"rel-art\" accept=\"image/*\" onchange=\"UI.handleImageUpload(event)\"><img src=\"${Engine.artBuffer}\">`; }; reader.readAsDataURL(file);
-    },
+    
     renderReleases() {
         const pipeList = document.getElementById('pipeline-list'); 
         const liveList = document.getElementById('live-discography-list');
