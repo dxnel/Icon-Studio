@@ -761,8 +761,8 @@ input[type="range"].custom-range::-moz-range-thumb { margin-top: 0; }
         gap: 8px !important; 
     }
     .vital-stat i { margin: 0 !important; width: 14px !important; height: 14px !important; }
-    .stat-bar-container { gap: 3px !important; display: flex !important; flex-direction: column !important; width: 100% !important; }
-    .stat-bar-label { font-size: 0.65rem !important; display: flex !important; justify-content: space-between !important; }
+    .stat-bar-container {display: flex !important; flex-direction: column !important; width: 100% !important; }
+    .stat-bar-label { font-size: 0.8rem !important; display: flex !important; justify-content: space-between !important; }
     .stat-bar-bg { height: 4px !important; width: 100% !important; }
     
     .hud-actions { 
@@ -1079,5 +1079,7 @@ input[type="range"].custom-range::-moz-range-thumb { margin-top: 0; }
     
     /* On réduit un peu la barre de temps pour laisser de l'air aux boutons */
     .time-bar-bg { height: 2px !important; }
+
+    .sync-container { width: 90vw !important; max-width: 350px !important; padding: 30px 20px !important; }
     
 }
