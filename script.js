@@ -471,6 +471,59 @@ const Engine = {
             default:
                 UI.showAlert("Access Denied", "Invalid Admin Command.");
                 break;
+                case "STRESS-TEST":
+    // 1. Remplir le Studio (Sessions actives)
+    for (let i = 1; i <= 50; i++) {
+        let t = new Track(`Stress Track ${i}`, "Hyperpop", 160, "Aggressive");
+        t.progress = Math.floor(Math.random() * 90);
+        t.lyrics = 10; t.prod = 10; t.mix = 10;
+        Engine.state.tracks.push(t);
+    }
+
+    // 2. Remplir le Vault (Masters prêts)
+    for (let i = 1; i <= 50; i++) {
+        let t = new Track(`Vault Monster ${i}`, "Drill", 140, "Dark");
+        t.status = 'Ready';
+        t.lyrics = 50; t.prod = 50; t.mix = 50;
+        Engine.state.tracks.push(t);
+    }
+
+    // 3. Remplir les contrats (Board)
+    for (let i = 1; i <= 50; i++) {
+        Engine.state.availableContracts.push({
+            instanceId: 'stress_' + i,
+            title: `Evil Contract ${i}`,
+            desc: "This is a duplicated test lead to check scroll physics.",
+            reward: 9999,
+            penalty: 666,
+            timeLimitDays: 7
+        });
+    }
+
+    // 4. Remplir la Discographie (Releases live)
+    for (let i = 1; i <= 50; i++) {
+        let rel = new Release(`Classic Hit ${i}`, 'Single', [Engine.state.tracks[0]], null, ['dsp'], 'dk', Engine.state.day - 1);
+        rel.status = 'Live';
+        rel.streams = Math.floor(Math.random() * 1000000);
+        rel.revenue = rel.streams * 0.0033;
+        Engine.state.releases.push(rel);
+    }
+
+    // 5. Remplir l'Inventaire (Merch)
+    Game.config.merch.forEach(item => {
+        let key = item.id;
+        Engine.state.inventory[key] = 9999;
+    });
+
+    UI.showAlert("⚠️ STRESS TEST ACTIVÉ", "Toutes les zones de scroll sont maintenant saturées. Bonne chance pour le débug !");
+    
+    // Refresh global de l'UI
+    UI.renderStudio();
+    UI.renderVault();
+    UI.renderContracts();
+    UI.renderReleases();
+    UI.renderMerch();
+    break;
         }
         UI.closeModal('settings-modal');
     }
@@ -1370,19 +1423,32 @@ const UI = {
         Game.config.settings.moods.forEach(v => vibeSel.innerHTML += `<option value="${v}">${v}</option>`);
     },
     renderServices() {
-        const list = document.getElementById('services-list'); list.innerHTML = '';
+        const categories = ['writing', 'recording', 'mixing'];
+        const colorMap = { writing: 'orange', recording: 'green', mixing: 'blue' };
+        const iconMap = { writing: 'pen-tool', recording: 'mic', mixing: 'sliders' };
         if(!Game.config.services) return;
-        Game.config.services.forEach(s => {
-            list.innerHTML += `
-            <div class="data-node flex-col">
-              <div style="margin-bottom: 15px;">
-                <strong style="font-size: 1.05rem;">${s.title}</strong><br>
-                <span class="text-muted" style="display: block; margin-top: 8px;">${s.desc}</span>
-              </div>
-              <button class="btn-outline-${s.color} w-100 mt-auto" onclick="MarketEngine.hireService('${s.id}')">Hire ($${s.cost})</button>
-            </div>`;
+        
+        categories.forEach(cat => {
+            let container = document.getElementById(`pros-list-${cat}`);
+            if (!container) return;
+            let badgeColor = colorMap[cat];
+            let icon = iconMap[cat];
+            
+            // On réintègre le titre de la catégorie avec grid-span-full pour qu'il prenne toute la largeur !
+            container.innerHTML = `<div class="shop-category-header grid-span-full" style="--accent-color: var(--accent-${badgeColor});"><i data-lucide="${icon}" class="text-${badgeColor}"></i><span>${cat.toUpperCase()}</span></div>`;
+            
+            Game.config.services.filter(s => s.capType === cat).forEach(s => {
+                container.innerHTML += `
+                <div class="data-node flex-col">
+                  <div style="margin-bottom: 15px;">
+                    <strong style="font-size: 1.05rem;">${s.title}</strong><br>
+                    <span class="text-muted" style="display: block; margin-top: 8px;">${s.desc}</span>
+                  </div>
+                  <button class="btn-outline-${s.color} w-100 mt-auto" onclick="MarketEngine.hireService('${s.id}')">Hire ($${s.cost.toLocaleString()})</button>
+                </div>`;
+            });
         });
-        lucide.createIcons();
+        if(window.lucide) lucide.createIcons();
     },
     renderDistroOptions() {
         const list = document.getElementById('distro-options-list'); 
@@ -1452,7 +1518,7 @@ const UI = {
         if(!board) return;
         const desc = document.getElementById('contract-board-desc');
         if (desc) {
-            let costText = `<span class="font-bold">(Costs: <span class="text-orange">15 Energy</span> / <span class="text-blue">2 Hours</span>)</span>`;
+            let costText = `<span>(Costs: <span class="text-orange">15 Energy</span> / <span class="text-blue">2 Hours</span>)</span>`;
             if (Engine.state.staff.includes('staff_manager')) {
                 desc.innerHTML = `<span class="text-green" style="display: inline-flex; align-items: center; gap: 6px; margin-bottom: 4px;"><i data-lucide="briefcase" style="width:14px; height:14px;"></i> Your Booking Manager is automatically hustling for leads.</span><br>You can also manually network below. ${costText}`;
             } else {
@@ -1551,6 +1617,7 @@ const UI = {
         document.querySelectorAll('.tab-content, .nav-btn').forEach(el => el.classList.remove('active'));
         document.getElementById(`tab-${tabId}`).classList.add('active');
         document.querySelector(`.nav-btn[onclick="UI.switchTab('${tabId}')"]`).classList.add('active');
+        document.body.classList.remove('menu-open');
         if(tabId === 'dashboard' && Engine.chart) Engine.chart.resize();
     },
     async runCountdown() {
@@ -1777,20 +1844,116 @@ const UI = {
             document.getElementById('life-impact-2').innerHTML = `<span class="text-orange">-${val * job.energyDrain}% Nrg</span> | <span class="text-red">+${val * job.stressGain}% Stress</span>`;
         }
     },
+    switchMarketTab(tab) {
+        document.getElementById('btn-market-gear').className = tab === 'gear' ? 'market-top-tab active' : 'market-top-tab';
+        document.getElementById('btn-market-pros').className = tab === 'pros' ? 'market-top-tab active' : 'market-top-tab';
+        document.getElementById('market-gear-container').classList.toggle('hidden', tab !== 'gear');
+        document.getElementById('market-pros-container').classList.toggle('hidden', tab !== 'pros');
+    },
+    switchHQTab(tab) {
+        // 1. Boutons Actifs
+        document.getElementById('btn-hq-realestate').className = tab === 'realestate' ? 'market-top-tab active' : 'market-top-tab';
+        document.getElementById('btn-hq-staff').className = tab === 'staff' ? 'market-top-tab active' : 'market-top-tab';
+        
+        // 2. Textes Explicatifs (Statiques)
+        document.getElementById('hq-desc-realestate').classList.toggle('hidden', tab !== 'realestate');
+        document.getElementById('hq-desc-staff').classList.toggle('hidden', tab !== 'staff');
+        
+        // 3. Grilles (Scrollables)
+        document.getElementById('hq-realestate-container').classList.toggle('hidden', tab !== 'realestate');
+        document.getElementById('hq-staff-container').classList.toggle('hidden', tab !== 'staff');
+    },
+    toggleMenu() {
+        document.body.classList.toggle('menu-open');
+    },
+    filterMarket(filter) {
+        document.querySelectorAll('.market-filter-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.market-filter-btn[data-filter="${filter}"]`).classList.add('active');
+        
+        ['writing', 'recording', 'mixing'].forEach(cat => {
+            let isMatch = (filter === 'all') || (cat === filter);
+            document.getElementById(`gear-list-${cat}`).classList.toggle('hidden', !isMatch);
+            document.getElementById(`pros-list-${cat}`).classList.toggle('hidden', !isMatch);
+        });
+    },
+    filterMerch(filter) {
+    // 1. Gestion de l'état actif uniquement
+    document.querySelectorAll('.merch-filter-btn').forEach(btn => {
+        // On retire simplement la classe active. 
+        // On ne touche PAS à .style.opacity ni aux classes disabled.
+        btn.classList.remove('active');
+        
+        if (btn.dataset.filter === filter) {
+            btn.classList.add('active');
+        }
+    });
+
+    // 2. Logique de filtrage des sections (Headers et Grilles)
+    const catalog = document.getElementById('merch-catalog');
+    const headers = catalog.querySelectorAll('.shop-category-header');
+    
+    headers.forEach(h => {
+        const text = h.innerText.toUpperCase();
+        const isPhysical = text.includes("PHYSICAL");
+        const isApparel = text.includes("APPAREL") || text.includes("BRAND");
+        const grid = h.nextElementSibling;
+
+        let shouldShow = (filter === 'all') || 
+                         (filter === 'physical' && isPhysical) || 
+                         (filter === 'apparel' && isApparel);
+
+        h.classList.toggle('hidden', !shouldShow);
+        if (grid) grid.classList.toggle('hidden', !shouldShow);
+    });
+},
+    switchMilestoneTab(tab) {
+        document.getElementById('btn-milestones-active').className = tab === 'active' ? 'market-top-tab active' : 'market-top-tab';
+        document.getElementById('btn-milestones-completed').className = tab === 'completed' ? 'market-top-tab active' : 'market-top-tab';
+        document.getElementById('milestones-active-container').classList.toggle('hidden', tab !== 'active');
+        document.getElementById('milestones-completed-container').classList.toggle('hidden', tab !== 'completed');
+    },
+
+    filterMilestones(filter) {
+        // Gère l'effet "Allumé" sur le bouton cliqué
+        document.querySelectorAll('.milestone-filter-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.milestone-filter-btn[data-filter="${filter}"]`).classList.add('active');
+        
+        // Cache ou affiche les blocs correspondants
+        const categories = ['Releases', 'Streaming', 'Collection', 'Fame', 'Challenges'];
+        categories.forEach(cat => {
+            let isMatch = (filter === 'all') || (cat === filter);
+            let activeEl = document.getElementById(`milestones-active-${cat}`);
+            let compEl = document.getElementById(`milestones-completed-${cat}`);
+            if(activeEl) activeEl.classList.toggle('hidden', !isMatch);
+            if(compEl) compEl.classList.toggle('hidden', !isMatch);
+        });
+    },
     renderStudio() {
-        const list = document.getElementById('active-tracks'); list.innerHTML = ''; 
-        let active = Engine.state.tracks.filter(t => t.status === 'In Progress');
-        if(active.length === 0) { 
-            list.innerHTML = `<div class="empty-state"><i data-lucide="mic-off"></i><span>No active sessions.</span><span style="font-size: 0.8rem; opacity: 0.7;">Start a new session to create music.</span></div>`; 
-            lucide.createIcons(); return; 
-        }
-        if (Engine.state.staff.includes('staff_ghost') && active.length > 0) {
-            list.innerHTML += `
-                <div class="staff-banner banner-purple grid-span-full">
-                    <i data-lucide="headphones" style="width: 16px; height: 16px;"></i>
-                    <span><strong>Ghost Producer Active:</strong> He is passively improving track quality and progress in your active sessions.</span>
-                </div>`;
-        }
+        const list = document.getElementById('active-tracks'); 
+    const staticTop = document.querySelector('#tab-studio .panel-static-top'); // Cible la zone fixe
+    list.innerHTML = ''; 
+    
+    // Nettoyer les anciennes bannières avant d'en ajouter une
+    const oldBanner = staticTop.querySelector('.staff-banner');
+    if (oldBanner) oldBanner.remove();
+
+    let active = Engine.state.tracks.filter(t => t.status === 'In Progress');
+    
+    if(active.length === 0) { 
+        list.innerHTML = `<div class="empty-state"><i data-lucide="mic-off"></i><span>No active sessions.</span><span style="font-size: 0.8rem; opacity: 0.7;">Start a new session to create music.</span></div>`; 
+        lucide.createIcons(); return; 
+    }
+
+    // Injecter la bannière dans la zone STATIQUE (fixe)
+    if (Engine.state.staff.includes('staff_ghost') && active.length > 0) {
+        const banner = document.createElement('div');
+        banner.className = 'staff-banner banner-purple grid-span-full';
+        banner.style.marginTop = "15px";
+        banner.innerHTML = `
+            <i data-lucide="headphones" style="width: 16px; height: 16px;"></i>
+            <span><strong>Ghost Producer Active:</strong> He is passively improving track quality and progress in your active sessions.</span>`;
+        staticTop.appendChild(banner);
+    }
         active.forEach(t => {
             let pctLyr = Math.min(100, (t.lyrics / Engine.state.player.caps.writing) * 100);
             let pctRec = Math.min(100, (t.prod / Engine.state.player.caps.recording) * 100);
@@ -1798,12 +1961,16 @@ const UI = {
             let lyrColor = pctLyr >= 100 ? 'var(--accent-red)' : 'var(--accent-orange)';
             let recColor = pctRec >= 100 ? 'var(--accent-red)' : 'var(--accent-green)';
             let mixColor = pctMix >= 100 ? 'var(--accent-red)' : 'var(--accent-blue)';
+            
+            // NEW: Determine dynamic color based on the current stage
+            let stageBadgeColor = t.currentStage === 'Writing' ? 'orange' : (t.currentStage === 'Recording' ? 'green' : 'blue');
+
             list.innerHTML += `
                 <div class="data-node flex-col">
                     <div class="node-header">
                         <span>${t.title}</span>
                         <div class="flex-row gap-10">
-                            <span class="text-yellow" style="font-size:0.8rem; padding: 2px 8px; background: rgba(254, 211, 48, 0.1); border-radius: 12px;">${t.currentStage}</span>
+                            <span class="badge badge-${stageBadgeColor}">${t.currentStage}</span>
                         </div>
                     </div>
                     <div class="flex-row gap-10 flex-start" style="margin-bottom: 15px;">
@@ -1856,24 +2023,30 @@ const UI = {
         this.openModal('session-setup-modal'); 
     },
     renderGear() {
-        const list = document.getElementById('gear-list'); list.innerHTML = '';
         let currentProp = Game.config.properties.find(p => p.id === Engine.state.player.propertyId);
         let ownedCount = Game.config.gear.filter(x => x.owned).length;
         let capDisplay = document.getElementById('gear-capacity-display');
+        
         if (capDisplay) {
-            capDisplay.innerHTML = `<i data-lucide="box"></i> Space: ${ownedCount} / ${currentProp.maxGear}`;
-            if (ownedCount >= currentProp.maxGear) capDisplay.className = 'badge badge-outline text-red';
-            else capDisplay.className = 'badge badge-outline';
+            capDisplay.innerHTML = `<i data-lucide="box" class="${ownedCount >= currentProp.maxGear ? 'text-red' : 'text-purple'}"></i> Space: ${ownedCount} / ${currentProp.maxGear}`;
+            if (ownedCount >= currentProp.maxGear) capDisplay.style.borderColor = 'rgba(255, 94, 87, 0.4)';
+            else capDisplay.style.borderColor = '';
         }
-        let categories = [...new Set(Game.config.gear.map(g => g.type))];
+        
+        const categories = ['writing', 'recording', 'mixing'];
         const colorMap = { writing: 'orange', recording: 'green', mixing: 'blue' };
+        const iconMap = { writing: 'pen-tool', recording: 'mic', mixing: 'sliders' };
+
         categories.forEach(cat => {
-            let sampleItem = Game.config.gear.find(g => g.type === cat);
-            let badgeColor = colorMap[sampleItem.capType];
-            let icon = sampleItem.capType === 'writing' ? 'pen-tool' : (sampleItem.capType === 'recording' ? 'mic' : 'sliders');
-            list.innerHTML += `<div class="shop-category-header" style="--accent-color: var(--accent-${badgeColor}); margin-top: ${list.innerHTML === '' ? '0' : '25px'};"><i data-lucide="${icon}" class="text-${badgeColor}"></i><span>${cat}</span></div>`;
-            let itemsHTML = '';
-            Game.config.gear.filter(g => g.type === cat).forEach(g => {
+            let container = document.getElementById(`gear-list-${cat}`);
+            if (!container) return;
+            let badgeColor = colorMap[cat];
+            let icon = iconMap[cat];
+
+            // On réintègre le titre de la catégorie !
+            container.innerHTML = `<div class="shop-category-header grid-span-full" style="--accent-color: var(--accent-${badgeColor});"><i data-lucide="${icon}" class="text-${badgeColor}"></i><span>${cat.toUpperCase()}</span></div>`;
+
+            Game.config.gear.filter(g => g.capType === cat).forEach(g => {
                 let gearFull = !g.owned && ownedCount >= currentProp.maxGear;
                 let locked = Engine.state.player.followers < g.reqFans;
                 let btnClass = (locked || gearFull) ? 'btn-outline disabled-btn' : `btn-outline-${badgeColor}`;
@@ -1881,74 +2054,102 @@ const UI = {
                 if (g.owned) btn = `<button class="btn-outline w-100 mt-auto disabled-btn" disabled><i data-lucide="check-circle" class="text-green"></i> Installed</button>`;
                 else if (gearFull) btn = `<button class="${btnClass} w-100 mt-auto" disabled><i data-lucide="lock"></i> HQ Full</button>`;
                 else if (locked) btn = `<button class="${btnClass} w-100 mt-auto" disabled><i data-lucide="lock"></i>  ${g.reqFans.toLocaleString()} Fans</button>`;
-                else btn = `<button class="${btnClass} w-100 mt-auto" onclick="MarketEngine.buyGear('${g.id}')">Buy $${g.cost}</button>`;
-                itemsHTML += `<div class="data-node flex-col" style="${g.owned ? 'border-color: rgba(11, 232, 129, 0.3);' : ''}"><div style="margin-bottom: 15px;"><strong style="font-size: 1.05rem;">${g.name}</strong><br><span class="badge badge-${badgeColor}"><i data-lucide="${icon}"></i> +${g.capIncrease} Cap</span></div>${btn}</div>`;
-            });
-            list.innerHTML += `<div class="flex-col gap-15">${itemsHTML}</div>`;
-        });
-        lucide.createIcons();
-    },
-    renderHQ() {
-        const list = document.getElementById('hq-list');
-        if (!list) return;
-        list.innerHTML = '';
-        let ownedGearCount = Game.config.gear.filter(x => x.owned).length;
-        Game.config.properties.forEach(p => {
-            let isCurrent = Engine.state.player.propertyId === p.id;
-            let tooMuchGear = !isCurrent && ownedGearCount > p.maxGear;
-            let totalStock = Object.values(Engine.state.inventory || {}).reduce((a, b) => a + b, 0);
-            let tooMuchStock = !isCurrent && totalStock > p.maxBoxes;
-            let notFamousEnough = Engine.state.player.followers < p.reqFans;
-            let btnClass = isCurrent ? 'btn-outline disabled-btn' : 'btn-outline-purple';
-            let btnText = isCurrent ? '<i data-lucide="check-circle" class="text-green"></i> Current Lease' : `Sign Lease ($${p.rent}/mo)`;
-            if (notFamousEnough) {
-                btnClass = 'btn-outline disabled-btn';
-                btnText = `<i data-lucide="lock"></i> ${p.reqFans.toLocaleString()} Fans`;
-            } else if (tooMuchGear) {
-                btnClass = 'btn-outline disabled-btn';
-                btnText = `Max ${p.maxGear} gear (You have ${ownedGearCount})`;
-            } else if (tooMuchStock) {
-                btnClass = 'btn-outline disabled-btn';
-                btnText = `Storage Full (Max ${p.maxBoxes})`;
-            }
-            list.innerHTML += `
-<div class="data-node flex-col" style="${isCurrent ? 'border-color: var(--accent-purple); background: rgba(176, 91, 255, 0.05);' : ''}">
-    <div class="flex-row-between">
-        <strong style="font-size: 1.1rem;">${p.title}</strong>
-    </div>
-    <div class="flex-row gap-10 mt-10" style="flex-wrap: wrap; align-items: center;">
-        <span class="badge badge-outline"><i data-lucide="layers"></i> Gear: ${p.maxGear}</span>
-        <span class="badge badge-outline"><i data-lucide="box"></i> Merch: ${p.maxBoxes.toLocaleString()}</span>
-        <span class="badge badge-outline"><i data-lucide="zap" class="text-yellow"></i> Hype: ${p.hypeBoost}x</span>
-    </div>
-    <span class="text-muted" style="margin: 15px 0; display: block; flex-grow: 1;">${p.desc}</span>
-    <button class="${btnClass} w-100 mt-auto" ${(isCurrent || tooMuchGear || tooMuchStock || notFamousEnough) ? 'disabled' : `onclick="PlayerActions.leaseProperty('${p.id}')"`}>${btnText}</button>
-</div>`;
-        });
-        const staffList = document.getElementById('staff-list');
-        if (staffList) {
-            staffList.innerHTML = '';
-            Game.config.staff.forEach(s => {
-                let hired = Engine.state.staff.includes(s.id);
-                let locked = Engine.state.player.followers < s.reqFans;
-                let btnClass = hired || locked ? 'btn-outline disabled-btn' : 'btn-outline-green';
-                let btnText = hired ? '<i data-lucide="check-circle" class="text-green"></i> On Payroll' : (locked ? `<i data-lucide="lock"></i> ${s.reqFans.toLocaleString()} Fans` : `Hire ($${s.cost.toLocaleString()})`);
-                staffList.innerHTML += `
-                 <div class="data-node flex-col" style="${hired ? 'border-color: var(--accent-purple); background: rgba(176, 91, 255, 0.05);' : ''}">
-                    <div class="flex-row gap-10" style="margin-bottom: 10px;">
-                        <i data-lucide="${s.icon}" class="text-purple"></i> <strong style="font-size: 1.05rem;">${s.title}</strong>
+                else btn = `<button class="${btnClass} w-100 mt-auto" onclick="MarketEngine.buyGear('${g.id}')">Buy $${g.cost.toLocaleString()}</button>`;
+                
+                container.innerHTML += `
+                <div class="data-node flex-col" style="${g.owned ? 'border-color: rgba(11, 232, 129, 0.3);' : ''}">
+                    <div style="margin-bottom: 15px;">
+                        <strong style="font-size: 1.05rem;">${g.name}</strong><br>
+                        <span class="badge badge-${badgeColor}" style="margin-top: 6px;"><i data-lucide="${icon}"></i> +${g.capIncrease} Cap</span>
                     </div>
-                    <div style="font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 10px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px;">
-                        <span class="text-red">-$${s.wage}/day</span>
-                    </div>
-                    <span class="text-muted" style="font-size: 0.8rem; margin-bottom: 15px; display: block; flex-grow: 1;">${s.desc}</span>
-                    <button class="${btnClass} w-100 mt-auto" ${hired || locked ? 'disabled' : `onclick="EntourageEngine.hireStaff('${s.id}')"`}>${btnText}</button>
+                    ${btn}
                 </div>`;
             });
-        }
+        });
         if(window.lucide) lucide.createIcons();
     },
+    renderHQ() {
+    const container = document.getElementById('hq-list');
+    const staffContainer = document.getElementById('staff-list');
+    if (!container || !staffContainer) return;
+
+    const currentId = Engine.state.player.propertyId;
+    const currentProp = Game.config.properties.find(p => p.id === currentId);
+    
+    // --- SECTION 1 & 2 : PROPRIÉTÉS ---
+    let html = `
+    <div class="shop-category-header grid-span-full"><i data-lucide="home"></i> Current Headquarters</div>
+    <div class="current-prop-card grid-span-full">
+        <div class="prop-icon-large"><i data-lucide="building-2"></i></div>
+        <div style="flex: 1;">
+            <h2 style="margin: 0 0 5px 0;">${currentProp.title}</h2>
+            <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 12px;">Active Base • Rent: <span class="text-green">$${currentProp.rent}/mo</span></p>
+            <div class="prop-stats-row" style="display: flex; gap: 10px; align-items: center;">
+                <div class="badge badge-outline"><i data-lucide="layers" class="text-blue"></i> ${currentProp.maxGear} Slots</div>
+                <div class="badge badge-outline"><i data-lucide="package" class="text-orange"></i> ${currentProp.maxBoxes.toLocaleString()} Units</div>
+                <div class="badge badge-outline"><i data-lucide="zap" class="text-yellow"></i> x${currentProp.hypeBoost} Hype</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="shop-category-header grid-span-full" style="margin-top:20px;"><i data-lucide="search"></i> Available Properties</div>`;
+
+    Game.config.properties.forEach(p => {
+        if(p.id === currentId) return;
+        let locked = Engine.state.player.followers < p.reqFans;
+        let btnClass = locked ? 'btn-outline disabled-btn' : 'btn-outline-purple';
+        
+        // ICI : On a ajouté le prix dans le bouton "Sign Lease ($X)"
+        let btnText = locked ? `<i data-lucide="lock" style="width:14px;"></i> ${p.reqFans.toLocaleString()} Fans` : `Sign Lease ($${p.rent})`;
+        
+        html += `
+        <div class="data-node flex-col">
+            <div style="margin-bottom: 10px;">
+                <strong style="display: flex; align-items: center; gap: 6px;"><i data-lucide="building" class="text-muted" style="width:16px;"></i> ${p.title}</strong>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 15px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px;">
+                <div class="flex-row-between text-muted" style="margin-bottom:4px;">Gear: <span class="text-blue">${p.maxGear}</span></div>
+                <div class="flex-row-between text-muted" style="margin-bottom:4px;">Stock: <span class="text-orange">${p.maxBoxes.toLocaleString()}</span></div>
+                <div class="flex-row-between text-muted">Rent: <span class="text-green">$${p.rent}</span></div>
+            </div>
+            <button class="${btnClass} w-100 mt-auto" ${locked ? 'disabled' : `onclick="PlayerActions.leaseProperty('${p.id}')"`}>${btnText}</button>
+        </div>`;
+    });
+    container.innerHTML = html;
+
+    // --- SECTION 3 : ENTOURAGE ---
+    let staffHtml = '';
+    Game.config.staff.forEach(s => {
+        let hired = Engine.state.staff.includes(s.id);
+        let locked = Engine.state.player.followers < s.reqFans;
+        let btnClass = hired || locked ? 'btn-outline disabled-btn' : 'btn-outline-green';
+        let btnText = hired ? '<i data-lucide="check-circle" class="text-green" style="width:16px;"></i> On Payroll' : (locked ? `<i data-lucide="lock" style="width:16px;"></i> ${s.reqFans.toLocaleString()}` : `Hire ($${s.cost.toLocaleString()})`);
+        
+        staffHtml += `
+        <div class="data-node flex-col" style="${hired ? 'border-color: var(--accent-purple); background: rgba(176, 91, 255, 0.05);' : ''}">
+            <div class="flex-row gap-10" style="margin-bottom: 12px;">
+                <i data-lucide="${s.icon}" class="text-purple"></i> <strong style="font-size: 1.05rem;">${s.title}</strong>
+            </div>
+            
+            <span class="text-muted" style="font-size: 0.85rem; line-height: 1.4; margin-bottom: 15px; display: block; flex-grow: 1;">${s.desc}</span>
+            
+            <div style="font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 15px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; text-align: center;">
+                <span class="text-red">-$${s.wage}/day</span>
+            </div>
+            
+            <button class="${btnClass} w-100 mt-auto" ${hired || locked ? 'disabled' : `onclick="EntourageEngine.hireStaff('${s.id}')"`}>${btnText}</button>
+        </div>`;
+    });
+    staffContainer.innerHTML = staffHtml;
+
+    if(window.lucide) lucide.createIcons();
+},
     renderMerch() {
+        const activeBtn = document.querySelector('.merch-filter-btn.active');
+    if (!activeBtn) {
+        const allBtn = document.querySelector('.merch-filter-btn[data-filter="all"]');
+        if (allBtn) allBtn.classList.add('active');
+    }
         const catalog = document.getElementById('merch-catalog');
         const invDisplay = document.getElementById('inventory-display');
         if (!catalog || !invDisplay) return;
@@ -1982,61 +2183,85 @@ const UI = {
             });
         }
        let staffBanner = '';
-        if (Engine.state.staff.includes('staff_merch')) {
-            staffBanner = `
-                <div class="staff-banner banner-green">
-                    <i data-lucide="package" style="width: 16px; height: 16px;"></i>
-                    <span><strong>Fulfillment Manager Active:</strong> Orders are being auto-packed and shipped. Zero energy drain on sales.</span>
-                </div>`;
-        }
-        invDisplay.innerHTML = staffBanner + (invHtml || `<div class="empty-state"><i data-lucide="box"></i><span>Warehouse empty.</span></div>`);
+       
+        // Dans UI.renderMerch
+const inventoryPanel = document.getElementById('tab-merch').querySelector('.panel:last-child');
+const inventoryHeader = inventoryPanel.querySelector('.panel-header');
+
+// Supprimer l'ancienne bannière si elle existe pour éviter les doublons
+const oldBanner = inventoryPanel.querySelector('.staff-banner');
+if (oldBanner) oldBanner.remove();
+
+if (Engine.state.staff.includes('staff_merch')) {
+    const banner = document.createElement('div');
+    banner.className = 'staff-banner banner-green';
+    banner.style.margin = "15px 20px 0 20px"; // Ajuster pour l'alignement
+    banner.innerHTML = `
+        <i data-lucide="package" style="width: 16px; height: 16px;"></i>
+        <span><strong>Fulfillment Manager Active:</strong> Orders are auto-packed. Zero energy drain.</span>`;
+    
+    // Insérer la bannière entre le header et le contenu scrollable
+    inventoryHeader.after(banner);
+}
+
+// Ensuite, remplissez invDisplay normalement sans la bannière
+invDisplay.innerHTML = invHtml || `<div class="empty-state"><i data-lucide="box"></i><span>Warehouse empty.</span></div>`;
         let eligibleReleases = Engine.state.releases.filter(r => r.status === 'Live' && r.format !== 'Single');
         let relOptions = eligibleReleases.map(r => `<option value="${r.id}">${r.title} (${r.format})</option>`).join('');
-        catalog.className = 'panel-content flex-col'; 
+        catalog.className = 'grid-4-col gap-15'; 
         let catHtml = '';
-        let categories = ['physical', 'apparel']; 
-        categories.forEach(cat => {
-            let items = Game.config.merch.filter(m => m.category === cat);
-            if(items.length === 0) return;
-            let catTitle = cat === 'physical' ? 'Physical Music Releases' : 'Apparel & Brand Logo';
-            let catIcon = cat === 'physical' ? 'disc' : 'shirt';
-            let catColor = cat === 'physical' ? 'blue' : 'orange';
-            catHtml += `<div class="shop-category-header" style="--accent-color: var(--accent-${catColor}); margin-top: ${catHtml === '' ? '0' : '20px'}; margin-bottom: 15px;"><i data-lucide="${catIcon}" class="text-${catColor}"></i><span>${catTitle}</span></div>`;
-            catHtml += `<div class="grid-4-col gap-15">`;
-            items.forEach(m => {
-                let overCapacity = (totalStock + m.batchSize) > currentProp.maxBoxes;
-                let locked = Engine.state.player.followers < m.reqFans;
-                let btnClass = locked || overCapacity ? 'btn-outline disabled-btn' : 'btn-outline-green';
-                let btnText = locked ? `<i data-lucide="lock"></i> ${m.reqFans.toLocaleString()} Fans` : (overCapacity ? `<i data-lucide="alert-circle"></i> HQ Full` : `Buy Batch ($${m.costPerBatch.toLocaleString()})`);
-                let unitProfit = (m.retailPrice - (m.costPerBatch / m.batchSize)).toFixed(2);
-                let dropdownHtml = '';
-                if (m.category === 'physical' && !locked) {
-                    if (eligibleReleases.length === 0) {
-                        btnClass = 'btn-outline disabled-btn';
-                        btnText = "No Albums Live";
-                    } else {
-                        dropdownHtml = `<select id="select-rel-${m.id}" style="margin-bottom: 10px; width: 100%; font-size: 0.8rem; padding: 5px;">${relOptions}</select>`;
-                    }
-                }
-                catHtml += `
-                <div class="data-node flex-col">
-                    <div style="margin-bottom: 10px;">
-                        <strong style="display: flex; align-items: center; gap: 6px;"><i data-lucide="${m.icon}" class="text-muted"></i> ${m.title}</strong>
-                    </div>
-                    <div style="font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 15px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px;">
-                        <div class="flex-row-between text-muted" style="margin-bottom:4px;">Size: <span class="text-main">${m.batchSize}</span></div>
-                        <div class="flex-row-between text-muted" style="margin-bottom:4px;">Price: <span class="text-green">$${m.retailPrice}</span></div>
-                        <div class="flex-row-between text-muted">Profit: <span class="text-yellow">+$${unitProfit}/ea</span></div>
-                    </div>
-                    <div class="mt-auto">
-                        ${dropdownHtml}
-                        <button class="${btnClass} w-100" ${locked || overCapacity || (m.category === 'physical' && eligibleReleases.length === 0) ? 'disabled' : `onclick="MerchEngine.buyBatch('${m.id}')"`}>${btnText}</button>
-                    </div>
-                </div>`;
-            });
-            catHtml += `</div>`;
-        });
-        catalog.innerHTML = catHtml;
+let categories = ['physical', 'apparel']; 
+categories.forEach(cat => {
+    let items = Game.config.merch.filter(m => m.category === cat);
+    if(items.length === 0) return;
+    
+    let catTitle = cat === 'physical' ? 'Physical Music Releases' : 'Apparel & Brand Logo';
+    let catIcon = cat === 'physical' ? 'disc' : 'shirt';
+    let catColor = cat === 'physical' ? 'blue' : 'orange';
+
+    // 1. On ajoute le header qui prend toute la largeur
+    catHtml += `<div class="shop-category-header grid-span-full" style="--accent-color: var(--accent-${catColor})"><i data-lucide="${catIcon}" class="text-${catColor}"></i><span>${catTitle}</span></div>`;
+    
+    // 2. CRUCIAL : On ouvre une div avec la classe 'grid-4-col' pour que les cartes soient côte à côte
+    catHtml += `<div class="grid-4-col gap-15 grid-span-full">`; 
+
+    items.forEach(m => {
+        let overCapacity = (totalStock + m.batchSize) > currentProp.maxBoxes;
+        let locked = Engine.state.player.followers < m.reqFans;
+        let btnClass = locked || overCapacity ? 'btn-outline disabled-btn' : 'btn-outline-green';
+        let btnText = locked ? `<i data-lucide="lock"></i> ${m.reqFans.toLocaleString()} Fans` : (overCapacity ? `<i data-lucide="alert-circle"></i> HQ Full` : `Buy Batch ($${m.costPerBatch.toLocaleString()})`);
+        let unitProfit = (m.retailPrice - (m.costPerBatch / m.batchSize)).toFixed(2);
+        
+        let dropdownHtml = '';
+        if (m.category === 'physical' && !locked) {
+            if (eligibleReleases.length === 0) {
+                btnClass = 'btn-outline disabled-btn';
+                btnText = "No Albums Live";
+            } else {
+                dropdownHtml = `<select id="select-rel-${m.id}" style="margin-bottom: 10px; width: 100%; font-size: 0.8rem; padding: 5px;">${relOptions}</select>`;
+            }
+        }
+
+        catHtml += `
+        <div class="data-node flex-col">
+            <div style="margin-bottom: 10px;">
+                <strong style="display: flex; align-items: center; gap: 6px;"><i data-lucide="${m.icon}" class="text-muted"></i> ${m.title}</strong>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 15px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px;">
+                <div class="flex-row-between text-muted" style="margin-bottom:4px;">Size: <span class="text-main">${m.batchSize}</span></div>
+                <div class="flex-row-between text-muted" style="margin-bottom:4px;">Price: <span class="text-green">$${m.retailPrice}</span></div>
+                <div class="flex-row-between text-muted">Profit: <span class="text-yellow">+$${unitProfit}/ea</span></div>
+            </div>
+            <div class="mt-auto">
+                ${dropdownHtml}
+                <button class="${btnClass} w-100" ${locked || overCapacity || (m.category === 'physical' && eligibleReleases.length === 0) ? 'disabled' : `onclick="MerchEngine.buyBatch('${m.id}')"`}>${btnText}</button>
+            </div>
+        </div>`;
+    });
+    
+    catHtml += `</div>`; // On ferme la div grid-4-col
+});
+catalog.innerHTML = catHtml;
         this.initCustomSelects(); 
         if (!UI.merchChart && document.getElementById('merchChart')) {
             UI.merchChart = new Chart(document.getElementById('merchChart').getContext('2d'), { type: 'bar', data: { labels: ['-6d', '-5d', '-4d', '-3d', '-2d', 'Yday', 'Today'], datasets: [{ label: 'Merch Revenue', data: Engine.state.stats.merchHistory, backgroundColor: '#0be881', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: {color: 'rgba(255,255,255,0.05)'} }, x: { grid: {display: false} } } } });
@@ -2074,8 +2299,13 @@ const UI = {
         if(window.lucide) lucide.createIcons();
     },
     renderMilestones() {
-        const list = document.getElementById('achievements-list');
-        list.innerHTML = '';
+        const activeContainer = document.getElementById('milestones-active-container');
+        const compContainer = document.getElementById('milestones-completed-container');
+        if(!activeContainer || !compContainer) return;
+        
+        activeContainer.innerHTML = '';
+        compContainer.innerHTML = '';
+        
         const categories = [...new Set(Game.config.achievements.map(a => a.category))];
         const catIcons = { 
             'Streaming': { icon: 'trending-up', color: 'purple' },
@@ -2084,35 +2314,86 @@ const UI = {
             'Releases': { icon: 'disc', color: 'green' },
             'Challenges': { icon: 'target', color: 'orange' }
         };
+
+        // Mise à jour du badge global de complétion
+        let completedCount = Game.config.achievements.filter(a => a.unlocked).length;
+        let totalCount = Game.config.achievements.length;
+        let completionBadge = document.getElementById('milestones-completion-display');
+        if(completionBadge) {
+            completionBadge.innerHTML = `<i data-lucide="check-circle" class="${completedCount === totalCount ? 'text-green' : 'text-purple'}"></i> ${completedCount} / ${totalCount}`;
+        }
+
+        // Variables pour tracker si les listes sont vides
+        let hasActive = false;
+        let hasCompleted = false;
+
         categories.forEach(cat => {
             const info = catIcons[cat] || { icon: 'award', color: 'muted' };
-            list.innerHTML += `
-                <div class="shop-category-header grid-span-full" style="--accent-color: var(--accent-${info.color}); margin-top: ${list.innerHTML === '' ? '0' : '30px'};">
-                    <i data-lucide="${info.icon}" class="text-${info.color}"></i>
-                    <span>${cat} Milestones</span>
-                </div>
-            `;
-            let itemsHTML = '';
-            Game.config.achievements.filter(a => a.category === cat).forEach(a => {
-                const status = a.unlocked 
-                    ? `<div class="text-green mt-10"><i data-lucide="check-circle" style="width:14px;"></i> Unlocked</div>` 
-                    : `<div class="text-muted mt-10"><i data-lucide="lock" style="width:14px;"></i> Locked</div>`;
-                itemsHTML += `
-                    <div class="data-node flex-col" style="${a.unlocked ? 'border-color: rgba(11, 232, 129, 0.4); background: rgba(11, 232, 129, 0.05);' : ''}">
+            
+            let activeItems = Game.config.achievements.filter(a => a.category === cat && !a.unlocked);
+            let compItems = Game.config.achievements.filter(a => a.category === cat && a.unlocked);
+
+            // Construction du bloc des succès EN COURS
+            if(activeItems.length > 0) {
+                hasActive = true;
+                let html = `<div id="milestones-active-${cat}" class="flex-col gap-15 w-100">`;
+                html += `<div class="shop-category-header grid-span-full" style="--accent-color: var(--accent-${info.color});"><i data-lucide="${info.icon}" class="text-${info.color}"></i><span>${cat.toUpperCase()}</span></div>`;
+                html += `<div class="grid-span-full grid-3-col gap-15">`;
+                activeItems.forEach(a => {
+                    html += `
+                    <div class="data-node flex-col">
                         <div>
                             <strong style="font-size: 1.05rem;">${a.title}</strong><br>
                             <span class="text-muted" style="font-size: 0.8rem; display: block; margin-top: 4px;">${a.desc}</span>
                         </div>
-                        <div class="text-yellow" style="font-size: 0.8rem; margin-top: 10px; font-weight: bold;">
-                            Reward: $${a.reward.toLocaleString()}
-                        </div>
-                        ${status}
+                        <div class="text-yellow" style="font-size: 0.8rem; margin-top: 10px; font-weight: bold;">Reward: $${a.reward.toLocaleString()}</div>
+                        <div class="text-muted mt-10"><i data-lucide="lock" style="width:14px;"></i> In Progress</div>
                     </div>`;
-            });
-            list.innerHTML += `<div class="grid-span-full grid-3-col gap-15">${itemsHTML}</div>`;
+                });
+                html += `</div></div>`;
+                activeContainer.innerHTML += html;
+            }
+
+            // Construction du bloc des succès COMPLÉTÉS
+            if(compItems.length > 0) {
+                hasCompleted = true;
+                let html = `<div id="milestones-completed-${cat}" class="flex-col gap-15 w-100">`;
+                html += `<div class="shop-category-header grid-span-full" style="--accent-color: var(--accent-${info.color});"><i data-lucide="${info.icon}" class="text-${info.color}"></i><span>${cat.toUpperCase()}</span></div>`;
+                html += `<div class="grid-span-full grid-3-col gap-15">`;
+                compItems.forEach(a => {
+                    html += `
+                    <div class="data-node flex-col" style="border-color: rgba(11, 232, 129, 0.4); background: rgba(11, 232, 129, 0.05);">
+                        <div>
+                            <strong style="font-size: 1.05rem;">${a.title}</strong><br>
+                            <span class="text-muted" style="font-size: 0.8rem; display: block; margin-top: 4px;">${a.desc}</span>
+                        </div>
+                        <div class="text-yellow" style="font-size: 0.8rem; margin-top: 10px; font-weight: bold;">Reward: $${a.reward.toLocaleString()}</div>
+                        <div class="text-green mt-10"><i data-lucide="check-circle" style="width:14px;"></i> Unlocked</div>
+                    </div>`;
+                });
+                html += `</div></div>`;
+                compContainer.innerHTML += html;
+            }
         });
+
+        // -----------------------------------------------------
+        // GESTION DES EMPTY STATES SI AUCUN ITEM TROUVÉ
+        // -----------------------------------------------------
+        if (!hasActive) {
+            activeContainer.innerHTML = `<div class="empty-state"><i data-lucide="award"></i><span>No active milestones.</span><span style="font-size: 0.8rem; opacity: 0.7;">You have completed every challenge available!</span></div>`;
+        }
+        
+        if (!hasCompleted) {
+            compContainer.innerHTML = `<div class="empty-state"><i data-lucide="target"></i><span>No completed milestones yet.</span><span style="font-size: 0.8rem; opacity: 0.7;">Keep hustling to unlock achievements and cash rewards.</span></div>`;
+        }
+
         lucide.createIcons();
+        
+        // S'assure que si on re-render (gain d'un milestone), le filtre actuel reste appliqué
+        let currentFilter = document.querySelector('.milestone-filter-btn.active')?.dataset.filter || 'all';
+        this.filterMilestones(currentFilter);
     },
+          
     openReleaseModal() {
         Engine.artBuffer = null; Engine.pendingTracklist = [];
         DistroEngine.currentDistro = 'sc'; 
@@ -2156,7 +2437,7 @@ const UI = {
         if (upcoming.length === 0) {
             pipeList.innerHTML = `<div class="empty-state" style="min-height: 80px;"><i data-lucide="clock"></i><span>No upcoming releases scheduled.</span></div>`;
         } else {
-            pipeList.innerHTML = upcoming.map(rel => {
+           pipeList.innerHTML = [...upcoming].reverse().map(rel => {
                 let artSrc = rel.artData || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23121218'/><circle cx='50' cy='50' r='20' fill='%231a1a24' stroke='%23b05bff' stroke-width='2'/></svg>";
                 let daysLeft = rel.dropDay - Engine.state.day;
                 return `

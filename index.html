@@ -38,23 +38,40 @@
 
     <div id="os-environment" class="hidden">
         <aside class="sidebar">
-            <div class="brand"><i data-lucide="disc-3"></i> ICON Studio</div>
-            <nav class="nav-menu">
-                <div class="nav-section-title">Workspace</div>
+           <div class="brand" style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <i data-lucide="disc-3"></i> ICON Studio
+                </div>
+                <i data-lucide="x" class="mobile-close-btn" onclick="UI.toggleMenu()" style="cursor: pointer; padding: 5px;"></i>
+            </div>
+           <nav class="nav-menu">
+                <div class="nav-section-title">Music</div>
                 <button class="nav-btn active" onclick="UI.switchTab('dashboard')"><i data-lucide="layout-dashboard"></i> Dashboard</button>
                 <button class="nav-btn" onclick="UI.switchTab('studio')"><i data-lucide="sliders"></i> Studio</button>
+                <button class="nav-btn" onclick="UI.switchTab('market')"><i data-lucide="shopping-cart"></i> Marketplace</button>
                 <button class="nav-btn" onclick="UI.switchTab('vault')"><i data-lucide="hard-drive"></i> Vault</button>
-                <button class="nav-btn" onclick="UI.switchTab('manage')"><i data-lucide="disc"></i> Discography</button>
+                <button class="nav-btn" onclick="UI.switchTab('manage')"><i data-lucide="disc"></i> Releases</button>
+
                 <div class="nav-section-title" style="margin-top: 15px;">Business</div>
-                <button class="nav-btn" onclick="UI.switchTab('hq')"><i data-lucide="building"></i> HQ & Team</button>
-                <button class="nav-btn" onclick="UI.switchTab('merch')"><i data-lucide="shopping-bag"></i> Merch</button>
+                <button class="nav-btn" onclick="UI.switchTab('hq')"><i data-lucide="building"></i> HQ</button>
+                <button class="nav-btn" onclick="UI.switchTab('career')"><i data-lucide="file-signature"></i> Contracts</button>
+                <button class="nav-btn" onclick="UI.switchTab('manufacturing')"><i data-lucide="package"></i> Factory</button>
+                <button class="nav-btn" onclick="UI.switchTab('merch')"><i data-lucide="bar-chart"></i> Merch</button>
+
                 <div class="nav-section-title" style="margin-top: 15px;">Growth</div>
                 <button class="nav-btn" onclick="UI.switchTab('socials')"><i data-lucide="smartphone"></i> Promo</button>
-                <button class="nav-btn" onclick="UI.switchTab('career')"><i data-lucide="target"></i> Career</button>
                 <button class="nav-btn" onclick="UI.switchTab('world')"><i data-lucide="globe"></i> Charts</button>
+                <button class="nav-btn" onclick="UI.switchTab('milestones')"><i data-lucide="award"></i> Milestones</button>
+                
+                <div class="nav-section-title" style="margin-top: 15px;">System</div>
+                <button class="nav-btn" onclick="UI.switchTab('logs')"><i data-lucide="square-terminal"></i> Logs</button>
             </nav>
-            <div class="sidebar-bottom">
-                <button class="nav-btn" onclick="UI.openModal('settings-modal')"><i data-lucide="settings"></i> Settings</button>
+            <div class="sidebar-bottom" style="display: flex; flex-direction: column; gap: 10px; padding: 20px;">
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-outline-purple" style="flex:1; padding: 0; min-height: 36px; font-size: 0.85rem;" onclick="Engine.saveGame()"><i data-lucide="save"></i> Save</button>
+                    <button class="btn-outline-purple" style="flex:1; padding: 0; min-height: 36px; font-size: 0.85rem;" onclick="Engine.loadGame()"><i data-lucide="download"></i> Load</button>
+                </div>
+                <button class="nav-btn" style="width: 100%; margin: 0; padding: 0 10px; min-height: 40px;" onclick="UI.openModal('settings-modal')"><i data-lucide="settings"></i> System Settings</button>
             </div>
         </aside>
 
@@ -119,9 +136,7 @@
                                 <input type="text" id="profile-bio" class="bio-input" placeholder="Write a short bio... (Click to edit)" onchange="Engine.modifyBio(this.value)">
                             </div>
                             <div class="market-trend-box">
-                                <div class="trend-header">
-                                    <i data-lucide="radar"></i> ALGORITHM RADAR
-                                </div>
+                                <div class="trend-header"><i data-lucide="radar"></i> ALGORITHM RADAR</div>
                                 <div id="trend-display" class="trend-data">Pop | Chill | ~120 BPM</div>
                                 <div class="trend-footer">Match for a massive Hype Boost</div>
                             </div>
@@ -141,53 +156,82 @@
                             <div class="current-val text-purple" style="font-size: 1.6rem; margin-top: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="dash-latest-drop">None</div>
                         </div>
                     </div>
-                    <div class="panel grid-span-2">
+                    <div class="panel grid-span-full">
                         <div class="panel-header"><span><i data-lucide="bar-chart-2"></i> Streamlytics Data</span></div>
                         <div class="panel-content flex-col" style="overflow: hidden; padding-bottom: 15px;">
-                            <div class="chart-wrapper" style="min-height: 0; flex-grow: 1;">
-                                <canvas id="streamsChart"></canvas>
-                            </div>
+                            <div class="chart-wrapper" style="min-height: 0; flex-grow: 1;"><canvas id="streamsChart"></canvas></div>
                         </div>
                         <div class="flex-row-between" style="padding: 15px 20px; border-top: 1px solid var(--border-color); background: rgba(0,0,0,0.2); z-index: 10; flex-shrink: 0;">
                             <div style="font-weight: bold; font-size: 0.9rem;">Lifetime Royalties: <span class="text-green">$<span id="stat-total-revenue">0.00</span></span></div>
                             <div style="font-weight: bold; font-size: 0.9rem;">Lifetime Streams: <span id="stat-total-streams" class="text-purple">0</span></div>
                         </div>
                     </div>
-                    <div class="panel">
-                        <div class="panel-header"><span><i data-lucide="terminal"></i> Console Log</span></div>
-                        <div id="activity-log" class="panel-content scrollable" style="font-family: var(--font-mono); font-size: 0.85rem;"></div>
-                    </div>
                 </div>
 
                 <div id="tab-studio" class="tab-content">
-                    <div class="panel grid-span-2">
+                    <div class="panel grid-span-full">
                         <div class="panel-header">
                             <span><i data-lucide="mic"></i> Active Sessions</span>
                             <button class="btn-primary btn-small" onclick="UI.openModal('track-modal')">+ ‎ New Session</button>
                         </div>
-                        <div id="active-tracks" class="panel-content scrollable studio-grid"></div>
-                    </div>
-                    <div class="panel">
-                        <div class="panel-header">
-                            <span><i data-lucide="shopping-cart"></i> Marketplace</span>
-                            <span id="gear-capacity-display" class="badge badge-outline" style="margin-top: 0 !important; border-color: rgba(255,255,255,0.2);"><i data-lucide="box"></i> Space: 0 / 0</span>
-                        </div>
-                        <div class="panel-content scrollable">
-                            <div id="gear-list"></div>
-                            <div class="shop-category-header" style="--accent-color: var(--accent-primary); margin-top: 25px;">
-                                <i data-lucide="briefcase" class="text-primary"></i><span>Professionals</span>
+                        <div class="panel-content flex-col split-layout">
+                            <div class="panel-static-top">
+                                <p class="text-muted" style="margin: 0;">Start a session to write, record, and mix tracks. Each stage costs <span class="text-orange">energy</span> and adds <span class="text-red">stress</span>. Buy equipment to boost quality caps.</p>
                             </div>
-                            <div id="services-list" class="flex-col gap-15"></div>
+                            <div id="active-tracks" class="studio-grid scroll-area"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-market" class="tab-content">
+                    <div class="panel grid-span-full">
+                        <div class="panel-header"><span><i data-lucide="shopping-cart"></i> Marketplace</span></div>
+                        <div class="panel-content flex-col split-layout">
+                            
+                            <div class="panel-static-top">
+                                <div style="position: relative; min-height: 26px; margin-bottom: 15px;">
+                                    <p class="text-muted" style="margin: 0; padding-right: 140px; line-height: 1.5;">Purchase studio equipment to permanently increase your track caps, or hire professionals to temporarily boost an active session.</p>
+                                    <span id="gear-capacity-display" class="badge badge-outline" style="position: absolute; top: 0; right: 0; font-family: var(--font-mono); margin: 0;"><i data-lucide="box" class="text-purple"></i> Space: 0 / 0</span>
+                                </div>
+                                <div class="market-controls-wrapper" style="margin: 0;">
+                                    <div class="market-top-tabs">
+                                        <button id="btn-market-gear" class="market-top-tab active" onclick="UI.switchMarketTab('gear')"><i data-lucide="layers"></i> Studio Gear</button>
+                                        <button id="btn-market-pros" class="market-top-tab" onclick="UI.switchMarketTab('pros')"><i data-lucide="users"></i> Professionals</button>
+                                    </div>
+                                    <div class="market-filter-bar">
+                                        <button class="market-filter-btn active" data-filter="all" onclick="UI.filterMarket('all')"><i data-lucide="layout-grid" class="text-purple"></i> All</button>
+                                        <button class="market-filter-btn" data-filter="writing" onclick="UI.filterMarket('writing')"><i data-lucide="pen-tool" class="text-orange"></i> Writing</button>
+                                        <button class="market-filter-btn" data-filter="recording" onclick="UI.filterMarket('recording')"><i data-lucide="mic" class="text-green"></i> Recording</button>
+                                        <button class="market-filter-btn" data-filter="mixing" onclick="UI.filterMarket('mixing')"><i data-lucide="sliders" class="text-blue"></i> Mixing</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="scroll-area">
+                                <div id="market-gear-container" class="flex-col gap-15">
+                                    <div id="gear-list-writing" class="grid-4-col gap-15"></div>
+                                    <div id="gear-list-recording" class="grid-4-col gap-15"></div>
+                                    <div id="gear-list-mixing" class="grid-4-col gap-15"></div>
+                                </div>
+                                <div id="market-pros-container" class="flex-col gap-15 hidden">
+                                    <div id="pros-list-writing" class="grid-4-col gap-15"></div>
+                                    <div id="pros-list-recording" class="grid-4-col gap-15"></div>
+                                    <div id="pros-list-mixing" class="grid-4-col gap-15"></div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
 
                 <div id="tab-vault" class="tab-content">
                     <div class="panel grid-span-full">
-                        <div class="panel-header"><span><i data-lucide="folder"></i> Unreleased Masters (Audio Files)</span></div>
-                        <div class="panel-content">
-                            <p class="text-muted" style="margin-bottom: 20px;">These are your finished, mastered audio files. Go to the Discography tab to package them into official releases.</p>
-                            <div id="vault-list" class="grid-3-col gap-10"></div>
+                        <div class="panel-header"><span><i data-lucide="folder"></i> Audio Vault</span></div>
+                        <div class="panel-content flex-col split-layout">
+                            <div class="panel-static-top">
+                                <p class="text-muted" style="margin: 0;">These are your finished, mastered audio files. Go to the Discography tab to package them into official releases.</p>
+                            </div>
+                            <div id="vault-list" class="grid-3-col gap-10 scroll-area"></div>
                         </div>
                     </div>
                 </div>
@@ -198,22 +242,127 @@
                             <span><i data-lucide="upload-cloud"></i> Distribution Pipeline</span>
                             <button class="btn-primary btn-small" onclick="UI.openReleaseModal()">+ ‎ Package New Release</button>
                         </div>
-                        <div class="panel-content flex-col">
-                            <div id="pipeline-list" class="flex-col gap-10"></div>
+                        <div class="panel-content flex-col split-layout">
+                            <div class="panel-static-top">
+                                <p class="text-muted" style="margin: 0;">Package your unreleased masters from the Vault into Singles, EPs, or Albums. Choose a distribution plan and shoot visuals to maximize your hype and streaming revenue.</p>
+                            </div>
+                            <div id="pipeline-list" class="flex-col gap-10 scroll-area"></div>
                         </div>
                     </div>
+
                     <div class="panel grid-span-full">
                         <div class="panel-header"><span><i data-lucide="library"></i> Active Discography</span></div>
-                        <div class="panel-content flex-col bg-darker">
+                        <div class="panel-content flex-col bg-darker scrollable">
                             <div id="live-discography-list" class="flex-col gap-10"></div>
                         </div>
+                    </div>
+                </div>
+
+                <div id="tab-hq" class="tab-content">
+    <div class="panel grid-span-full">
+        <div class="panel-header"><span><i data-lucide="building"></i> Headquarters & Operations</span></div>
+        <div class="panel-content flex-col split-layout">
+            
+            <div class="panel-static-top">
+                
+                <div class="market-controls-wrapper" style="margin: 0 0 15px 0;">
+                    <div class="market-top-tabs">
+                        <button id="btn-hq-realestate" class="market-top-tab active" onclick="UI.switchHQTab('realestate')">
+                            <i data-lucide="home"></i> Real Estate
+                        </button>
+                        <button id="btn-hq-staff" class="market-top-tab" onclick="UI.switchHQTab('staff')">
+                            <i data-lucide="users"></i> The Entourage
+                        </button>
+                    </div>
+                </div>
+
+                <p id="hq-desc-realestate" class="text-muted" style="margin: 0;">Upgrade your creative space to hold more gear and boost your clout. Rent is deducted automatically every month.</p>
+                <p id="hq-desc-staff" class="text-muted hidden" style="margin: 0;">Hire professionals to automate your empire. Staff charge a daily wage deducted at the end of the day.</p>
+            </div>
+
+            <div class="scroll-area">
+                
+                <div id="hq-realestate-container">
+                    <div id="hq-list" class="grid-3-col gap-15"></div>
+                </div>
+
+                <div id="hq-staff-container" class="hidden">
+                    <div id="staff-list" class="grid-4-col gap-15"></div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+                <div id="tab-career" class="tab-content">
+                    <div class="panel grid-span-full">
+                        <div class="panel-header">
+                            <span><i data-lucide="file-text"></i> Active Contract Board</span>
+                            <button class="btn-primary btn-small" onclick="ChallengeEngine.network()"><i data-lucide="users"></i> Network</button>
+                        </div>
+                        <div class="panel-content flex-col split-layout">
+                            <div class="panel-static-top">
+                                <p id="contract-board-desc" class="text-muted" style="margin: 0;">Sign industry contracts to earn cash injections. Missing deadlines incurs heavy penalties. Network manually to find leads.</p>
+                            </div>
+                            <div id="contract-board" class="flex-col gap-10 scroll-area"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-manufacturing" class="tab-content">
+                    <div class="panel grid-span-full">
+                        <div class="panel-header"><span><i data-lucide="package"></i> Manufacturing Catalog</span></div>
+                        <div class="panel-content flex-col split-layout">
+                            
+                            <div class="panel-static-top">
+                                <div style="margin-bottom: 15px;">
+                                    <p class="text-muted" style="margin: 0; line-height: 1.5;">Produce physical goods and apparel to sell to your fanbase. Apparel increases brand clout, while physical music formats boost chart performance.</p>
+                                </div>
+                                <div class="market-controls-wrapper" style="margin: 0;">
+                                    <div class="market-filter-bar">
+    <button class="market-filter-btn merch-filter-btn active" data-filter="all" onclick="UI.filterMerch('all')"><i data-lucide="layout-grid" class="text-purple"></i> All</button>
+    <button class="market-filter-btn merch-filter-btn" data-filter="apparel" onclick="UI.filterMerch('apparel')"><i data-lucide="shirt" class="text-orange"></i> Apparel</button>
+    <button class="market-filter-btn merch-filter-btn" data-filter="physical" onclick="UI.filterMerch('physical')"><i data-lucide="disc" class="text-blue"></i> Physical Music</button>
+</div>
+                                </div>
+                            </div>
+
+                            <div class="scroll-area">
+                                <div id="merch-catalog" class="grid-4-col gap-15"></div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-merch" class="tab-content">
+                    <div class="panel grid-span-2">
+                        <div class="panel-header"><span><i data-lucide="bar-chart"></i> Merch Sales & Fulfillment</span></div>
+                        <div class="panel-content flex-col" style="overflow: hidden; padding-bottom: 15px;">
+                            <p class="text-muted" style="margin-bottom: 15px; flex-shrink: 0;">Apparel sells based on your global brand. Physicals must be pressed for specific albums and boost their chart performance (1 sale = 1,500 equivalent streams).</p>
+                            <div class="chart-wrapper" style="min-height: 0; flex-grow: 1;">
+                                <canvas id="merchChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="flex-row-between" style="padding: 15px 20px; border-top: 1px solid var(--border-color); background: rgba(0,0,0,0.2); z-index: 10; flex-shrink: 0;">
+                            <div style="font-weight: bold; font-size: 0.9rem;">Lifetime Revenue: <span class="text-green">$<span id="stat-merch-revenue">0.00</span></span></div>
+                            <div style="font-weight: bold; font-size: 0.9rem;">Items Sold: <span id="stat-merch-items" class="text-yellow">0</span></div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span><i data-lucide="box"></i> Active Inventory</span>
+                            <span id="warehouse-capacity-display" class="badge badge-outline" style="margin-top: 0 !important; border-color: rgba(255,255,255,0.2);"><i data-lucide="box"></i> Space: 0 / 0</span>
+                        </div>
+                        <div class="panel-content scrollable flex-col gap-15" id="inventory-display"></div>
                     </div>
                 </div>
 
                 <div id="tab-socials" class="tab-content">
                     <div class="panel grid-span-full">
                         <div class="panel-header"><span><i data-lucide="smartphone"></i> Content Creation (Algorithm)</span></div>
-                        <div class="panel-content grid-3-col gap-15">
+                        <div class="panel-content scrollable grid-3-col gap-15">
                             <div class="data-node flex-col">
                                 <div>
                                     <strong>Lip-Sync TikTok</strong><br>
@@ -245,68 +394,7 @@
                     </div>
                     <div class="panel grid-span-full">
                         <div class="panel-header"><span><i data-lucide="megaphone"></i> Paid Promotion Campaigns</span></div>
-                        <div id="promo-list" class="panel-content grid-3-col gap-15"></div>
-                    </div>
-                </div>
-
-                <div id="tab-hq" class="tab-content">
-                    <div class="panel grid-span-full">
-                        <div class="panel-header"><span><i data-lucide="home"></i> Real Estate Leases</span></div>
-                        <div class="panel-content">
-                            <p class="text-muted" style="margin-bottom: 20px;">Upgrade your creative space to hold more gear and boost your clout. Rent is deducted automatically every month.</p>
-                            <div id="hq-list" class="grid-3-col gap-15"></div>
-                        </div>
-                    </div>
-                    <div class="panel grid-span-full">
-                        <div class="panel-header"><span><i data-lucide="users"></i> The Entourage (Staff)</span></div>
-                        <div class="panel-content">
-                            <p class="text-muted" style="margin-bottom: 20px;">Hire professionals to automate your empire. Staff charge a daily wage deducted at the end of the day.</p>
-                            <div id="staff-list" class="grid-4-col gap-15"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="tab-merch" class="tab-content">
-                    <div class="panel grid-span-2">
-                        <div class="panel-header"><span><i data-lucide="bar-chart"></i> Merch Sales & Fulfillment</span></div>
-                        <div class="panel-content flex-col" style="overflow: hidden; padding-bottom: 15px;">
-                            <p class="text-muted" style="margin-bottom: 15px; flex-shrink: 0;">Apparel sells based on your global brand. Physicals must be pressed for specific albums and boost their chart performance (1 sale = 1,500 equivalent streams).</p>
-                            <div class="chart-wrapper" style="min-height: 0; flex-grow: 1;">
-                                <canvas id="merchChart"></canvas>
-                            </div>
-                        </div>
-                        <div class="flex-row-between" style="padding: 15px 20px; border-top: 1px solid var(--border-color); background: rgba(0,0,0,0.2); z-index: 10; flex-shrink: 0;">
-                            <div style="font-weight: bold; font-size: 0.9rem;">Lifetime Revenue: <span class="text-green">$<span id="stat-merch-revenue">0.00</span></span></div>
-                            <div style="font-weight: bold; font-size: 0.9rem;">Items Sold: <span id="stat-merch-items" class="text-yellow">0</span></div>
-                        </div>
-                    </div>
-                    <div class="panel">
-                        <div class="panel-header">
-                            <span><i data-lucide="box"></i> Active Inventory</span>
-                            <span id="warehouse-capacity-display" class="badge badge-outline" style="margin-top: 0 !important; border-color: rgba(255,255,255,0.2);"><i data-lucide="box"></i> Space: 0 / 0</span>
-                        </div>
-                        <div class="panel-content scrollable flex-col gap-10" id="inventory-display"></div>
-                    </div>
-                    <div class="panel grid-span-full">
-                        <div class="panel-header"><span><i data-lucide="shopping-bag"></i> Manufacturing Catalog</span></div>
-                        <div id="merch-catalog" class="panel-content grid-4-col gap-15"></div>
-                    </div>
-                </div>
-
-                <div id="tab-career" class="tab-content">
-                    <div class="panel grid-span-full" style="margin-bottom: 15px;">
-                        <div class="panel-header">
-                            <span><i data-lucide="file-text"></i> Active Contract Board</span>
-                            <button class="btn-primary btn-small" onclick="ChallengeEngine.network()"><i data-lucide="users"></i> Network</button>
-                        </div>
-                        <div class="panel-content flex-col gap-15">
-                            <p id="contract-board-desc" class="text-muted">Sign industry contracts to earn cash injections. Missing deadlines incurs heavy penalties. Network manually to find leads. <span class="font-bold">(Costs: <span class="text-orange">15 Energy</span> / <span class="text-blue">2 Hours</span>)</span></p>
-                            <div id="contract-board" class="flex-col gap-10"></div>
-                        </div>
-                    </div>
-                    <div class="panel grid-span-full">
-                        <div class="panel-header"><span><i data-lucide="award"></i> Career Milestones</span></div>
-                        <div id="achievements-list" class="panel-content grid-3-col gap-15"></div>
+                        <div id="promo-list" class="panel-content scrollable grid-3-col gap-15"></div>
                     </div>
                 </div>
 
@@ -323,6 +411,51 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="tab-milestones" class="tab-content">
+                    <div class="panel grid-span-full">
+                        <div class="panel-header"><span><i data-lucide="award"></i> Career Milestones</span></div>
+                        <div class="panel-content flex-col split-layout">
+                            
+                            <div class="panel-static-top">
+                                <div style="position: relative; min-height: 26px; margin-bottom: 15px;">
+                                    <p class="text-muted" style="margin: 0; padding-right: 140px; line-height: 1.5;">Track your career progress and complete challenges to unlock permanent cash bonuses.</p>
+                                    <span id="milestones-completion-display" class="badge badge-outline" style="position: absolute; top: 0; right: 0; font-family: var(--font-mono); margin: 0;"><i data-lucide="check-circle" class="text-green"></i> 0 / 0</span>
+                                </div>
+                                <div class="market-controls-wrapper" style="margin: 0;">
+                                    <div class="market-top-tabs">
+                                        <button id="btn-milestones-active" class="market-top-tab active" onclick="UI.switchMilestoneTab('active')"><i data-lucide="target"></i> In Progress</button>
+                                        <button id="btn-milestones-completed" class="market-top-tab" onclick="UI.switchMilestoneTab('completed')"><i data-lucide="award"></i> Completed</button>
+                                    </div>
+                                    <div class="market-filter-bar">
+                                       <button class="market-filter-btn milestone-filter-btn active" data-filter="all" onclick="UI.filterMilestones('all')"><i data-lucide="layout-grid" class="text-purple"></i> All</button>
+                                        <button class="market-filter-btn milestone-filter-btn" data-filter="Releases" onclick="UI.filterMilestones('Releases')"><i data-lucide="disc" class="text-green"></i> Releases</button>
+                                        <button class="market-filter-btn milestone-filter-btn" data-filter="Streaming" onclick="UI.filterMilestones('Streaming')"><i data-lucide="trending-up" class="text-purple"></i> Streaming</button>
+                                        <button class="market-filter-btn milestone-filter-btn" data-filter="Collection" onclick="UI.filterMilestones('Collection')"><i data-lucide="package" class="text-yellow"></i> Collection</button>
+                                        <button class="market-filter-btn milestone-filter-btn" data-filter="Fame" onclick="UI.filterMilestones('Fame')"><i data-lucide="users" class="text-blue"></i> Fame</button>
+                                        <button class="market-filter-btn milestone-filter-btn" data-filter="Challenges" onclick="UI.filterMilestones('Challenges')"><i data-lucide="target" class="text-orange"></i> Challenges</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="scroll-area">
+                                <div id="milestones-active-container" class="flex-col gap-15"></div>
+                                <div id="milestones-completed-container" class="flex-col gap-15 hidden"></div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-logs" class="tab-content">
+                    <div class="panel grid-span-full">
+                        <div class="panel-header"><span><i data-lucide="terminal"></i> System Activity Log</span></div>
+                        <div class="panel-content scrollable flex-col">
+                            <div id="activity-log" style="font-family: var(--font-mono); font-size: 0.85rem;"></div>
+                        </div>
+                    </div>
+                </div>
+
             </main>
         </div>
     </div>
@@ -407,13 +540,9 @@
                 <div class="data-node flex-col" style="margin-bottom: 15px; padding: 15px;">
                     <strong style="margin-bottom: 10px;">Save Data Management</strong>
                     <button id="btn-toggle-autosave" class="btn-outline-green w-100" style="margin-bottom: 10px;" onclick="UI.toggleAutosave()"><i data-lucide="check-circle"></i> Autosave: ON</button>
-                    <div class="flex-row gap-10">
-                        <button class="btn-outline-purple" style="flex:1;" onclick="Engine.saveGame()"><i data-lucide="save"></i> Save</button>
-                        <button class="btn-outline-purple" style="flex:1;" onclick="Engine.loadGame()"><i data-lucide="download"></i> Load</button>
-                    </div>
-                    <button class="btn-outline-red w-100" style="margin-top: 10px;" onclick="Engine.resetGame()"><i data-lucide="alert-triangle"></i> Hard Reset</button>
+                    <button class="btn-outline-red w-100" onclick="Engine.resetGame()"><i data-lucide="alert-triangle"></i> Hard Reset</button>
                 </div>
-                <div class="input-group" style="margin-bottom: 0;">
+                <div class="input-group">
                     <label>Admin Terminal</label>
                     <div class="flex-row gap-10">
                         <input type="text" id="admin-code-input" placeholder="Type AUTH <password> to unlock..." style="flex:1;">
@@ -621,7 +750,9 @@
             </div>
         </div>
     </div>
-    
+    <div id="mobile-menu-overlay" onclick="UI.toggleMenu()"></div>
+    <button id="mobile-menu-fab" onclick="UI.toggleMenu()">MENU</button>
+
     <script src="script.js"></script>
 </body>
 </html>

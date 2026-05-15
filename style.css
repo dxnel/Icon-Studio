@@ -86,7 +86,8 @@ input, select, textarea, button {
 .mt-10 { margin-top: 10px; } 
 .mt-auto { margin-top: auto; }
 .grid-3-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; align-content: start; }
-.grid-4-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; align-content: start; }
+.grid-4-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; align-content: start; margin-bottom: 15px; }
+.studio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 15px; align-content: start; }
 .grid-span-2 { grid-column: span 2; }
 .grid-span-full { grid-column: 1 / -1; }
 
@@ -220,13 +221,97 @@ input:focus, select:focus { border-color: var(--accent-purple); background: rgba
 
 #tab-dashboard { grid-template-rows: auto auto minmax(0, 1fr); }
 #tab-studio { grid-template-rows: minmax(0, 1fr); }
+#tab-market { grid-template-rows: minmax(0, 1fr); }
 #tab-vault { grid-template-rows: minmax(0, 1fr); }
 #tab-manage { grid-template-rows: auto minmax(0, 1fr); }
 #tab-socials { grid-template-rows: auto minmax(0, 1fr); }
-#tab-hq { grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }  
-#tab-merch { grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); } 
-#tab-career { grid-template-rows: auto minmax(0, 1fr); }
+#tab-hq { grid-template-rows: minmax(0, 1fr); }
+#tab-merch { grid-template-rows: minmax(0, 1fr); }
+#tab-manufacturing { grid-template-rows: minmax(0, 1fr); }
+#tab-career { grid-template-rows: minmax(0, 1fr); }
+#tab-milestones { grid-template-rows: minmax(0, 1fr); }
 #tab-world { grid-template-rows: minmax(0, 1fr); }
+#tab-logs { grid-template-rows: minmax(0, 1fr); }
+
+/* 1. LE CONTENEUR UNIFIÉ (Visible, englobe tout) */
+.market-controls-wrapper {
+    background: rgba(0, 0, 0, 0.2); /* Fond subtil pour lier la zone */
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-m);
+    padding: 15px;
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    gap:20px;
+}
+
+/* 2. LES DEUX BARRES (Devenues 100% invisibles, juste du layout) */
+.market-top-tabs, .market-filter-bar { 
+    display: flex; 
+    gap: 10px; 
+    margin: 0; 
+    padding: 0;
+    background: transparent !important; /* Plus de fond gris */
+    border: none !important; /* Plus de bordure */
+    box-shadow: none;
+}
+
+/* 3. LES BOUTONS TOP BAR (Design principal, tailles d'origine conservées) */
+.market-top-tab { 
+    flex: 1; 
+    background: var(--bg-card); /* Fond solide */
+    border: 1px solid var(--border-color); 
+    padding: 10px; /* <-- Retour à la taille d'origine */
+    color: var(--text-muted); 
+    font-weight: 700; font-size: 0.95rem; cursor: pointer; 
+    transition: all 0.2s ease; border-radius: var(--radius-m); 
+    display: flex; justify-content: center; align-items: center; gap: 8px; 
+    opacity: 1; /* Pleine visibilité */
+    box-shadow: none !important; 
+}
+.market-top-tab:hover { 
+    border-color: rgba(255,255,255,0.2); color: var(--text-main); 
+}
+.market-top-tab.active { 
+    background: rgba(176, 91, 255, 0.08); 
+    color: white; 
+    border-color: rgba(176, 91, 255, 0.4); 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; /* L'effet actif */
+}
+
+/* 4. LES BOUTONS FILTRES (Design secondaire, tailles d'origine conservées) */
+.market-filter-btn { 
+    flex: 1; 
+    background: rgba(0, 0, 0, 0.2); /* Fond assombri pour montrer que c'est un sous-menu */
+    background: var(--bg-card); /* Fond solide */
+    border: 1px solid var(--border-color); 
+    padding: 12px 0; 
+    border-radius: var(--radius-m); 
+    color: var(--text-muted); 
+    font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease; 
+    display: flex; justify-content: center; align-items: center; gap: 8px; 
+    opacity: 1; /* <-- Retour à la normale, le bouton a l'air actif ! */
+    box-shadow: none !important;
+}
+.market-filter-btn:hover { 
+    border-color: rgba(255,255,255,0.2); 
+    color: var(--text-main); 
+    background: rgba(255,255,255,0.02); /* Petit feedback visuel au survol */
+}
+
+/* On remet l'opacité à 1 quand le filtre est cliqué, et on garde tes couleurs dynamiques ! */
+.market-filter-btn.active { opacity: 1; }
+.market-filter-btn[data-filter="all"].active { border-color: rgba(176, 91, 255, 0.4); background: rgba(176, 91, 255, 0.08); color: var(--accent-purple); box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; }
+.market-filter-btn[data-filter="writing"].active { border-color: rgba(255, 168, 1, 0.4); background: rgba(255, 168, 1, 0.08); color: var(--accent-orange); box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; }
+.market-filter-btn[data-filter="recording"].active { border-color: rgba(11, 232, 129, 0.4); background: rgba(11, 232, 129, 0.08); color: var(--accent-green); box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; }
+.market-filter-btn[data-filter="mixing"].active { border-color: rgba(75, 207, 250, 0.4); background: rgba(75, 207, 250, 0.08); color: var(--accent-blue); box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; }
+/* Couleurs dynamiques pour les onglets MILESTONES */
+/* Couleurs dynamiques pour les onglets MILESTONES */
+.market-filter-btn[data-filter="Releases"].active { border-color: rgba(11, 232, 129, 0.4); background: rgba(11, 232, 129, 0.08); color: var(--accent-green); box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; }
+.market-filter-btn[data-filter="Streaming"].active { border-color: rgba(176, 91, 255, 0.4); background: rgba(176, 91, 255, 0.08); color: var(--accent-purple); box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; }
+.market-filter-btn[data-filter="Collection"].active { border-color: rgba(254, 211, 48, 0.4); background: rgba(254, 211, 48, 0.08); color: var(--accent-yellow); box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; }
+.market-filter-btn[data-filter="Fame"].active { border-color: rgba(75, 207, 250, 0.4); background: rgba(75, 207, 250, 0.08); color: var(--accent-blue); box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; }
+.market-filter-btn[data-filter="Challenges"].active { border-color: rgba(255, 168, 1, 0.4); background: rgba(255, 168, 1, 0.08); color: var(--accent-orange); box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; }
 
 .panel { 
     background: rgba(0,0,0,0.2); 
@@ -269,7 +354,23 @@ input:focus, select:focus { border-color: var(--accent-purple); background: rgba
 }
 .data-node:hover { border-color: rgba(255,255,255,0.2); }
 .node-header { display: flex; justify-content: space-between; align-items: center; font-weight: 800; margin-bottom: 12px; font-size: 1.1rem; }
-.shop-category-header { display: inline-flex; align-items: center; gap: 10px; padding: 5px 0; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 15px; }
+
+
+
+/* CORRECTION : En-têtes de sous-catégories (Discrets et propres) */
+.shop-category-header { 
+    grid-column: 1 / -1 !important; 
+    display: flex; align-items: center; gap: 8px; 
+    padding: 0 0 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); 
+    font-weight: 700; font-size: 0.75rem; /* Beaucoup plus petit */
+    text-transform: uppercase; 
+    letter-spacing: 1.5px; 
+    color: var(--text-muted); /* Couleur atténuée */
+    margin-top: 10px; margin-bottom: 5px; width: 100%;
+}
+.shop-category-header i, .shop-category-header svg { 
+    width: 14px; height: 14px; opacity: 0.8; 
+}
 
 .empty-state { 
     grid-column: 1 / -1; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -278,7 +379,7 @@ input:focus, select:focus { border-color: var(--accent-purple); background: rgba
 }
 .empty-state i, .empty-state svg { width: 32px; height: 32px; opacity: 0.5; margin-bottom: 5px; }
 
-.staff-banner { display: flex; align-items: center; padding: 10px 16px; min-height: 44px; gap: 12px; margin-bottom: 20px; border-radius: var(--radius-m); border: 1px solid; flex-shrink: 0;}
+.staff-banner { display: flex; align-items: center; padding: 10px 16px; min-height: 44px; gap: 12px; border-radius: var(--radius-m); border: 1px solid; flex-shrink: 0;}
 .banner-purple { background: rgba(176, 91, 255, 0.08); border-color: rgba(176, 91, 255, 0.2); color: #e9d5ff; }
 .banner-blue { background: rgba(75, 207, 250, 0.08); border-color: rgba(75, 207, 250, 0.2); color: #bee3f8; }
 .banner-green { background: rgba(11, 232, 129, 0.08); border-color: rgba(11, 232, 129, 0.2); color: #c6f6d5; }
@@ -459,171 +560,244 @@ input[type="range"].custom-range::-moz-range-thumb { margin-top: 0; }
 .sync-container.fail { border-color: var(--accent-red); }
 .sync-container.fail .sync-result { color: var(--accent-red); }
 
-#orientation-warning { 
-    display: none; position: fixed; inset: 0; background: var(--bg-base); z-index: 99999; 
-    flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white; 
+
+x/* --- SYSTÈME CLEAN SCROLL (SANS STICKY) --- */
+.panel-content.split-layout {
+    overflow: hidden !important; /* Empêche le panneau entier de scroller */
+    padding-bottom: 0 !important; /* Le padding bas est transféré à la zone de scroll */
 }
 
-@media screen and (orientation: portrait) and (max-width: 1024px) {
-    #os-environment, #onboarding-modal { display: none !important; }
-    #orientation-warning { display: flex; }
+.panel-static-top {
+    flex-shrink: 0;
+    margin-bottom: 15px; /* Espace naturel avant la grille */
+    display: flex;
+    flex-direction: column;
 }
 
-@media screen and (max-width: 1180px) {
-    .sidebar { width: 190px; }
-    .brand { font-size: 1.1rem; padding: 20px 15px; }
-    .nav-menu { padding: 15px 10px; }
-    .nav-btn { font-size: 0.85rem; padding: 0 10px; min-height: 36px; }
-    .top-hud { padding: 15px 15px; height: 60px; }
-    .hud-time { width: 85px; }
-    .time-text { font-size: 0.75rem; }
-    .hud-vitals { gap: 10px; margin-right: 15px; }
-    .vital-stat { min-width: 105px; gap: 6px; } 
-    .stat-bar-label { font-size: 0.65rem; gap: 5px; } 
-    .stat-bar-bg { width: 75px; } 
-    .vital-stat i { width: 14px; height: 14px; }
-    .vitals-money-wrapper { gap: 6px; }
-    .vitals-money-wrapper i { width: 16px; height: 16px; }
-    #vitals-money { font-size: 0.9rem; }
-    .hud-actions { gap: 5px; }
-    .hud-actions button { padding: 0 8px; font-size: 0.75rem; min-height: 34px; }
-    .workspace { padding: 15px; }
-    .panel-content { padding: 15px; }
-    .panel-header { flex-wrap: wrap; gap: 8px; line-height: 1.3; }
-    .panel-header > span.badge { margin-top: 4px !important; }
-    .tab-content { grid-template-columns: 1.2fr 1fr !important; }
-    .grid-span-2 { grid-column: span 1 !important; }
-    .grid-3-col { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
-    .grid-4-col { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
-    .data-node { padding: 15px; }
-    .node-header { font-size: 1rem; }
-    button { min-height: 38px; }
-    #profile-name { font-size: 1.8rem !important; }
-    .avatar-wrapper { width: 85px !important; height: 85px !important; }
-    .profile-card .panel-content { padding: 15px !important; gap: 15px !important; }
-    .bio-input { font-size: 0.85rem; }
-    .market-trend-box { min-width: 180px; padding: 12px 15px; }
-    .trend-header { font-size: 0.65rem; margin-bottom: 8px; }
-    .trend-data { font-size: 0.8rem; padding: 4px 8px; }
-    .stat-gauge { padding: 15px !important; } 
-    .stat-gauge .current-val { font-size: 1rem !important; margin-top: 5px !important; }
-    .grid-3-col { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+.scroll-area {
+    flex-grow: 1;
+    overflow-y: auto;
+    min-height: 0; /* Obligatoire pour que Flexbox autorise le scroll interne */
+    padding-right: 5px; /* Espace pour la barre de scroll */
+    padding-bottom: 20px; /* Restaure le padding du bas pour ne pas couper les cartes */
 }
 
-/* ======================================================= */
-/* 📱 ULTIMATE MOBILE OVERHAUL (max-width: 768px)          */
-/* ======================================================= */
+/* --- HARMONISATION DESIGN MERCH --- */
 
-@media screen and (max-width: 768px) {
-    
-    /* 1. DISABLE APPLE ORIENTATION BLOCKER */
-    #orientation-warning { display: none !important; }
-    #os-environment, #onboarding-modal { display: flex !important; }
-    
-    /* 2. REVERSE LAYOUT (Sidebar moves to bottom) */
-    #os-environment { flex-direction: column; }
-    .main-container { order: 1; flex: 1; min-height: 0; }
-    
-    .sidebar { 
-        order: 2; width: 100%; height: 65px; flex-direction: row; 
-        border-right: none; border-top: 1px solid var(--border-color); 
-        background: rgba(18, 18, 24, 0.98); padding: 0; z-index: 100;
-        flex-shrink: 0;
+/* État actif par défaut (Violet) */
+.merch-filter-btn.active {
+    background: rgba(176, 91, 255, 0.1) !important;
+    border-color: var(--accent-purple) !important;
+    color: var(--accent-purple) !important;
+    opacity: 1 !important;
+}
+
+/* Couleur spécifique : Physical (Bleu) */
+.merch-filter-btn[data-filter="physical"].active {
+    background: rgba(75, 207, 250, 0.1) !important;
+    border-color: var(--accent-blue) !important;
+    color: var(--accent-blue) !important;
+}
+
+/* Couleur spécifique : Apparel (Orange) */
+.merch-filter-btn[data-filter="apparel"].active {
+    background: rgba(255, 168, 1, 0.1) !important;
+    border-color: var(--accent-orange) !important;
+    color: var(--accent-orange) !important;
+}
+
+/* Correction du hover pour que ce soit moins "léger" */
+.merch-filter-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.current-prop-card {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    padding: 20px;
+    background: rgba(176, 91, 255, 0.05);
+    border: 1px solid rgba(176, 91, 255, 0.2);
+    border-radius: var(--radius-m);
+    margin-bottom: 10px;
+}
+
+.prop-icon-large {
+    width: 60px;
+    height: 60px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: var(--radius-m);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-purple);
+}
+
+.prop-icon-large svg { width: 32px; height: 32px; }
+
+.prop-stats-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   📱 OVERHAUL MOBILE & RESPONSIVE (IOS / ANDROID NATIVE FEEL)
+   ========================================================================== */
+
+/* Cache les éléments mobiles sur PC */
+#mobile-menu-overlay, #mobile-menu-fab { display: none; }
+
+@media (max-width: 850px) {
+    /* --- 1. DÉBLOQUER LE SCROLL NATIF --- */
+    html, body {
+        background-color: #0a0a0e !important;
+        overscroll-behavior-y: none;
     }
 
-    /* 3. HORIZONTAL BOTTOM NAVIGATION (EXPANDING PILL DESIGN) */
-    .brand, .nav-section-title { display: none !important; }
-    
-    .nav-menu { 
-        flex-direction: row; flex: 1; padding: 0 10px; overflow-x: auto; 
-        overflow-y: hidden; align-items: center; gap: 8px; justify-content: space-between;
+    #os-environment, .main-container {
+        height: 100vh !important;
+        height: 100dvh !important;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
     }
-    .nav-menu::-webkit-scrollbar { display: none; }
-    
-    .nav-btn { 
-        flex-direction: row; /* Changed to row for a better pill */
-        min-height: 44px; flex: 1; 
-        padding: 0; justify-content: center; align-items: center;
-        border-radius: 22px; border: none; gap: 0;
-        font-size: 0 !important; 
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        color: var(--text-muted);
-        background: transparent;
-    }
-    
-    .nav-btn i, .nav-btn svg { width: 20px !important; height: 20px !important; margin: 0 !important; transition: all 0.3s ease; }
-    .nav-btn.active::before { display: none; } 
-    
-    .nav-btn.active { 
-        background: rgba(176,91,255,0.15); 
-        color: var(--accent-purple);
-        font-weight: 700;
-        flex: 1.8; 
-        padding: 0 15px; /* Gives the pill breathing room */
-    }
-    
-    .nav-btn.active i, .nav-btn.active svg { width: 18px !important; height: 18px !important; }
-    
-    .sidebar-bottom { padding: 0 10px; border: none; display: flex; align-items: center; }
-    .sidebar-bottom .nav-btn { min-width: 44px; flex: 0 0 auto; }
 
-    /* 4. COMPACT TOP HUD (NATIVE APP STYLE) */
-    .top-hud { height: auto; padding: 12px; flex-direction: column; gap: 10px; align-items: stretch; background: var(--bg-card); }
-    
-    /* Row 1: Time & Progress */
-    .hud-time { width: 100%; flex-direction: row; align-items: center; justify-content: space-between; gap: 15px; margin: 0; }
-    .time-text { font-size: 0.85rem; margin: 0; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
-    .time-bar-bg { flex: 1; margin: 0; max-width: none; }
-    
-    /* Row 2: Status Tray */
-    #status-tray { width: 100%; justify-content: flex-start; margin: 0; padding: 0 4px; }
+    .workspace {
+        flex: 1 1 auto; /* Prend tout l'espace restant */
+        overflow-y: auto !important; /* Force le scroll interne */
+        -webkit-overflow-scrolling: touch;
+        padding: 15px !important;
+        padding-bottom: 120px !important; /* Espace pour le menu en bas */
+    }
 
-    /* Row 3 & 4: Vitals Grid */
-    .hud-vitals { width: 100%; margin: 0; padding: 0; border: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    /* Libère les boîtes internes pour qu'elles puissent défiler */
+    .tab-content { height: auto !important; display: none !important; flex-direction: column; gap: 15px; }
+    .tab-content.active { display: flex !important; }
+    .panel { height: auto !important; overflow: visible !important; min-height: auto !important; }
+    .panel-content, .scroll-area { overflow: visible !important; padding-bottom: 0 !important; }
+
+    /* --- 2. RÉPARER LE FREEZE (OVERLAY INVISIBLE) --- */
+    #mobile-menu-overlay {
+        display: block !important; 
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+        z-index: 3999;
+        opacity: 0;
+        pointer-events: none; /* TRÈS IMPORTANT: Laisse passer les clics et le scroll ! */
+        transition: opacity 0.3s ease;
+    }
+    body.menu-open #mobile-menu-overlay {
+        opacity: 1;
+        pointer-events: auto; /* Bloque les clics UNIQUEMENT quand le menu est ouvert */
+    }
+
+    /* --- 3. RÉPARER LE BOUTON MENU (FAB) --- */
+    #mobile-menu-fab {
+        display: flex !important; 
+        position: fixed;
+        bottom: 30px; /* Position sécurisée sans variables complexes */
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 5000;
+        
+        /* Design du bouton */
+        padding: 14px 40px !important;
+        border-radius: 40px !important;
+        background: #121218 !important;
+        border: 1px solid rgba(176, 91, 255, 0.5) !important;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.9), 0 0 20px rgba(176, 91, 255, 0.2) !important;
+        color: #fff !important;
+        font-size: 1rem !important;
+        font-weight: 800 !important;
+        letter-spacing: 2px !important;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    /* --- 4. ANIMATION DU MENU TIROIR --- */
+    .sidebar {
+        position: fixed;
+        bottom: -100%; left: 0; width: 100%; height: 85vh;
+        background: var(--bg-base); z-index: 4000;
+        transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border-radius: 25px 25px 0 0;
+        border-right: none; border-top: 1px solid var(--border-color);
+        padding-bottom: 20px;
+    }
+    body.menu-open .sidebar { bottom: 0; }
+    .nav-menu { padding: 30px 20px; }
+    .nav-btn { font-size: 1.1rem; min-height: 50px; }
+
+    /* --- 5. REFONTE DU TOP HUD --- */
+    .top-hud {
+        flex-direction: column; height: auto; padding: 20px 15px; gap: 15px;
+        background: var(--bg-base); border-bottom: none; flex-shrink: 0;
+    }
     .vital-separator { display: none !important; }
     
-    /* Money Block (Full Width) */
-    .vitals-money-wrapper { grid-column: span 2; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.25); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); margin: 0; }
-    .money-text-group { flex-direction: row; gap: 10px; align-items: baseline; }
-    #vitals-money { font-size: 1.1rem; }
-    #rent-countdown { font-size: 0.7rem; }
-    
-    /* Energy & Stress Blocks (Side by Side) */
-    .vital-stat { flex-direction: column; align-items: stretch; background: rgba(0,0,0,0.25); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); gap: 6px; min-width: 0; }
-    .vital-stat i { display: none; } /* Hide icons to save space */
-    .stat-bar-label { font-size: 0.7rem; margin-bottom: 2px; }
-    .stat-bar-bg { width: 100%; height: 6px; }
-    
-   /* Row 5: Actions */
-    .hud-actions { width: 100%; gap: 6px; margin-top: 0px; display: flex; }
-    .hud-actions button {     flex: 1;
-    padding: 15px 10px;
-    font-size: 0.9rem;
-    min-height: 32px;
-    border-radius: 6px;
-    background: rgba(255,255,255,0.03);
-    border-color: rgba(255,255,255,0.1); }
-    .hud-actions button i { width: 12px; height: 12px; }
-    
+    .hud-time { width: 100%; flex-direction: row; justify-content: space-between; align-items: center; gap: 20px; }
+    .time-text { font-size: 1.1rem; line-height: 1.3; font-weight: 800; }
+    .time-bar-bg { flex-grow: 1; height: 6px; }
 
-    /* 5. WORKSPACE & GRID DESTRUCTION */
-    .workspace { padding: 15px 10px; overflow-y: auto; overflow-x: hidden; }
-    .tab-content { display: none; flex-direction: column; gap: 15px !important; height: auto; }
-    .tab-content.active { display: flex !important; }
+    .hud-vitals { width: 100%; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    #money-container {
+        grid-column: 1 / -1; width: 100%; background: var(--bg-card); border: 1px solid var(--border-color);
+        padding: 15px 20px; border-radius: var(--radius-m);
+        display: flex; flex-direction: row; justify-content: space-between; align-items: center;
+    }
+    .money-text-group { flex-direction: row; gap: 15px; align-items: center; justify-content: flex-end; }
+    #vitals-money { font-size: 1.5rem; }
+
+    .vital-stat {
+        background: var(--bg-card); border: 1px solid var(--border-color);
+        padding: 15px; border-radius: var(--radius-m);
+        flex-direction: column; align-items: flex-start; min-width: 0;
+    }
+    .vital-stat i { margin-bottom: 8px; }
+    .stat-bar-container { width: 100%; }
+
+    .hud-actions { width: 100%; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 5px; }
+    .hud-actions button { width: 100%; padding: 12px 0; font-size: 0.85rem; }
+    #status-tray { width: 100%; order: -1; margin-bottom: -5px; }
+
+    /* --- PROPORTION DES GRILLES --- */
+    .grid-3-col, .grid-4-col, .studio-grid { grid-template-columns: 1fr; gap: 15px; }
+    .split-layout { flex-direction: column; }
     
-    .grid-3-col, .grid-4-col { display: flex; flex-direction: column; gap: 15px; }
-    .grid-span-2, .grid-span-full { grid-column: auto; }
-    .panel { height: auto; min-height: auto; }
+    .profile-card .panel-content { flex-direction: column; text-align: center; }
+    .profile-info { align-items: center; margin: 15px 0; }
+    .market-trend-box { width: 100%; align-items: center; text-align: center; }
     
-    /* 6. SPECIFIC UI FIXES */
-    .profile-card .panel-content { flex-direction: column !important; align-items: center; text-align: center; padding: 15px !important; gap: 10px !important; }
-    .avatar-wrapper { width: 60px !important; height: 60px !important; } /* Tiny mobile avatar */
-    #profile-name { font-size: 1.3rem !important; }
-    .market-trend-box { width: 100%; align-items: center; margin-top: 5px; padding: 10px; min-width: 0; }
-    .sidebar-bottom { margin-top: 0px !important; justify-content: center; }
-    .stat-gauge { flex-direction: row; align-items: center; justify-content: space-between; padding: 12px 15px !important; }
-    .stat-gauge .current-val { font-size: 1.2rem !important; margin: 0 !important; }
+    .release-manage-card { flex-direction: column; text-align: center; padding: 15px; }
+    .release-stats-group { border-right: none; border-bottom: 1px dashed rgba(255,255,255,0.1); padding: 0 0 15px 0; margin-bottom: 15px; width: 100%; }
+    .release-manage-card > .flex-col:last-child { width: 100%; }
     
-    /* Force the 3 stat gauges in the Studio to stack vertically so they don't crush */
-    .data-node > div[style*="display: flex; gap: 8px;"] { flex-direction: column; gap: 10px !important; }
+    .modal { width: 95vw !important; max-height: 85vh; transform: scale(0.95) translateY(0); }
+    .overlay.active-overlay .modal { transform: scale(1) translateY(0); }
+    
+    .market-top-tabs { flex-direction: column; }
+    .market-filter-bar { flex-wrap: wrap; }
+    .market-filter-btn { flex: 1 1 45%; }
+
+    /* --- 6. CORRECTION DU MENU ET BOUTON FLOTTANT --- */
+    
+    /* Afficher le bouton de fermeture uniquement sur mobile */
+    .mobile-close-btn { display: block !important; color: var(--text-muted); }
+
+    /* Placer le menu au-dessus de tout le reste (incluant le bouton MENU) */
+    .sidebar { z-index: 6000 !important; }
+
+    /* Animation du bouton MENU : il glisse vers le bas quand on ouvre la sidebar */
+    #mobile-menu-fab {
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease !important;
+    }
+    
+    body.menu-open #mobile-menu-fab {
+        transform: translateX(-50%) translateY(150px) !important; /* Pousse le bouton hors de l'écran */
+        opacity: 0 !important;
+        pointer-events: none;
+    }
 }
