@@ -38,11 +38,9 @@
 
     <div id="os-environment" class="hidden">
         <aside class="sidebar">
-           <div class="brand" style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <i data-lucide="disc-3"></i> ICON Studio
-                </div>
-                <i data-lucide="x" class="mobile-close-btn" onclick="UI.toggleMenu()" style="cursor: pointer; padding: 5px;"></i>
+           <div class="modal-header" style="border-radius: 25px 25px 0 0; background: transparent; border-bottom: 1px solid var(--border-color); padding: 20px 25px;">
+                <span class="flex-row gap-10" style="font-weight: 800; font-size: 1.2rem;"><i data-lucide="disc-3" class="text-purple"></i> ICON Studio</span>
+                <i data-lucide="x" class="close-icon" onclick="UI.toggleMenu()"></i>
             </div>
            <nav class="nav-menu">
                 <div class="nav-section-title">Music</div>
@@ -71,7 +69,7 @@
                     <button class="btn-outline-purple" style="flex:1; padding: 0; min-height: 36px; font-size: 0.85rem;" onclick="Engine.saveGame()"><i data-lucide="save"></i> Save</button>
                     <button class="btn-outline-purple" style="flex:1; padding: 0; min-height: 36px; font-size: 0.85rem;" onclick="Engine.loadGame()"><i data-lucide="download"></i> Load</button>
                 </div>
-                <button class="nav-btn" style="width: 100%; margin: 0; padding: 0 10px; min-height: 40px;" onclick="UI.openModal('settings-modal')"><i data-lucide="settings"></i> System Settings</button>
+                <button class="nav-btn" style="width: 100%; margin: 0; padding: 0 10px; min-height: 40px;" onclick="UI.openModal('settings-modal')"><i data-lucide="settings"></i> Settings</button>
             </div>
         </aside>
 
@@ -751,7 +749,9 @@
         </div>
     </div>
     <div id="mobile-menu-overlay" onclick="UI.toggleMenu()"></div>
-    <button id="mobile-menu-fab" onclick="UI.toggleMenu()">MENU</button>
+    <button id="mobile-menu-fab" onclick="UI.toggleMenu()">
+        <i data-lucide="menu"></i>
+    </button>
 
     <script src="script.js"></script>
 </body>

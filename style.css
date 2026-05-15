@@ -31,8 +31,8 @@ body {
     overflow: hidden; 
     font-size: 14px; 
     letter-spacing: 0.2px;
-    touch-action: manipulation; /* Improves tap response time */
-    -webkit-text-size-adjust: 100%; /* Prevents font-size jumping */
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
@@ -180,6 +180,8 @@ input:focus, select:focus { border-color: var(--accent-purple); background: rgba
 
 #os-environment { display: flex; height: 100vh; height: 100dvh; width: 100vw; overflow: hidden; }
 
+.sidebar .modal-header .close-icon { display: none !important; }
+
 .sidebar { width: 240px; background: rgba(0,0,0, 0.4); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; z-index: 10; flex-shrink: 0; }
 .brand { height: 70px; padding: 25px 20px; font-weight: 800; font-size: 1.3rem; display: flex; align-items: center; gap: 12px; color: #fff; letter-spacing: -0.5px; }
 .brand i { color: var(--accent-purple); }
@@ -233,40 +235,37 @@ input:focus, select:focus { border-color: var(--accent-purple); background: rgba
 #tab-world { grid-template-rows: minmax(0, 1fr); }
 #tab-logs { grid-template-rows: minmax(0, 1fr); }
 
-/* 1. LE CONTENEUR UNIFIÉ (Visible, englobe tout) */
 .market-controls-wrapper {
-    background: rgba(0, 0, 0, 0.2); /* Fond subtil pour lier la zone */
+    background: rgba(0, 0, 0, 0.2);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-m);
     padding: 15px;
     margin-bottom: 25px;
     display: flex;
     flex-direction: column;
-    gap:20px;
+    gap: 20px;
 }
 
-/* 2. LES DEUX BARRES (Devenues 100% invisibles, juste du layout) */
 .market-top-tabs, .market-filter-bar { 
     display: flex; 
     gap: 10px; 
     margin: 0; 
     padding: 0;
-    background: transparent !important; /* Plus de fond gris */
-    border: none !important; /* Plus de bordure */
+    background: transparent !important;
+    border: none !important;
     box-shadow: none;
 }
 
-/* 3. LES BOUTONS TOP BAR (Design principal, tailles d'origine conservées) */
 .market-top-tab { 
     flex: 1; 
-    background: var(--bg-card); /* Fond solide */
+    background: var(--bg-card);
     border: 1px solid var(--border-color); 
-    padding: 10px; /* <-- Retour à la taille d'origine */
+    padding: 10px;
     color: var(--text-muted); 
     font-weight: 700; font-size: 0.95rem; cursor: pointer; 
     transition: all 0.2s ease; border-radius: var(--radius-m); 
     display: flex; justify-content: center; align-items: center; gap: 8px; 
-    opacity: 1; /* Pleine visibilité */
+    opacity: 1;
     box-shadow: none !important; 
 }
 .market-top-tab:hover { 
@@ -276,37 +275,33 @@ input:focus, select:focus { border-color: var(--accent-purple); background: rgba
     background: rgba(176, 91, 255, 0.08); 
     color: white; 
     border-color: rgba(176, 91, 255, 0.4); 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; /* L'effet actif */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
 }
 
-/* 4. LES BOUTONS FILTRES (Design secondaire, tailles d'origine conservées) */
 .market-filter-btn { 
     flex: 1; 
-    background: rgba(0, 0, 0, 0.2); /* Fond assombri pour montrer que c'est un sous-menu */
-    background: var(--bg-card); /* Fond solide */
+    background: var(--bg-card);
     border: 1px solid var(--border-color); 
     padding: 12px 0; 
     border-radius: var(--radius-m); 
     color: var(--text-muted); 
     font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease; 
     display: flex; justify-content: center; align-items: center; gap: 8px; 
-    opacity: 1; /* <-- Retour à la normale, le bouton a l'air actif ! */
+    opacity: 1;
     box-shadow: none !important;
 }
 .market-filter-btn:hover { 
     border-color: rgba(255,255,255,0.2); 
     color: var(--text-main); 
-    background: rgba(255,255,255,0.02); /* Petit feedback visuel au survol */
+    background: rgba(255,255,255,0.02);
 }
 
-/* On remet l'opacité à 1 quand le filtre est cliqué, et on garde tes couleurs dynamiques ! */
 .market-filter-btn.active { opacity: 1; }
 .market-filter-btn[data-filter="all"].active { border-color: rgba(176, 91, 255, 0.4); background: rgba(176, 91, 255, 0.08); color: var(--accent-purple); box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; }
 .market-filter-btn[data-filter="writing"].active { border-color: rgba(255, 168, 1, 0.4); background: rgba(255, 168, 1, 0.08); color: var(--accent-orange); box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; }
 .market-filter-btn[data-filter="recording"].active { border-color: rgba(11, 232, 129, 0.4); background: rgba(11, 232, 129, 0.08); color: var(--accent-green); box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; }
 .market-filter-btn[data-filter="mixing"].active { border-color: rgba(75, 207, 250, 0.4); background: rgba(75, 207, 250, 0.08); color: var(--accent-blue); box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; }
-/* Couleurs dynamiques pour les onglets MILESTONES */
-/* Couleurs dynamiques pour les onglets MILESTONES */
+
 .market-filter-btn[data-filter="Releases"].active { border-color: rgba(11, 232, 129, 0.4); background: rgba(11, 232, 129, 0.08); color: var(--accent-green); box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; }
 .market-filter-btn[data-filter="Streaming"].active { border-color: rgba(176, 91, 255, 0.4); background: rgba(176, 91, 255, 0.08); color: var(--accent-purple); box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; }
 .market-filter-btn[data-filter="Collection"].active { border-color: rgba(254, 211, 48, 0.4); background: rgba(254, 211, 48, 0.08); color: var(--accent-yellow); box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; }
@@ -355,17 +350,14 @@ input:focus, select:focus { border-color: var(--accent-purple); background: rgba
 .data-node:hover { border-color: rgba(255,255,255,0.2); }
 .node-header { display: flex; justify-content: space-between; align-items: center; font-weight: 800; margin-bottom: 12px; font-size: 1.1rem; }
 
-
-
-/* CORRECTION : En-têtes de sous-catégories (Discrets et propres) */
 .shop-category-header { 
     grid-column: 1 / -1 !important; 
     display: flex; align-items: center; gap: 8px; 
     padding: 0 0 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); 
-    font-weight: 700; font-size: 0.75rem; /* Beaucoup plus petit */
+    font-weight: 700; font-size: 0.75rem;
     text-transform: uppercase; 
     letter-spacing: 1.5px; 
-    color: var(--text-muted); /* Couleur atténuée */
+    color: var(--text-muted);
     margin-top: 10px; margin-bottom: 5px; width: 100%;
 }
 .shop-category-header i, .shop-category-header svg { 
@@ -428,7 +420,6 @@ input:focus, select:focus { border-color: var(--accent-purple); background: rgba
 .max-val { font-size: 0.75rem; font-weight: 600; color: rgba(255, 255, 255, 0.3); font-family: var(--font-mono); }
 .stat-gauge-track { width: 100%; height: 4px; background: rgba(255, 255, 255, 0.05); border-radius: 2px; overflow: visible; }
 .stat-gauge-fill { height: 100%; border-radius: 2px; transition: width 0.3s ease, background-color 0.3s ease; }
-
 
 .stat-gauge { padding: 15px !important; }
 .stat-gauge .current-val { font-size: 1.4rem !important; margin-top: 5px !important; }
@@ -560,16 +551,14 @@ input[type="range"].custom-range::-moz-range-thumb { margin-top: 0; }
 .sync-container.fail { border-color: var(--accent-red); }
 .sync-container.fail .sync-result { color: var(--accent-red); }
 
-
-x/* --- SYSTÈME CLEAN SCROLL (SANS STICKY) --- */
 .panel-content.split-layout {
-    overflow: hidden !important; /* Empêche le panneau entier de scroller */
-    padding-bottom: 0 !important; /* Le padding bas est transféré à la zone de scroll */
+    overflow: hidden !important; 
+    padding-bottom: 0 !important; 
 }
 
 .panel-static-top {
     flex-shrink: 0;
-    margin-bottom: 15px; /* Espace naturel avant la grille */
+    margin-bottom: 15px; 
     display: flex;
     flex-direction: column;
 }
@@ -577,14 +566,11 @@ x/* --- SYSTÈME CLEAN SCROLL (SANS STICKY) --- */
 .scroll-area {
     flex-grow: 1;
     overflow-y: auto;
-    min-height: 0; /* Obligatoire pour que Flexbox autorise le scroll interne */
-    padding-right: 5px; /* Espace pour la barre de scroll */
-    padding-bottom: 20px; /* Restaure le padding du bas pour ne pas couper les cartes */
+    min-height: 0; 
+    padding-right: 5px; 
+    padding-bottom: 20px; 
 }
 
-/* --- HARMONISATION DESIGN MERCH --- */
-
-/* État actif par défaut (Violet) */
 .merch-filter-btn.active {
     background: rgba(176, 91, 255, 0.1) !important;
     border-color: var(--accent-purple) !important;
@@ -592,21 +578,18 @@ x/* --- SYSTÈME CLEAN SCROLL (SANS STICKY) --- */
     opacity: 1 !important;
 }
 
-/* Couleur spécifique : Physical (Bleu) */
 .merch-filter-btn[data-filter="physical"].active {
     background: rgba(75, 207, 250, 0.1) !important;
     border-color: var(--accent-blue) !important;
     color: var(--accent-blue) !important;
 }
 
-/* Couleur spécifique : Apparel (Orange) */
 .merch-filter-btn[data-filter="apparel"].active {
     background: rgba(255, 168, 1, 0.1) !important;
     border-color: var(--accent-orange) !important;
     color: var(--accent-orange) !important;
 }
 
-/* Correction du hover pour que ce soit moins "léger" */
 .merch-filter-btn:hover {
     background: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.2);
@@ -642,15 +625,9 @@ x/* --- SYSTÈME CLEAN SCROLL (SANS STICKY) --- */
     flex-wrap: wrap;
 }
 
-/* ==========================================================================
-   📱 OVERHAUL MOBILE & RESPONSIVE (IOS / ANDROID NATIVE FEEL)
-   ========================================================================== */
-
-/* Cache les éléments mobiles sur PC */
 #mobile-menu-overlay, #mobile-menu-fab { display: none; }
 
 @media (max-width: 850px) {
-    /* --- 1. DÉBLOQUER LE SCROLL NATIF --- */
     html, body {
         background-color: #0a0a0e !important;
         overscroll-behavior-y: none;
@@ -665,44 +642,40 @@ x/* --- SYSTÈME CLEAN SCROLL (SANS STICKY) --- */
     }
 
     .workspace {
-        flex: 1 1 auto; /* Prend tout l'espace restant */
-        overflow-y: auto !important; /* Force le scroll interne */
+        flex: 1 1 auto; 
+        overflow-y: auto !important; 
         -webkit-overflow-scrolling: touch;
         padding: 15px !important;
-        padding-bottom: 120px !important; /* Espace pour le menu en bas */
+        padding-bottom: 120px !important; 
     }
 
-    /* Libère les boîtes internes pour qu'elles puissent défiler */
     .tab-content { height: auto !important; display: none !important; flex-direction: column; gap: 15px; }
     .tab-content.active { display: flex !important; }
     .panel { height: auto !important; overflow: visible !important; min-height: auto !important; }
     .panel-content, .scroll-area { overflow: visible !important; padding-bottom: 0 !important; }
 
-    /* --- 2. RÉPARER LE FREEZE (OVERLAY INVISIBLE) --- */
     #mobile-menu-overlay {
         display: block !important; 
         position: fixed; top: 0; left: 0; right: 0; bottom: 0;
         background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
         z-index: 3999;
         opacity: 0;
-        pointer-events: none; /* TRÈS IMPORTANT: Laisse passer les clics et le scroll ! */
+        pointer-events: none; 
         transition: opacity 0.3s ease;
     }
     body.menu-open #mobile-menu-overlay {
         opacity: 1;
-        pointer-events: auto; /* Bloque les clics UNIQUEMENT quand le menu est ouvert */
+        pointer-events: auto; 
     }
 
-    /* --- 3. RÉPARER LE BOUTON MENU (FAB) --- */
     #mobile-menu-fab {
         display: flex !important; 
         position: fixed;
-        bottom: 30px; /* Position sécurisée sans variables complexes */
+        bottom: 30px; 
         left: 50%;
         transform: translateX(-50%);
         z-index: 5000;
         
-        /* Design du bouton */
         padding: 14px 40px !important;
         border-radius: 40px !important;
         background: #121218 !important;
@@ -717,7 +690,6 @@ x/* --- SYSTÈME CLEAN SCROLL (SANS STICKY) --- */
         cursor: pointer;
     }
 
-    /* --- 4. ANIMATION DU MENU TIROIR --- */
     .sidebar {
         position: fixed;
         bottom: -100%; left: 0; width: 100%; height: 85vh;
@@ -727,43 +699,81 @@ x/* --- SYSTÈME CLEAN SCROLL (SANS STICKY) --- */
         border-right: none; border-top: 1px solid var(--border-color);
         padding-bottom: 20px;
     }
+    .sidebar .modal-header .close-icon { display: block !important; }
+
     body.menu-open .sidebar { bottom: 0; }
     .nav-menu { padding: 30px 20px; }
     .nav-btn { font-size: 1.1rem; min-height: 50px; }
 
-    /* --- 5. REFONTE DU TOP HUD --- */
     .top-hud {
-        flex-direction: column; height: auto; padding: 20px 15px; gap: 15px;
-        background: var(--bg-base); border-bottom: none; flex-shrink: 0;
+        display: flex !important;
+        flex-direction: column !important;
+        padding: 10px 15px !important; 
+        gap: 8px !important;
+        background: #0a0a0e !important; /* Noir solide, finit le bug transparent ! */
+        border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+        position: relative !important; /* On retire le sticky qui casse tout sur iPhone */
+        z-index: 3000 !important;
+        flex-shrink: 0 !important;
+        height: auto !important;
     }
+    
     .vital-separator { display: none !important; }
     
-    .hud-time { width: 100%; flex-direction: row; justify-content: space-between; align-items: center; gap: 20px; }
-    .time-text { font-size: 1.1rem; line-height: 1.3; font-weight: 800; }
-    .time-bar-bg { flex-grow: 1; height: 6px; }
-
-    .hud-vitals { width: 100%; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    #money-container {
-        grid-column: 1 / -1; width: 100%; background: var(--bg-card); border: 1px solid var(--border-color);
-        padding: 15px 20px; border-radius: var(--radius-m);
-        display: flex; flex-direction: row; justify-content: space-between; align-items: center;
+    /* Ligne 1 : Temps très fin */
+    .hud-time { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 15px !important; width: 100% !important; }
+    .time-text { font-size: 0.8rem !important; margin: 0 !important; color: var(--text-muted); width: auto !important; }
+    .time-bar-bg { flex-grow: 1 !important; height: 3px !important; margin: 0 !important; }
+    
+    /* Ligne 2 : Stats */
+    .hud-vitals { 
+        display: flex !important; 
+        flex-wrap: wrap !important; 
+        gap: 8px 15px !important; 
+        width: 100% !important; 
+        margin: 0 !important; 
     }
-    .money-text-group { flex-direction: row; gap: 15px; align-items: center; justify-content: flex-end; }
-    #vitals-money { font-size: 1.5rem; }
-
-    .vital-stat {
-        background: var(--bg-card); border: 1px solid var(--border-color);
-        padding: 15px; border-radius: var(--radius-m);
-        flex-direction: column; align-items: flex-start; min-width: 0;
+    
+    #money-container, .vital-stat {
+        background: transparent !important; 
+        border: none !important; 
+        padding: 0 !important; 
+        min-width: 0 !important;
     }
-    .vital-stat i { margin-bottom: 8px; }
-    .stat-bar-container { width: 100%; }
+    
+    /* L'argent prend le haut, souligné subtilement */
+    #money-container { 
+        flex: 1 1 100% !important; 
+        padding-bottom: 6px !important; 
+        border-bottom: 1px dashed rgba(255,255,255,0.1) !important;
+    }
+    .money-text-group { display: flex !important; flex-direction: row !important; gap: 10px !important; align-items: baseline !important; justify-content: space-between !important; width: 100%; }
+    #vitals-money { font-size: 1.15rem !important; line-height: 1 !important; }
+    #rent-countdown { font-size: 0.7rem !important; opacity: 0.7; }
+    
+    /* Energie & Stress côte à côte, ultra clean */
+    .vital-stat { 
+        flex: 1 1 40% !important; 
+        flex-direction: row !important; 
+        align-items: center !important; 
+        gap: 8px !important; 
+    }
+    .vital-stat i { margin: 0 !important; width: 14px !important; height: 14px !important; }
+    .stat-bar-container { gap: 3px !important; display: flex !important; flex-direction: column !important; width: 100% !important; }
+    .stat-bar-label { font-size: 0.65rem !important; display: flex !important; justify-content: space-between !important; }
+    .stat-bar-bg { height: 4px !important; width: 100% !important; }
+    
+    /* Ligne 3 : Boutons d'action affinés */
+    .hud-actions { margin-top: 2px !important; gap: 8px !important; width: 100% !important; display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; }
+    .hud-actions button { 
+        padding: 6px 0 !important; 
+        min-height: 34px !important; 
+        font-size: 0.75rem !important; 
+        background: rgba(255,255,255,0.03) !important; 
+    }
+    
+    #status-tray { width: 100% !important; order: -1 !important; margin-bottom: -4px !important; }
 
-    .hud-actions { width: 100%; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 5px; }
-    .hud-actions button { width: 100%; padding: 12px 0; font-size: 0.85rem; }
-    #status-tray { width: 100%; order: -1; margin-bottom: -5px; }
-
-    /* --- PROPORTION DES GRILLES --- */
     .grid-3-col, .grid-4-col, .studio-grid { grid-template-columns: 1fr; gap: 15px; }
     .split-layout { flex-direction: column; }
     
@@ -782,22 +792,173 @@ x/* --- SYSTÈME CLEAN SCROLL (SANS STICKY) --- */
     .market-filter-bar { flex-wrap: wrap; }
     .market-filter-btn { flex: 1 1 45%; }
 
-    /* --- 6. CORRECTION DU MENU ET BOUTON FLOTTANT --- */
-    
-    /* Afficher le bouton de fermeture uniquement sur mobile */
-    .mobile-close-btn { display: block !important; color: var(--text-muted); }
+    .mobile-close-btn { 
+        display: block !important; 
+        color: var(--text-muted); 
+        padding: 5px; 
+    }
+    .mobile-close-btn svg { 
+        width: 20px !important; 
+        height: 20px !important; 
+    }
 
-    /* Placer le menu au-dessus de tout le reste (incluant le bouton MENU) */
+    .mobile-close-btn:active {
+        transform: scale(0.9); 
+        color: var(--text-main);
+    }
+
     .sidebar { z-index: 6000 !important; }
 
-    /* Animation du bouton MENU : il glisse vers le bas quand on ouvre la sidebar */
     #mobile-menu-fab {
         transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease !important;
     }
     
     body.menu-open #mobile-menu-fab {
-        transform: translateX(-50%) translateY(150px) !important; /* Pousse le bouton hors de l'écran */
+        transform: translateX(-50%) translateY(150px) !important; 
         opacity: 0 !important;
         pointer-events: none;
     }
+
+    .workspace, .panel, .data-node, .scroll-area, .tab-content, .release-manage-card {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .panel { width: 100% !important; margin: 0 !important; }
+    .scroll-area { padding-right: 0 !important; }
+
+    #mobile-menu-fab {
+        display: flex !important; 
+        position: fixed;
+        bottom: 30px; 
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 5000;
+        
+        padding: 12px 24px !important; 
+        border-radius: 30px !important;
+        background: rgba(18, 18, 24, 0.95) !important; 
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important;
+        
+        color: var(--text-main) !important;
+        font-size: 0.9rem !important;
+        font-weight: 700 !important;
+        letter-spacing: 1px !important;
+        
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        cursor: pointer;
+    }
+
+    #mobile-menu-fab svg {
+        width: 18px !important;
+        height: 18px !important;
+        color: var(--text-muted) !important;
+    }
+
+    .panel-content.split-layout {
+        overflow: visible !important;
+        padding-bottom: 20px !important;
+    }
+
+    .workspace, .tab-content, .panel, .panel-content, .data-node, .empty-state {
+        min-width: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    
+    .workspace {
+        overflow-x: hidden !important; 
+    }
+
+    body:has(.overlay.active-overlay) #mobile-menu-fab,
+    body:has(#action-blocker.active) #mobile-menu-fab,
+    body:has(.sync-overlay.active) #mobile-menu-fab {
+        transform: translateX(-50%) translateY(150px) !important; 
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
+    /* --- 7. CONSISTANCE DES TAILLES (SIZING OVERHAUL) --- */
+    
+    /* 1. iOS Anti-Zoom & Touch Targets */
+    /* Obligatoire sur iPhone : 16px sur les champs évite le zoom forcé de l'écran */
+    input[type="text"], input[type="number"], select, .custom-select-trigger {
+        font-size: 16px !important; 
+        padding: 0 12px !important;
+    }
+
+    /* 2. Sizing des Modales */
+    /* On utilise calc() pour garantir un bel espacement sur les bords sans déborder */
+    .modal {
+        width: calc(100vw - 30px) !important;
+        max-width: 400px !important; 
+    }
+    /* On réduit le padding PC (25px) à un padding Mobile (15px) pour libérer l'espace */
+    .modal-header, .modal-footer { padding: 15px !important; }
+    .modal-body { padding: 15px !important; gap: 12px !important; }
+
+    /* 3. Panneaux et Cartes (Data Nodes) */
+    /* Uniformisation absolue de toutes les marges internes à 15px */
+    .panel-content, .data-node { padding: 15px !important; }
+    .panel-header { padding: 12px 15px !important; }
+    .empty-state { padding: 25px 15px !important; min-height: 100px !important; }
+
+    /* 4. Le Menu (Sidebar) */
+    /* Alignement parfait de la liste avec l'en-tête "ICON Studio" */
+    .nav-menu { padding: 15px !important; gap: 6px !important; }
+    .nav-btn { min-height: 44px !important; font-size: 1.05rem !important; }
+    .sidebar-bottom { padding: 15px !important; }
+
+    /* 5. Le Top HUD (Vitals) */
+    /* Resserre légèrement les cartes d'énergie et de stress */
+    .vital-stat { padding: 12px !important; }
+    #money-container { padding: 12px 15px !important; }
+
+    /* On garde l'agencement horizontal, mais avec plus d'air */
+    .profile-card .panel-content { 
+        flex-direction: row !important; 
+        flex-wrap: wrap !important; 
+        align-items: center !important; 
+        text-align: left !important; 
+        padding: 15px !important; 
+        gap: 15px !important; 
+    }
+    
+    /* Avatar ni trop gros, ni trop petit (85px) */
+    .avatar-wrapper { 
+        width: 85px !important; 
+        height: 85px !important; 
+        border-width: 2px !important; 
+    }
+    
+    /* Alignement du texte à côté de l'avatar */
+    .profile-info { 
+        align-items: flex-start !important; 
+        margin: 0 !important; 
+        flex: 1 1 calc(100% - 105px) !important; 
+    }
+    
+    .profile-info h2 { font-size: 1.3rem !important; margin-bottom: 2px !important; }
+    .bio-input { font-size: 0.9rem !important; margin-top: 0 !important; padding: 0 !important; }
+    #profile-perk-display { font-size: 0.75rem !important; margin-bottom: 4px !important; }
+    
+    /* Le Radar redevient une vraie boîte esthétique, prenant 100% de la largeur en dessous */
+    .market-trend-box { 
+        width: 100% !important; 
+        flex-direction: column !important; 
+        align-items: flex-start !important; /* Aligné à gauche pour la lecture mobile */
+        padding: 12px 15px !important; 
+        margin-top: 5px !important; 
+        background: rgba(0, 0, 0, 0.4) !important;
+    }
+    
+    .trend-header { font-size: 0.75rem !important; margin-bottom: 8px !important; }
+    .trend-data { font-size: 0.9rem !important; margin-bottom: 6px !important; }
+    .trend-footer { display: block !important; font-size: 0.75rem !important; } /* On remet l'aide textuelle */
+
+
+    
 }
