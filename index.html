@@ -238,7 +238,7 @@
                     <div class="panel grid-span-full" style="margin-bottom: 15px;">
                         <div class="panel-header">
                             <span><i data-lucide="upload-cloud"></i> Distribution Pipeline</span>
-                            <button class="btn-primary btn-small" onclick="UI.openReleaseModal()">+ ‎ Package New Release</button>
+                            <button class="btn-primary btn-small" onclick="UI.openReleaseModal()">+ ‎ New Release</button>
                         </div>
                         <div class="panel-content flex-col split-layout">
                             <div class="panel-static-top">
@@ -269,7 +269,7 @@
                             <i data-lucide="home"></i> Real Estate
                         </button>
                         <button id="btn-hq-staff" class="market-top-tab" onclick="UI.switchHQTab('staff')">
-                            <i data-lucide="users"></i> The Entourage
+                            <i data-lucide="users"></i> Entourage
                         </button>
                     </div>
                 </div>
@@ -489,12 +489,12 @@
     </div>
 
     <div id="release-modal" class="overlay hidden">
-        <div class="modal" style="width: 550px;">
-            <div class="modal-header">
+        <div class="modal" style="width: 660px; max-height: 85vh;"> <div class="modal-header">
                 <span><i data-lucide="disc"></i> Package Release</span>
                 <i data-lucide="x" class="close-icon" style="cursor:pointer;" onclick="UI.closeModal('release-modal')"></i>
             </div>
-            <div class="modal-body scrollable" style="padding: 25px; max-height: 50vh;">
+            
+            <div class="modal-body scrollable" style="padding: 25px; max-height: 55vh;">
                 <div class="data-node flex-row gap-20" style="margin-bottom: 15px; align-items: stretch;">
                     <div class="art-upload-box" id="art-preview-box" style="width: 120px; height: 120px; border-radius: 8px;">
                         <input type="file" id="rel-art" accept="image/*" onchange="UI.handleImageUpload(event)">
@@ -520,8 +520,11 @@
                     <select id="vault-selector" onchange="DistroEngine.addTrackToPending()"></select>
                     <div id="pending-tracklist" style="margin-top: 15px;"></div>
                 </div>
-                <div id="distro-options-list" class="data-node flex-col gap-10" style="padding: 20px; margin-bottom: 15px;"></div>
+                <div id="distro-options-list" class="data-node flex-col gap-10" style="padding: 20px; margin-bottom: 0;"></div>
             </div> 
+            
+            <div id="release-invoice-box" class="data-node flex-col" style="padding: 15px 25px; background: rgba(0,0,0,0.4); border-top: 1px solid var(--border-color); border-bottom: none; border-left: none; border-right: none; border-radius: 0; font-family: var(--font-mono); font-size: 0.85rem;"></div>
+            
             <div class="modal-footer">
                 <button class="btn-primary w-100" style="font-size: 1.05rem; padding: 15px 0;" onclick="DistroEngine.submitRelease()">Sign Off & Deploy <i data-lucide="check-circle"></i></button>
             </div>

@@ -27,7 +27,6 @@ const ImageCompressor = {
                 let width = img.width;
                 let height = img.height;
 
-                // Calcul du ratio pour ne pas déformer l'image
                 if (width > height) {
                     if (width > maxDimension) {
                         height = Math.round(height * (maxDimension / width));
@@ -44,12 +43,10 @@ const ImageCompressor = {
                 canvas.height = height;
                 const ctx = canvas.getContext('2d');
                 
-                // On remplit le fond en noir au cas où c'est un PNG transparent (car on convertit en JPEG)
                 ctx.fillStyle = "#121218"; 
                 ctx.fillRect(0, 0, width, height);
                 ctx.drawImage(img, 0, 0, width, height);
 
-                // On exporte en JPEG (beaucoup plus léger que PNG) avec la qualité choisie
                 const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
                 callback(compressedBase64);
             };
@@ -267,18 +264,14 @@ const Engine = {
         };
         
         try {
-            // On essaie de sauvegarder
             localStorage.setItem('studioOS_save', JSON.stringify(saveData));
             
-            // Si ça marche et que ce n'est pas silencieux, on affiche le succès
             if (!silent) {
                 UI.showAlert("Game Saved", "Your progress has been stored locally.");
             }
         } catch (error) {
-            // Si ça plante (ex: Stockage plein à cause des images)
             console.error("Save failed:", error);
             
-            // On force l'affichage d'une alerte, même si c'était un autosave silencieux
             if (error.name === 'QuotaExceededError' || error.code === 22) {
                 UI.showAlert("Save Failed: Storage Full", "Your save file is too large! This usually happens when uploading high-resolution custom cover arts. Try using smaller images.");
             } else {
@@ -538,7 +531,6 @@ const Engine = {
                 UI.showAlert("Access Denied", "Invalid Admin Command.");
                 break;
                 case "STRESS-TEST":
-    // 1. Remplir le Studio (Sessions actives)
     for (let i = 1; i <= 50; i++) {
         let t = new Track(`Stress Track ${i}`, "Hyperpop", 160, "Aggressive");
         t.progress = Math.floor(Math.random() * 90);
@@ -546,7 +538,6 @@ const Engine = {
         Engine.state.tracks.push(t);
     }
 
-    // 2. Remplir le Vault (Masters prêts)
     for (let i = 1; i <= 50; i++) {
         let t = new Track(`Vault Monster ${i}`, "Drill", 140, "Dark");
         t.status = 'Ready';
@@ -554,7 +545,6 @@ const Engine = {
         Engine.state.tracks.push(t);
     }
 
-    // 3. Remplir les contrats (Board)
     for (let i = 1; i <= 50; i++) {
         Engine.state.availableContracts.push({
             instanceId: 'stress_' + i,
@@ -566,7 +556,6 @@ const Engine = {
         });
     }
 
-    // 4. Remplir la Discographie (Releases live)
     for (let i = 1; i <= 50; i++) {
         let rel = new Release(`Classic Hit ${i}`, 'Single', [Engine.state.tracks[0]], null, ['dsp'], 'dk', Engine.state.day - 1);
         rel.status = 'Live';
@@ -575,15 +564,12 @@ const Engine = {
         Engine.state.releases.push(rel);
     }
 
-    // 5. Remplir l'Inventaire (Merch)
     Game.config.merch.forEach(item => {
         let key = item.id;
         Engine.state.inventory[key] = 9999;
     });
 
-    UI.showAlert("⚠️ STRESS TEST ACTIVÉ", "Toutes les zones de scroll sont maintenant saturées. Bonne chance pour le débug !");
-    
-    // Refresh global de l'UI
+    UI.showAlert("⚠️ STRESS TEST ENABLED", "All scroll zones are now saturated. Good luck with the debug!");
     UI.renderStudio();
     UI.renderVault();
     UI.renderContracts();
@@ -649,8 +635,14 @@ const TimeManager = {
         UI.renderStatuses();
         if (Math.random() < 0.15) setTimeout(() => EventEngine.triggerEvent(context), 300);
         if (Engine.state.player.burnout >= 100) {
+            Engine.modifyStat('burnout', -100); 
+            Engine.modifyStat('energy', 100);
             Engine.log("CRITICAL BURNOUT! Hospitalised. You lost 2 days.");
-            Engine.modifyStat('burnout', -100); Engine.modifyStat('energy', 100);
+            
+            // On affiche la modale d'alerte !
+            UI.showAlert("CRITICAL BURNOUT", "You pushed yourself way too hard and collapsed from exhaustion.<br><br>You are being <strong>hospitalized for 2 days</strong> to recover. Take care of your mental health!");
+            
+            // Le temps passera en arrière-plan pendant que la modale est affichée
             setTimeout(() => this.passTime(48, "Hospitalized"), 500); 
         }
         if (Engine.state.preferences && Engine.state.preferences.autosave) {
@@ -973,21 +965,30 @@ const PlayerActions = {
         const sleepCD = Engine.state.cooldowns.sleep || 0;
         this.currentAction = type;
         const slider = document.getElementById('life-hours-slider');
-        slider.value = 8;
+        
         if (type === 'sleep') {
             const isExhausted = player.energy < 30;
             if (sleepCD > 0 && !isExhausted) return UI.showAlert("Not Tired", `Your mind is still racing! You'll be tired again in ${sleepCD}h, or once your energy drops below 30%.`);
-            document.getElementById('life-modal-title').innerHTML = `<i data-lucide="bed"></i> ${isExhausted ? 'Emergency Nap' : 'Rest / Sleep'}`;
-            document.getElementById('confirm-life-btn').innerText = "GO TO SLEEP";
+            
+            let maxSleep = (sleepCD > 0 && isExhausted) ? 3 : 8; 
+            slider.max = maxSleep;
+            slider.value = (maxSleep === 3) ? 3 : 6;
+            
+            document.getElementById('life-modal-title').innerHTML = `<i data-lucide="bed"></i> ${isExhausted && sleepCD > 0 ? 'Emergency Nap' : 'Rest / Sleep'}`;
+            document.getElementById('confirm-life-btn').innerText = (sleepCD > 0 && isExhausted) ? "TAKE NAP" : "GO TO SLEEP";
             document.getElementById('job-info-box').style.display = 'none';
         } else {
             if (Engine.state.player.lastWorkDay === Engine.state.day) return UI.showAlert("Shift Completed", "You've already clocked out for today! Your manager expects you back at the start of next shift.");
+            
+            slider.max = 12; // On remet à 12h pour le travail
+            slider.value = 8;
+            
             document.getElementById('life-modal-title').innerHTML = `<i data-lucide="briefcase"></i> Day Job`;
             document.getElementById('confirm-life-btn').innerText = "START SHIFT";
             document.getElementById('job-info-box').style.display = 'flex';
             this.updateJobInfoDisplay();
         }
-        UI.updateLifeSlider(8);
+        UI.updateLifeSlider(slider.value);
         document.getElementById('confirm-life-btn').onclick = () => this.confirmLifeAction();
         UI.openModal('life-modal');
         lucide.createIcons();
@@ -1063,7 +1064,7 @@ const PlayerActions = {
             if(Engine.state.player.perkId === 'sleeper') rec *= 1.2;
             Engine.modifyStat('energy', rec); 
             Engine.modifyStat('burnout', -(hours * 6)); 
-            Engine.state.cooldowns.sleep = 12; 
+            Engine.state.cooldowns.sleep = 16; 
         }
         else if (this.currentAction === 'pass') {
             const stressGain = hours * Game.config.settings.waitStressGainPerHour;
@@ -1402,12 +1403,40 @@ const SocialEngine = {
 };
 
 const DistroEngine = {
-    currentDistro: 'sc', 
+    currentDistro: 'sc',
+    updateReleaseInvoice() {
+        let formatStr = document.getElementById('rel-format').value;
+        let visualStr = document.getElementById('rel-visuals').value;
+        let dspVal = this.currentDistro;
+        
+        let distroObj = Game.config.distroOptions.find(d => d.id === dspVal);
+        let visualObj = Game.config.visualOptions.find(v => v.id === visualStr);
+        if (!distroObj || !visualObj) return;
+
+        let trackCount = Engine.pendingTracklist.length;
+        let trackPremium = distroObj.cost > 0 ? (trackCount * 3) : 0;
+        let totalCost = distroObj.cost + trackPremium + visualObj.cost;
+
+        let invoiceBox = document.getElementById('release-invoice-box');
+        if (!invoiceBox) return;
+
+        let playerMoney = Engine.state.player.money;
+        let costClass = playerMoney >= totalCost ? 'text-green' : 'text-red';
+
+        invoiceBox.innerHTML = `
+            <div style="font-weight: 700; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-family: var(--font-ui);">Project invoice</div>
+            <div class="flex-row-between text-muted" style="margin-bottom: 6px;">Plan Base Cost: <span class="text-main">$${distroObj.cost}</span></div>
+            <div class="flex-row-between text-muted" style="margin-bottom: 6px;">Track Vol. Fee (${trackCount} tracks): <span class="text-main">+$${trackPremium}</span></div>
+            <div class="flex-row-between text-muted" style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed rgba(255,255,255,0.1);">Visual Budget: <span class="text-main">+$${visualObj.cost}</span></div>
+            <div class="flex-row-between" style="font-weight: bold; font-size: 0.95rem;">Total Cost: <span class="${costClass}">$${totalCost.toLocaleString()}</span></div>
+        `;
+    },
     selectDistro(type) {
         let opt = Game.config.distroOptions.find(d => d.id === type);
         if (opt.reqFans > Engine.state.player.followers) return;
         this.currentDistro = type;
         UI.renderDistroOptions(); 
+        this.updateReleaseInvoice();
     },
     addTrackToPending() {
         let sel = document.getElementById('vault-selector');
@@ -1416,6 +1445,7 @@ const DistroEngine = {
         if(!Engine.pendingTracklist.find(t => t.id === id)) {
             Engine.pendingTracklist.push(track);
             this.renderPendingTracklist();
+            this.updateReleaseInvoice();
         }
         sel.value = "";
         sel.dispatchEvent(new Event('change'));
@@ -1430,6 +1460,8 @@ const DistroEngine = {
     removeTrack(index) {
         Engine.pendingTracklist.splice(index, 1);
         this.renderPendingTracklist();
+        this.updateReleaseInvoice();
+        this.openModal('release-modal');
     },
     renderPendingTracklist() {
         let list = document.getElementById('pending-tracklist');
@@ -1470,9 +1502,15 @@ const DistroEngine = {
         if(Engine.pendingTracklist.length < formatObj.min || Engine.pendingTracklist.length > formatObj.max) {
             return UI.showAlert("Invalid Track Count", `A ${formatObj.title} requires ${formatObj.min}-${formatObj.max} tracks.`);
         }
-        let totalCost = distroObj.cost + visualObj.cost;
+        
+        let trackPremium = distroObj.cost > 0 ? (Engine.pendingTracklist.length * 3) : 0;
+        let totalCost = distroObj.cost + trackPremium + visualObj.cost;
+        
         if(Engine.state.player.money < totalCost) return UI.showAlert("Insufficient Funds", "You don't have enough money for this distribution tier and visual budget.");
-        UI.showConfirm("Deploy Release", `Package "${title}" and sign off distribution? (Cost: <span class="text-red">$${totalCost.toLocaleString()}</span>)`, () => {
+        
+        let confirmMsg = `Package "${title}" and sign off distribution? (Base cost + $${trackPremium} track volume fee: <span class="text-red">$${totalCost.toLocaleString()}</span>)`;
+        
+        UI.showConfirm("Deploy Release", confirmMsg, () => {
             Engine.modifyStat('money', -totalCost);
             let platforms = ['sc']; 
             if(dspVal !== 'sc') platforms.push('dsp');
@@ -1720,12 +1758,15 @@ let btnText = cantAfford ? `<i data-lucide="lock"></i> $${s.cost.toLocaleString(
     openPassTimeModal() {
         PlayerActions.currentAction = 'pass';
         const slider = document.getElementById('life-hours-slider');
+        slider.max = 12;
         slider.value = 1;
         document.getElementById('life-modal-title').innerHTML = `<i data-lucide="clock"></i> Kill Time`;
         document.getElementById('confirm-life-btn').innerText = "WAIT";
         document.getElementById('job-info-box').style.display = 'none';
         this.updateLifeSlider(1);
         document.getElementById('confirm-life-btn').onclick = () => PlayerActions.confirmLifeAction();
+        document.getElementById('rel-format').onchange = () => { UI.updateReleaseFormatUI(); DistroEngine.updateReleaseInvoice(); };
+        document.getElementById('rel-visuals').onchange = () => { DistroEngine.updateReleaseInvoice(); };
         this.openModal('life-modal');
         lucide.createIcons();
     },
@@ -1924,15 +1965,19 @@ let btnText = cantAfford ? `<i data-lucide="lock"></i> $${s.cost.toLocaleString(
     },
     updateLifeSlider(val) {
         document.getElementById('life-hours-display').innerText = val;
-        let pct = ((val - 1) / 11) * 100;
-        document.getElementById('life-hours-slider').style.background = `linear-gradient(to right, var(--accent-purple) ${pct}%, rgba(0, 0, 0, 0.4) ${pct}%)`;
+        const slider = document.getElementById('life-hours-slider');
+        let max = parseInt(slider.max) || 12;
+        let pct = max > 1 ? ((val - 1) / (max - 1)) * 100 : 100;
+        slider.style.background = `linear-gradient(to right, var(--accent-purple) ${pct}%, rgba(0, 0, 0, 0.4) ${pct}%)`;
+        
         if (PlayerActions.currentAction === 'sleep') {
             let nrg = val * 8;
             if(Engine.state.player.perkId === 'sleeper') nrg *= 1.2;
             document.getElementById('life-impact-1').innerHTML = `<span class="text-green">+${nrg}% Energy</span>`;
             document.getElementById('life-impact-2').innerHTML = `<span class="text-green">-${val * 6}% Stress</span>`;
         }
-        else if (PlayerActions.currentAction === 'pass') {
+       else if (PlayerActions.currentAction === 'pass') {
+            document.getElementById('life-impact-1').innerHTML = ''; 
             document.getElementById('life-impact-2').innerHTML = `<span class="text-red">+${val * Game.config.settings.waitStressGainPerHour}% Stress</span>`;
         }
         else {
@@ -1948,15 +1993,11 @@ let btnText = cantAfford ? `<i data-lucide="lock"></i> $${s.cost.toLocaleString(
         document.getElementById('market-pros-container').classList.toggle('hidden', tab !== 'pros');
     },
     switchHQTab(tab) {
-        // 1. Boutons Actifs
         document.getElementById('btn-hq-realestate').className = tab === 'realestate' ? 'market-top-tab active' : 'market-top-tab';
         document.getElementById('btn-hq-staff').className = tab === 'staff' ? 'market-top-tab active' : 'market-top-tab';
-        
-        // 2. Textes Explicatifs (Statiques)
         document.getElementById('hq-desc-realestate').classList.toggle('hidden', tab !== 'realestate');
         document.getElementById('hq-desc-staff').classList.toggle('hidden', tab !== 'staff');
         
-        // 3. Grilles (Scrollables)
         document.getElementById('hq-realestate-container').classList.toggle('hidden', tab !== 'realestate');
         document.getElementById('hq-staff-container').classList.toggle('hidden', tab !== 'staff');
     },
@@ -1974,10 +2015,7 @@ let btnText = cantAfford ? `<i data-lucide="lock"></i> $${s.cost.toLocaleString(
         });
     },
     filterMerch(filter) {
-    // 1. Gestion de l'état actif uniquement
     document.querySelectorAll('.merch-filter-btn').forEach(btn => {
-        // On retire simplement la classe active. 
-        // On ne touche PAS à .style.opacity ni aux classes disabled.
         btn.classList.remove('active');
         
         if (btn.dataset.filter === filter) {
@@ -1985,7 +2023,6 @@ let btnText = cantAfford ? `<i data-lucide="lock"></i> $${s.cost.toLocaleString(
         }
     });
 
-    // 2. Logique de filtrage des sections (Headers et Grilles)
     const catalog = document.getElementById('merch-catalog');
     const headers = catalog.querySelectorAll('.shop-category-header');
     
@@ -2011,11 +2048,9 @@ let btnText = cantAfford ? `<i data-lucide="lock"></i> $${s.cost.toLocaleString(
     },
 
     filterMilestones(filter) {
-        // Gère l'effet "Allumé" sur le bouton cliqué
         document.querySelectorAll('.milestone-filter-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelector(`.milestone-filter-btn[data-filter="${filter}"]`).classList.add('active');
         
-        // Cache ou affiche les blocs correspondants
         const categories = ['Releases', 'Streaming', 'Collection', 'Fame', 'Challenges'];
         categories.forEach(cat => {
             let isMatch = (filter === 'all') || (cat === filter);
@@ -2027,10 +2062,9 @@ let btnText = cantAfford ? `<i data-lucide="lock"></i> $${s.cost.toLocaleString(
     },
     renderStudio() {
         const list = document.getElementById('active-tracks'); 
-    const staticTop = document.querySelector('#tab-studio .panel-static-top'); // Cible la zone fixe
+    const staticTop = document.querySelector('#tab-studio .panel-static-top'); 
     list.innerHTML = ''; 
     
-    // Nettoyer les anciennes bannières avant d'en ajouter une
     const oldBanner = staticTop.querySelector('.staff-banner');
     if (oldBanner) oldBanner.remove();
 
@@ -2041,7 +2075,6 @@ let btnText = cantAfford ? `<i data-lucide="lock"></i> $${s.cost.toLocaleString(
         lucide.createIcons(); return; 
     }
 
-    // Injecter la bannière dans la zone STATIQUE (fixe)
     if (Engine.state.staff.includes('staff_ghost') && active.length > 0) {
         const banner = document.createElement('div');
         banner.className = 'staff-banner banner-purple grid-span-full';
@@ -2059,7 +2092,6 @@ let btnText = cantAfford ? `<i data-lucide="lock"></i> $${s.cost.toLocaleString(
             let recColor = pctRec >= 100 ? 'var(--accent-red)' : 'var(--accent-green)';
             let mixColor = pctMix >= 100 ? 'var(--accent-red)' : 'var(--accent-blue)';
             
-            // NEW: Determine dynamic color based on the current stage
             let stageBadgeColor = t.currentStage === 'Writing' ? 'orange' : (t.currentStage === 'Recording' ? 'green' : 'blue');
 
             list.innerHTML += `
@@ -2140,7 +2172,6 @@ let btnText = cantAfford ? `<i data-lucide="lock"></i> $${s.cost.toLocaleString(
             let badgeColor = colorMap[cat];
             let icon = iconMap[cat];
 
-            // On réintègre le titre de la catégorie !
             container.innerHTML = `<div class="shop-category-header grid-span-full" style="--accent-color: var(--accent-${badgeColor});"><i data-lucide="${icon}" class="text-${badgeColor}"></i><span>${cat.toUpperCase()}</span></div>`;
 
             Game.config.gear.filter(g => g.capType === cat).forEach(g => {
@@ -2183,7 +2214,6 @@ let btnText = cantAfford ? `<i data-lucide="lock"></i> $${s.cost.toLocaleString(
     const currentId = Engine.state.player.propertyId;
     const currentProp = Game.config.properties.find(p => p.id === currentId);
     
-    // --- SECTION 1 & 2 : PROPRIÉTÉS ---
     let html = `
     <div class="shop-category-header grid-span-full"><i data-lucide="home"></i> Current Headquarters</div>
     <div class="current-prop-card grid-span-full">
@@ -2206,7 +2236,6 @@ let btnText = cantAfford ? `<i data-lucide="lock"></i> $${s.cost.toLocaleString(
         let locked = Engine.state.player.followers < p.reqFans;
         let btnClass = locked ? 'btn-outline disabled-btn' : 'btn-outline-purple';
         
-        // ICI : On a ajouté le prix dans le bouton "Sign Lease ($X)"
         let btnText = locked ? `<i data-lucide="lock" style="width:14px;"></i> ${p.reqFans.toLocaleString()} Fans` : `Sign Lease ($${p.rent})`;
         
         html += `
@@ -2224,7 +2253,6 @@ let btnText = cantAfford ? `<i data-lucide="lock"></i> $${s.cost.toLocaleString(
     });
     container.innerHTML = html;
 
-    // --- SECTION 3 : ENTOURAGE ---
     let staffHtml = '';
     Game.config.staff.forEach(s => {
         let money = Engine.state.player.money;
@@ -2300,27 +2328,23 @@ let btnText = cantAfford ? `<i data-lucide="lock"></i> $${s.cost.toLocaleString(
         }
        let staffBanner = '';
        
-        // Dans UI.renderMerch
 const inventoryPanel = document.getElementById('tab-merch').querySelector('.panel:last-child');
 const inventoryHeader = inventoryPanel.querySelector('.panel-header');
 
-// Supprimer l'ancienne bannière si elle existe pour éviter les doublons
 const oldBanner = inventoryPanel.querySelector('.staff-banner');
 if (oldBanner) oldBanner.remove();
 
 if (Engine.state.staff.includes('staff_merch')) {
     const banner = document.createElement('div');
     banner.className = 'staff-banner banner-green';
-    banner.style.margin = "15px 20px 0 20px"; // Ajuster pour l'alignement
+    banner.style.margin = "15px 20px 0 20px"; 
     banner.innerHTML = `
         <i data-lucide="package" style="width: 16px; height: 16px;"></i>
         <span><strong>Fulfillment Manager Active:</strong> Orders are auto-packed. Zero energy drain.</span>`;
     
-    // Insérer la bannière entre le header et le contenu scrollable
     inventoryHeader.after(banner);
 }
 
-// Ensuite, remplissez invDisplay normalement sans la bannière
 invDisplay.innerHTML = invHtml || `<div class="empty-state"><i data-lucide="box"></i><span>Warehouse empty.</span></div>`;
         let eligibleReleases = Engine.state.releases.filter(r => r.status === 'Live' && r.format !== 'Single');
         let relOptions = eligibleReleases.map(r => `<option value="${r.id}">${r.title} (${r.format})</option>`).join('');
@@ -2335,10 +2359,8 @@ categories.forEach(cat => {
     let catIcon = cat === 'physical' ? 'disc' : 'shirt';
     let catColor = cat === 'physical' ? 'blue' : 'orange';
 
-    // 1. On ajoute le header qui prend toute la largeur
     catHtml += `<div class="shop-category-header grid-span-full" style="--accent-color: var(--accent-${catColor})"><i data-lucide="${catIcon}" class="text-${catColor}"></i><span>${catTitle}</span></div>`;
-    
-    // 2. CRUCIAL : On ouvre une div avec la classe 'grid-4-col' pour que les cartes soient côte à côte
+
     catHtml += `<div class="grid-4-col gap-15 grid-span-full">`; 
 
     items.forEach(m => {
@@ -2385,7 +2407,7 @@ categories.forEach(cat => {
         </div>`;
     });
     
-    catHtml += `</div>`; // On ferme la div grid-4-col
+    catHtml += `</div>`; 
 });
 catalog.innerHTML = catHtml;
         this.initCustomSelects(); 
@@ -2441,7 +2463,6 @@ catalog.innerHTML = catHtml;
             'Challenges': { icon: 'target', color: 'orange' }
         };
 
-        // Mise à jour du badge global de complétion
         let completedCount = Game.config.achievements.filter(a => a.unlocked).length;
         let totalCount = Game.config.achievements.length;
         let completionBadge = document.getElementById('milestones-completion-display');
@@ -2449,7 +2470,6 @@ catalog.innerHTML = catHtml;
             completionBadge.innerHTML = `<i data-lucide="check-circle" class="${completedCount === totalCount ? 'text-green' : 'text-purple'}"></i> ${completedCount} / ${totalCount}`;
         }
 
-        // Variables pour tracker si les listes sont vides
         let hasActive = false;
         let hasCompleted = false;
 
@@ -2459,7 +2479,6 @@ catalog.innerHTML = catHtml;
             let activeItems = Game.config.achievements.filter(a => a.category === cat && !a.unlocked);
             let compItems = Game.config.achievements.filter(a => a.category === cat && a.unlocked);
 
-            // Construction du bloc des succès EN COURS
             if(activeItems.length > 0) {
                 hasActive = true;
                 let html = `<div id="milestones-active-${cat}" class="flex-col gap-15 w-100">`;
@@ -2480,7 +2499,6 @@ catalog.innerHTML = catHtml;
                 activeContainer.innerHTML += html;
             }
 
-            // Construction du bloc des succès COMPLÉTÉS
             if(compItems.length > 0) {
                 hasCompleted = true;
                 let html = `<div id="milestones-completed-${cat}" class="flex-col gap-15 w-100">`;
@@ -2502,9 +2520,7 @@ catalog.innerHTML = catHtml;
             }
         });
 
-        // -----------------------------------------------------
-        // GESTION DES EMPTY STATES SI AUCUN ITEM TROUVÉ
-        // -----------------------------------------------------
+
         if (!hasActive) {
             activeContainer.innerHTML = `<div class="empty-state"><i data-lucide="award"></i><span>No active milestones.</span><span style="font-size: 0.8rem; opacity: 0.7;">You have completed every challenge available!</span></div>`;
         }
@@ -2515,7 +2531,6 @@ catalog.innerHTML = catHtml;
 
         lucide.createIcons();
         
-        // S'assure que si on re-render (gain d'un milestone), le filtre actuel reste appliqué
         let currentFilter = document.querySelector('.milestone-filter-btn.active')?.dataset.filter || 'all';
         this.filterMilestones(currentFilter);
     },
@@ -2526,21 +2541,39 @@ catalog.innerHTML = catHtml;
         document.getElementById('art-preview-box').innerHTML = `<input type=\"file\" id=\"rel-art\" accept=\"image/*\" onchange=\"UI.handleImageUpload(event)\"><span id=\"art-placeholder\" style=\"flex-direction: column;\"><i data-lucide=\"image\"></i> Art</span>`;
         let vault = Engine.state.tracks.filter(t => t.status === 'Ready');
         document.getElementById('vault-selector').innerHTML = `<option value=\"\">-- Select Track --</option>` + vault.map(t => `<option value=\"${t.id}\">${t.title} (Q:${t.quality})</option>`).join('');
-        const fmtSel = document.getElementById('rel-format'); fmtSel.innerHTML = '';
+        
+        const fmtSel = document.getElementById('rel-format'); 
+        fmtSel.removeAttribute('data-customized'); 
+        fmtSel.innerHTML = '';
         Game.config.releaseFormats.forEach(f => {
             let locked = (Engine.state.stats.singles < f.reqSingles) || (Engine.state.stats.eps < f.reqEps) || (Engine.state.player.followers < f.reqFans);
             let lockText = locked ? `${f.title} (Req: ${f.reqSingles?f.reqSingles+' Singles ':''}${f.reqEps?f.reqEps+' EPs ':''}${f.reqFans?f.reqFans.toLocaleString()+' Fans':''})` : f.title;
             fmtSel.innerHTML += `<option value="${f.id}" ${locked?'disabled':''}>${lockText}</option>`;
         });
-        const visSel = document.getElementById('rel-visuals'); visSel.innerHTML = '';
+
+        for (let opt of fmtSel.options) { if (!opt.disabled) { fmtSel.value = opt.value; break; } }
+
+
+        const visSel = document.getElementById('rel-visuals'); 
+        visSel.removeAttribute('data-customized'); 
+        visSel.innerHTML = '';
         Game.config.visualOptions.forEach(v => {
             let locked = Engine.state.player.followers < v.reqFans;
             let lockText = locked ? `${v.title} (Req: ${v.reqFans.toLocaleString()} Fans)` : `${v.title} (${v.cost === 0 ? 'FREE' : '+$' + v.cost})`;
             visSel.innerHTML += `<option value="${v.id}" ${locked?'disabled':''}>${lockText}</option>`;
         });
+        for (let opt of visSel.options) { if (!opt.disabled) { visSel.value = opt.value; break; } }
+
+        fmtSel.onchange = () => { UI.updateReleaseFormatUI(); DistroEngine.updateReleaseInvoice(); };
+        visSel.onchange = () => { DistroEngine.updateReleaseInvoice(); };
+
         this.renderDistroOptions();
         this.updateReleaseFormatUI(); 
         DistroEngine.renderPendingTracklist();
+        
+        UI.initCustomSelects(); 
+        DistroEngine.updateReleaseInvoice(); 
+
         this.openModal('release-modal');
     },
     updateReleaseFormatUI() { 
@@ -2604,6 +2637,16 @@ let pushBtnText = pushCantAfford ? `<i data-lucide="lock"></i> Algorithmic Push 
 
                 return `
                 <div class="release-manage-card">
+                    <img src="${artSrc}" class="release-cover-art">
+                    <div class="flex-col">
+                        <div class="flex-row-between" style="align-items: flex-start; margin-bottom: 8px;">
+                            <div>
+                                <strong style="font-size: 1.1rem;">${rel.title}</strong>
+                                <div class="text-muted" style="font-size: 0.8rem; margin-top: 4px;">${rel.format} | <span class="text-purple">${rel.visualName}</span></div>
+                            </div>
+                        </div>
+                        ${tracklistHtml}
+                    </div>
                     <div class="release-stats-group">
                         <div class="text-muted" style="font-size: 0.7rem; text-transform: uppercase; margin-bottom: 4px;">DSP Streams</div>
                         ${dspStat}
@@ -2611,10 +2654,10 @@ let pushBtnText = pushCantAfford ? `<i data-lucide="lock"></i> Algorithmic Push 
                         <div style="margin-top: 6px; font-size: 0.75rem; font-family: var(--font-mono);">${momentumText}</div>
                     </div>
                     <div class="flex-col gap-10">
-                        <button class="${pushBtnClass} btn-small" style="justify-content: flex-start;" ${pushBtnAction}>
+                        <button class="${pushBtnClass} w-100" style="justify-content: flex-start;" ${pushBtnAction}>
                             ${pushBtnText}
                         </button>
-                        <button class="${visBtnClass} btn-small" style="justify-content: flex-start;" ${visBtnAction}>
+                        <button class="${visBtnClass} w-100" style="justify-content: flex-start;" ${visBtnAction}>
                             <i data-lucide="video"></i> ${visBtnText}
                         </button>
                     </div>

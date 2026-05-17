@@ -1135,5 +1135,32 @@ input:focus, select:focus { border-color: var(--accent-purple); background: rgba
     .time-bar-bg { height: 2px !important; }
 
     .sync-container { width: 90vw !important; max-width: 350px !important; padding: 30px 20px !important; }
+
+    /* =========================================
+   🛠️ MASTER Z-INDEX HIERARCHY 🛠️
+   ========================================= */
+
+/* 1. Tooltips et HUD (Base) */
+.status-tooltip { z-index: 2500 !important; }
+.top-hud { z-index: 3000 !important; }
+
+/* 2. Menu Mobile */
+#mobile-menu-overlay { z-index: 4000 !important; }
+#mobile-menu-fab { z-index: 5000 !important; }
+.sidebar { z-index: 6000 !important; }
+
+/* 3. Fenêtres de jeu standards (Modales) */
+.overlay { z-index: 8000 !important; }
+
+/* 4. Alertes Système (Passent TOUJOURS par-dessus les autres modales) */
+#system-alert-modal, 
+#system-confirm-modal { z-index: 9000 !important; }
+
+/* 5. Minijeu de rythme & Écran de chargement (Bloquent absolument tout) */
+.sync-overlay { z-index: 9500 !important; }
+#action-blocker { z-index: 9800 !important; }
+
+/* 6. Menus déroulants (Doivent toujours flotter au sommet absolu) */
+.custom-options.body-appended { z-index: 99999 !important; }
     
 }

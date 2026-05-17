@@ -9,12 +9,12 @@
     "rentIntervalDays": 30,
     "debtPenaltyStress": 10,
     "botNames": [
-      "Lil Neural", "The Weekday", "Data Cartel", "AI Drake", "Bedroom Pop Guy",
-      "Jpeg.exe", "Cash Carti Clone", "LoFi Girl", "Synth Lord", "AfroKing V2",
-      "Olivia Dropdrigo", "Industry Plant", "Yeat Clone", "Vaporwave Bot",
-      "Yung Algorithm", "AutoTune Demon", "Spotify Curator 04"
+      "Lil Moshpit", "The Weekday", "Pay-Z", "Lil Pimp", "Radiofeet",
+      "PNGMAFIA", "Playgirl Cactus", "Olivio Sandiego", "Draft Punk", "Taylor Shift",
+      "Skinny Joe", "Industry Plant", "Yeet", "Sabrina Dishwater",
+      "Yung Fe!n", "Hotplay", "The Infamous S.M.A.L.L."
     ],
-    "genres": ["Hip-Hop", "R&B", "Pop", "Afrobeats", "EDM", "Alternative", "Latin", "Synthwave", "Indie Rock", "Phonk", "Drill", "Hyperpop"],
+    "genres": ["Hip-Hop/Rap", "R&B", "Pop", "Afrobeats", "EDM", "Alternative", "Latin", "Synthwave", "Indie Rock", "Phonk", "Drill", "Hyperpop"],
     "moods": ["Aggressive", "Bounce", "Chill", "Cinematic", "Dark", "Dreamy", "Euphoric", "Groovy", "Melancholic", "Upbeat", "Nostalgic", "Sad", "Trippy"]
   },
 
@@ -64,15 +64,15 @@
     { "id": "Single", "title": "Single", "min": 1, "max": 2, "reqSingles": 0, "reqEps": 0, "reqFans": 0, "hypeMult": 1.0 },
     { "id": "EP", "title": "EP", "min": 3, "max": 6, "reqSingles": 3, "reqEps": 0, "reqFans": 1000, "hypeMult": 1.5 },
     { "id": "Mixtape", "title": "Mixtape", "min": 7, "max": 12, "reqSingles": 5, "reqEps": 1, "reqFans": 5000, "hypeMult": 2.0 },
-    { "id": "Album", "title": "Studio Album", "min": 10, "max": 20, "reqSingles": 8, "reqEps": 2, "reqFans": 25000, "hypeMult": 3.0 },
-    { "id": "Double", "title": "Double LP", "min": 21, "max": 40, "reqSingles": 15, "reqEps": 3, "reqFans": 100000, "hypeMult": 4.5 }
+    { "id": "Album", "title": "Studio Album", "min": 10, "max": 20, "reqSingles": 6, "reqEps": 1, "reqFans": 25000, "hypeMult": 3.0 },
+    { "id": "Double", "title": "Double LP", "min": 21, "max": 40, "reqSingles": 10, "reqEps": 2, "reqFans": 100000, "hypeMult": 4.5 }
   ],
 
   "distroOptions": [
     { "id": "sc", "title": "SoundCloud & YouTube", "badge": "FREE", "badgeColor": "green", "desc": "Instant release. Builds early fans. No streaming revenue.", "cost": 0, "delay": 0, "reqFans": 0, "distroBoost": 0.2 },
-    { "id": "dk", "title": "Standard DSP (Spotify / Apple)", "badge": "$35", "badgeColor": "orange", "desc": "+5 Days Delivery. Fully monetized streams.", "cost": 35, "delay": 5, "reqFans": 0, "distroBoost": 1.0 },
-    { "id": "pitch", "title": "Editorial Pitch", "badge": "$150", "badgeColor": "purple", "desc": "+21 Days. Pitched directly to editors. Massive algorithm boost.", "cost": 150, "delay": 21, "reqFans": 5000, "distroBoost": 2.5 },
-    { "id": "major", "title": "Major Label Campaign", "badge": "$4000", "badgeColor": "red", "desc": "+30 Days. Billboards, Radio, Global playlists.", "cost": 4000, "delay": 30, "reqFans": 150000, "distroBoost": 6.5 }
+    { "id": "dk", "title": "Standard DSP (Spotify / Apple)", "badge": "$35", "badgeColor": "orange", "desc": "+3 Days Delivery. Fully monetized streams.", "cost": 35, "delay": 3, "reqFans": 0, "distroBoost": 1.0 },
+    { "id": "pitch", "title": "Editorial Pitch", "badge": "$150", "badgeColor": "purple", "desc": "+15 Days. Pitched directly to editors. Massive algorithm boost.", "cost": 150, "delay": 15, "reqFans": 5000, "distroBoost": 2.5 },
+    { "id": "major", "title": "Major Label Campaign", "badge": "$4000", "badgeColor": "red", "desc": "+21 Days. Billboards, Radio, Global playlists.", "cost": 4000, "delay": 21, "reqFans": 150000, "distroBoost": 6.5 }
   ],
 
   "promos": [
@@ -145,7 +145,7 @@
     { 
       "id": "m_poster", "category": "apparel", "title": "Signed Posters", 
       "desc": "Cheap to print, massive margins. Great for early cash flow.", 
-      "batchSize": 200, "costPerBatch": 400, "retailPrice": 25, 
+      "batchSize": 200, "costPerBatch": 400, "retailPrice": 15, 
       "demandFactor": 0.9, "reqFans": 10000, "icon": "image"
     },
     { 
@@ -181,7 +181,7 @@
     
     { "id": "r1", "category": "Releases", "title": "The Grind", "desc": "Release your first Mixtape.", "reward": 1500, "condition": { "target": "stats.mixtapes", "operator": ">=", "value": 1 } },
     { "id": "r2", "category": "Releases", "title": "Workaholic", "desc": "Release your first Studio Album.", "reward": 5000, "condition": { "target": "stats.albums", "operator": ">=", "value": 1 } },
-    { "id": "r3", "category": "Releases", "title": "Veteran", "desc": "Release 5 Studio Albums.", "reward": 25000, "condition": { "target": "stats.albums", "operator": ">=", "value": 5 } },
+    { "id": "r3", "category": "Releases", "title": "Veteran", "desc": "Release 3 Studio Albums.", "reward": 25000, "condition": { "target": "stats.albums", "operator": ">=", "value": 3 } },
     { "id": "r4", "category": "Releases", "title": "Magnum Opus", "desc": "Release a Double LP.", "reward": 20000, "condition": { "target": "stats.doubles", "operator": ">=", "value": 1 } },
 
     { "id": "ch1", "category": "Challenges", "title": "First Bounty", "desc": "Complete 1 industry contract.", "reward": 200, "condition": { "target": "stats.completedChallenges", "operator": ">=", "value": 1 } },
