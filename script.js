@@ -365,6 +365,15 @@ const Engine = {
         if(stat==='hype') this.state.player[stat] = Math.max(1.0, this.state.player[stat]);
         UI.updateVitals();
         Progression.check();
+
+        if (stat === 'money' || stat === 'followers') {
+            if (UI.renderServices) UI.renderServices();
+            if (UI.renderGear) UI.renderGear();
+            if (UI.renderHQ) UI.renderHQ();
+            if (UI.renderMerch) UI.renderMerch();
+            if (UI.renderPromos) UI.renderPromos();
+            if (UI.renderReleases) UI.renderReleases();
+        }
     },
     modifyBio(newBio) { this.state.player.bio = newBio; },
     rollWeeklyTrend() {
@@ -1098,9 +1107,21 @@ const PlayerActions = {
         let currentVisIndex = Math.max(0, Game.config.visualOptions.findIndex(v => v.title === rel.visualName));
         Game.config.visualOptions.forEach((v, index) => {
             if (index <= currentVisIndex) return;
-            let locked = Engine.state.player.followers < v.reqFans;
-            let btnClass = locked ? 'btn-outline disabled-btn' : 'btn-outline-purple';
-            let btnText = locked ? `<i data-lucide="lock"></i> ${v.reqFans.toLocaleString()} Fans` : `Shoot ($${v.cost.toLocaleString()})`;
+            
+            let money = Engine.state.player.money;
+            let lockedFans = Engine.state.player.followers < v.reqFans;
+            let cantAfford = !lockedFans && money < v.cost;
+            
+            let btnClass = ''; let btnText = ''; let disabledAttr = '';
+            
+            if (lockedFans) {
+                btnClass = 'btn-outline disabled-btn'; btnText = `<i data-lucide="lock"></i> ${v.reqFans.toLocaleString()} Fans`; disabledAttr = 'disabled';
+            } else if (cantAfford) {
+               btnClass = 'btn-cant-afford'; btnText = `<i data-lucide="lock"></i> $${v.cost.toLocaleString()}`; disabledAttr = 'disabled';
+            } else {
+                btnClass = 'btn-outline-purple'; btnText = `Shoot ($${v.cost.toLocaleString()})`; disabledAttr = `onclick="PlayerActions.buyVisualUpgrade('${rel.id}', '${v.id}')"`;
+            }
+
             list.innerHTML += `
                 <div class="data-node flex-col">
                     <div class="flex-row-between" style="align-items: flex-start;">
@@ -1113,7 +1134,7 @@ const PlayerActions = {
                     <div style="font-family: var(--font-mono); font-size: 0.8rem; margin: 12px 0;">
                         <span class="text-green">Base Hype Multiplier: ${v.hypeBoost}x</span>
                     </div>
-                    <button class="${btnClass} w-100 mt-auto" ${locked ? 'disabled' : `onclick="PlayerActions.buyVisualUpgrade('${rel.id}', '${v.id}')"`}>${btnText}</button>
+                    <button class="${btnClass} w-100 mt-auto" ${disabledAttr}>${btnText}</button>
                 </div>
             `;
         });
@@ -1491,17 +1512,22 @@ const UI = {
             let badgeColor = colorMap[cat];
             let icon = iconMap[cat];
             
-            // On réintègre le titre de la catégorie avec grid-span-full pour qu'il prenne toute la largeur !
+            
             container.innerHTML = `<div class="shop-category-header grid-span-full" style="--accent-color: var(--accent-${badgeColor});"><i data-lucide="${icon}" class="text-${badgeColor}"></i><span>${cat.toUpperCase()}</span></div>`;
             
             Game.config.services.filter(s => s.capType === cat).forEach(s => {
+                let money = Engine.state.player.money;
+                let cantAfford = money < s.cost;
+               let btnClass = cantAfford ? 'btn-cant-afford' : `btn-outline-${s.color}`;
+let btnText = cantAfford ? `<i data-lucide="lock"></i> $${s.cost.toLocaleString()}` : `Hire ($${s.cost.toLocaleString()})`;
+                
                 container.innerHTML += `
                 <div class="data-node flex-col">
                   <div style="margin-bottom: 15px;">
                     <strong style="font-size: 1.05rem;">${s.title}</strong><br>
                     <span class="text-muted" style="display: block; margin-top: 8px;">${s.desc}</span>
                   </div>
-                  <button class="btn-outline-${s.color} w-100 mt-auto" onclick="MarketEngine.hireService('${s.id}')">Hire ($${s.cost.toLocaleString()})</button>
+                  <button class="${btnClass} w-100 mt-auto" ${cantAfford ? 'disabled' : `onclick="MarketEngine.hireService('${s.id}')"`}>${btnText}</button>
                 </div>`;
             });
         });
@@ -1632,8 +1658,8 @@ const UI = {
                 btnClass   = 'btn-outline disabled-btn';
                 btnContent = `<i data-lucide="lock"></i> ${p.reqFans.toLocaleString()} Fans`;
             } else if (cantAfford) {
-                btnClass   = 'btn-outline-red disabled-btn';
-                btnContent = `<i data-lucide="dollar-sign"></i> Need $${(p.cost - money).toFixed(0)} More`;
+                btnClass   = 'btn-cant-afford';
+                btnContent = `<i data-lucide="lock"></i> $${p.cost.toLocaleString()}`;
             } else {
                 btnClass   = `btn-outline-${p.color}`;
                 btnContent = `Purchase ($${p.cost})`;
@@ -2118,14 +2144,24 @@ const UI = {
             container.innerHTML = `<div class="shop-category-header grid-span-full" style="--accent-color: var(--accent-${badgeColor});"><i data-lucide="${icon}" class="text-${badgeColor}"></i><span>${cat.toUpperCase()}</span></div>`;
 
             Game.config.gear.filter(g => g.capType === cat).forEach(g => {
+                let money = Engine.state.player.money;
                 let gearFull = !g.owned && ownedCount >= currentProp.maxGear;
-                let locked = Engine.state.player.followers < g.reqFans;
-                let btnClass = (locked || gearFull) ? 'btn-outline disabled-btn' : `btn-outline-${badgeColor}`;
-                let btn = '';
-                if (g.owned) btn = `<button class="btn-outline w-100 mt-auto disabled-btn" disabled><i data-lucide="check-circle" class="text-green"></i> Installed</button>`;
-                else if (gearFull) btn = `<button class="${btnClass} w-100 mt-auto" disabled><i data-lucide="lock"></i> HQ Full</button>`;
-                else if (locked) btn = `<button class="${btnClass} w-100 mt-auto" disabled><i data-lucide="lock"></i>  ${g.reqFans.toLocaleString()} Fans</button>`;
-                else btn = `<button class="${btnClass} w-100 mt-auto" onclick="MarketEngine.buyGear('${g.id}')">Buy $${g.cost.toLocaleString()}</button>`;
+                let lockedFans = Engine.state.player.followers < g.reqFans;
+                let cantAfford = !lockedFans && !gearFull && money < g.cost;
+                
+                let btnClass = ''; let btnText = ''; let disabledAttr = '';
+                
+                if (g.owned) {
+                    btnClass = 'btn-outline disabled-btn'; btnText = `<i data-lucide="check-circle" class="text-green"></i> Installed`; disabledAttr = 'disabled';
+                } else if (lockedFans) {
+                    btnClass = 'btn-outline disabled-btn'; btnText = `<i data-lucide="lock"></i> ${g.reqFans.toLocaleString()} Fans`; disabledAttr = 'disabled';
+                } else if (gearFull) {
+                    btnClass = 'btn-outline disabled-btn'; btnText = `<i data-lucide="alert-circle"></i> HQ Full`; disabledAttr = 'disabled';
+                } else if (cantAfford) {
+                   btnClass = 'btn-cant-afford'; btnText = `<i data-lucide="lock"></i> $${g.cost.toLocaleString()}`; disabledAttr = 'disabled';
+                } else {
+                    btnClass = `btn-outline-${badgeColor}`; btnText = `Buy ($${g.cost.toLocaleString()})`; disabledAttr = `onclick="MarketEngine.buyGear('${g.id}')"`;
+                }
                 
                 container.innerHTML += `
                 <div class="data-node flex-col" style="${g.owned ? 'border-color: rgba(11, 232, 129, 0.3);' : ''}">
@@ -2133,7 +2169,7 @@ const UI = {
                         <strong style="font-size: 1.05rem;">${g.name}</strong><br>
                         <span class="badge badge-${badgeColor}" style="margin-top: 6px;"><i data-lucide="${icon}"></i> +${g.capIncrease} Cap</span>
                     </div>
-                    ${btn}
+                    <button class="${btnClass} w-100 mt-auto" ${disabledAttr}>${btnText}</button>
                 </div>`;
             });
         });
@@ -2191,24 +2227,33 @@ const UI = {
     // --- SECTION 3 : ENTOURAGE ---
     let staffHtml = '';
     Game.config.staff.forEach(s => {
+        let money = Engine.state.player.money;
         let hired = Engine.state.staff.includes(s.id);
-        let locked = Engine.state.player.followers < s.reqFans;
-        let btnClass = hired || locked ? 'btn-outline disabled-btn' : 'btn-outline-green';
-        let btnText = hired ? '<i data-lucide="check-circle" class="text-green" style="width:16px;"></i> On Payroll' : (locked ? `<i data-lucide="lock" style="width:16px;"></i> ${s.reqFans.toLocaleString()}` : `Hire ($${s.cost.toLocaleString()})`);
+        let lockedFans = Engine.state.player.followers < s.reqFans;
+        let cantAfford = !hired && !lockedFans && money < s.cost;
+        
+        let btnClass = ''; let btnText = ''; let disabledAttr = '';
+        
+        if (hired) {
+            btnClass = 'btn-outline disabled-btn'; btnText = '<i data-lucide="check-circle" class="text-green" style="width:16px;"></i> On Payroll'; disabledAttr = 'disabled';
+        } else if (lockedFans) {
+            btnClass = 'btn-outline disabled-btn'; btnText = `<i data-lucide="lock" style="width:16px;"></i> ${s.reqFans.toLocaleString()}`; disabledAttr = 'disabled';
+        } else if (cantAfford) {
+            btnClass = 'btn-cant-afford'; btnText = `<i data-lucide="lock" style="width:16px;"></i> $${s.cost.toLocaleString()}`; disabledAttr = 'disabled'
+        } else {
+            btnClass = 'btn-outline-green'; btnText = `Hire ($${s.cost.toLocaleString()})`; disabledAttr = `onclick="EntourageEngine.hireStaff('${s.id}')"`;
+        }
         
         staffHtml += `
         <div class="data-node flex-col" style="${hired ? 'border-color: var(--accent-purple); background: rgba(176, 91, 255, 0.05);' : ''}">
             <div class="flex-row gap-10" style="margin-bottom: 12px;">
                 <i data-lucide="${s.icon}" class="text-purple"></i> <strong style="font-size: 1.05rem;">${s.title}</strong>
             </div>
-            
             <span class="text-muted" style="font-size: 0.85rem; line-height: 1.4; margin-bottom: 15px; display: block; flex-grow: 1;">${s.desc}</span>
-            
             <div style="font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 15px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; text-align: center;">
                 <span class="text-red">-$${s.wage}/day</span>
             </div>
-            
-            <button class="${btnClass} w-100 mt-auto" ${hired || locked ? 'disabled' : `onclick="EntourageEngine.hireStaff('${s.id}')"`}>${btnText}</button>
+            <button class="${btnClass} w-100 mt-auto" ${disabledAttr}>${btnText}</button>
         </div>`;
     });
     staffContainer.innerHTML = staffHtml;
@@ -2297,20 +2342,30 @@ categories.forEach(cat => {
     catHtml += `<div class="grid-4-col gap-15 grid-span-full">`; 
 
     items.forEach(m => {
+        let money = Engine.state.player.money;
         let overCapacity = (totalStock + m.batchSize) > currentProp.maxBoxes;
-        let locked = Engine.state.player.followers < m.reqFans;
-        let btnClass = locked || overCapacity ? 'btn-outline disabled-btn' : 'btn-outline-green';
-        let btnText = locked ? `<i data-lucide="lock"></i> ${m.reqFans.toLocaleString()} Fans` : (overCapacity ? `<i data-lucide="alert-circle"></i> HQ Full` : `Buy Batch ($${m.costPerBatch.toLocaleString()})`);
-        let unitProfit = (m.retailPrice - (m.costPerBatch / m.batchSize)).toFixed(2);
+        let lockedFans = Engine.state.player.followers < m.reqFans;
+        let noAlbum = m.category === 'physical' && eligibleReleases.length === 0;
+        let cantAfford = !lockedFans && !overCapacity && !noAlbum && money < m.costPerBatch;
         
+        let btnClass = ''; let btnText = ''; let disabledAttr = '';
+        let unitProfit = (m.retailPrice - (m.costPerBatch / m.batchSize)).toFixed(2);
         let dropdownHtml = '';
-        if (m.category === 'physical' && !locked) {
-            if (eligibleReleases.length === 0) {
-                btnClass = 'btn-outline disabled-btn';
-                btnText = "No Albums Live";
-            } else {
-                dropdownHtml = `<select id="select-rel-${m.id}" style="margin-bottom: 10px; width: 100%; font-size: 0.8rem; padding: 5px;">${relOptions}</select>`;
-            }
+        
+        if (m.category === 'physical' && !lockedFans && !noAlbum) {
+            dropdownHtml = `<select id="select-rel-${m.id}" style="margin-bottom: 10px; width: 100%; font-size: 0.8rem; padding: 5px;">${relOptions}</select>`;
+        }
+
+        if (lockedFans) {
+            btnClass = 'btn-outline disabled-btn'; btnText = `<i data-lucide="lock"></i> ${m.reqFans.toLocaleString()} Fans`; disabledAttr = 'disabled';
+        } else if (overCapacity) {
+            btnClass = 'btn-outline disabled-btn'; btnText = `<i data-lucide="alert-circle"></i> HQ Full`; disabledAttr = 'disabled';
+        } else if (noAlbum) {
+            btnClass = 'btn-outline disabled-btn'; btnText = "No Albums Live"; disabledAttr = 'disabled';
+        } else if (cantAfford) {
+           btnClass = 'btn-cant-afford'; btnText = `<i data-lucide="lock"></i> $${m.costPerBatch.toLocaleString()}`; disabledAttr = 'disabled';
+        } else {
+            btnClass = 'btn-outline-green'; btnText = `Buy Batch ($${m.costPerBatch.toLocaleString()})`; disabledAttr = `onclick="MerchEngine.buyBatch('${m.id}')"`;
         }
 
         catHtml += `
@@ -2325,7 +2380,7 @@ categories.forEach(cat => {
             </div>
             <div class="mt-auto">
                 ${dropdownHtml}
-                <button class="${btnClass} w-100" ${locked || overCapacity || (m.category === 'physical' && eligibleReleases.length === 0) ? 'disabled' : `onclick="MerchEngine.buyBatch('${m.id}')"`}>${btnText}</button>
+                <button class="${btnClass} w-100" ${disabledAttr}>${btnText}</button>
             </div>
         </div>`;
     });
@@ -2540,18 +2595,15 @@ catalog.innerHTML = catHtml;
                 let visBtnClass = isMaxVisual ? 'btn-outline disabled-btn' : 'btn-outline-purple';
                 let visBtnText = isMaxVisual ? 'Max Visuals' : 'Upgrade Visuals';
                 let visBtnAction = isMaxVisual ? 'disabled' : `onclick="PlayerActions.openVisualsModal('${rel.id}')"`;
+                
+                let money = Engine.state.player.money;
+                let pushCantAfford = money < 500;
+                let pushBtnClass = pushCantAfford ? 'btn-cant-afford' : 'btn-outline-blue';
+let pushBtnText = pushCantAfford ? `<i data-lucide="lock"></i> Algorithmic Push ($500)` : `<i data-lucide="trending-up"></i> Algorithmic Push ($500)`;
+                let pushBtnAction = pushCantAfford ? 'disabled' : `onclick="PlayerActions.marketingPush('${rel.id}')"`;
+
                 return `
                 <div class="release-manage-card">
-                    <img src="${artSrc}" class="release-cover-art">
-                    <div class="flex-col" style="min-width: 0;">
-                        <div style="font-weight: 800; font-size: 1.15rem; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${rel.title}</div>
-                        <div class="flex-row gap-10" style="margin-bottom: 8px;">
-                            <span class="badge badge-purple" style="margin-top:0 !important;">${rel.format}</span>
-                            <span class="text-muted" style="font-size: 0.8rem;"><i data-lucide="music" style="width:12px;"></i> ${rel.tracks.length} Tracks</span>
-                        </div>
-                        <div class="text-muted" style="font-size: 0.75rem;"><i data-lucide="video" style="width:12px;"></i> ${rel.visualName}</div>
-                        ${tracklistHtml}
-                    </div>
                     <div class="release-stats-group">
                         <div class="text-muted" style="font-size: 0.7rem; text-transform: uppercase; margin-bottom: 4px;">DSP Streams</div>
                         ${dspStat}
@@ -2559,8 +2611,8 @@ catalog.innerHTML = catHtml;
                         <div style="margin-top: 6px; font-size: 0.75rem; font-family: var(--font-mono);">${momentumText}</div>
                     </div>
                     <div class="flex-col gap-10">
-                        <button class="btn-outline-blue btn-small" style="justify-content: flex-start;" onclick="PlayerActions.marketingPush('${rel.id}')">
-                            <i data-lucide="trending-up"></i> Algorithmic Push ($500)
+                        <button class="${pushBtnClass} btn-small" style="justify-content: flex-start;" ${pushBtnAction}>
+                            ${pushBtnText}
                         </button>
                         <button class="${visBtnClass} btn-small" style="justify-content: flex-start;" ${visBtnAction}>
                             <i data-lucide="video"></i> ${visBtnText}

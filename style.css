@@ -129,6 +129,15 @@ button:disabled, .disabled-btn {
     transform: none !important; 
     box-shadow: none !important; 
 }
+button:disabled.btn-cant-afford, .btn-cant-afford {
+    background: rgba(255, 94, 87, 0.05) !important;
+    border: 1px dashed rgba(255, 94, 87, 0.3) !important;
+    color: rgba(255, 94, 87, 0.8) !important;
+    cursor: not-allowed !important;
+    opacity: 1 !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
 
 .badge { 
     display: inline-flex; align-items: center; gap: 6px; 
