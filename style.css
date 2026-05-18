@@ -863,7 +863,18 @@ input:focus, select:focus { border-color: var(--accent-purple); background: rgba
         border-color: var(--accent-purple) !important;
     }
     
-    #status-tray { width: 100% !important; order: -1 !important; margin-bottom: -4px !important; }
+   .hud-time { order: 1 !important; }
+    .hud-vitals { order: 2 !important; }
+    
+    #status-tray { 
+        width: 100% !important; 
+        order: 3 !important; /* Passe en 3ème position, juste sous le bloc Stress/Energy */
+        margin-top: 5px !important;
+        margin-bottom: 5px !important; 
+        justify-content: center !important; /* Centre les icônes sur l'écran mobile pour le style */
+    }
+    
+    .hud-actions { order: 4 !important; margin-top: 8px !important; }
 
     .grid-3-col, .grid-4-col, .studio-grid { grid-template-columns: 1fr; gap: 15px; }
     .split-layout { flex-direction: column; }
