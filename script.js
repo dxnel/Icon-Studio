@@ -196,7 +196,7 @@ const Engine = {
         trend: { genre: 'Pop', mood: 'Chill', bpmBase: 120 }, 
         player: { 
             name: "", bio: "Hey there!", avatar: null, 
-            money: 50, energy: 100, burnout: 0, followers: 0, hype: 1.0, 
+            money: 200, energy: 100, burnout: 0, followers: 0, hype: 1.0, 
             caps: { writing: 10, recording: 10, mixing: 10 },
             jobId: 'barista', perkId: 'writer', untitledCount: 0, lastWorkDay: 0,
             propertyId: 'prop_basement',
@@ -1064,7 +1064,7 @@ const PlayerActions = {
             if(Engine.state.player.perkId === 'sleeper') rec *= 1.2;
             Engine.modifyStat('energy', rec); 
             Engine.modifyStat('burnout', -(hours * 6)); 
-            Engine.state.cooldowns.sleep = 16; 
+            Engine.state.cooldowns.sleep = 8; 
         }
         else if (this.currentAction === 'pass') {
             const stressGain = hours * Game.config.settings.waitStressGainPerHour;
@@ -1871,7 +1871,13 @@ let btnText = cantAfford ? `<i data-lucide="lock"></i> $${s.cost.toLocaleString(
         document.getElementById('day-progress').style.width = `${(Engine.state.hour / 24) * 100}%`;
     },
     updateVitals() {
-        document.getElementById('vitals-money').innerText = `$${Engine.state.player.money.toFixed(2)}`;
+        const moneyEl = document.getElementById('vitals-money');
+        moneyEl.innerText = `$${Engine.state.player.money.toFixed(2)}`;
+        if (Engine.state.player.money < 0) {
+            moneyEl.classList.add('text-red');
+        } else {
+            moneyEl.classList.remove('text-red');
+        }
         let currentProp = Game.config.properties.find(p => p.id === Engine.state.player.propertyId);
         let rentCost = currentProp ? currentProp.rent : 0;
         let rentInterval = Game.config.settings.rentIntervalDays;
