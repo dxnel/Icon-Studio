@@ -260,7 +260,8 @@ const Engine = {
         const saveData = {
             state: this.state,
             gear: Game.config.gear, 
-            achievements: Game.config.achievements
+            achievements: Game.config.achievements,
+            ownerId: (typeof Cloud !== 'undefined' && Cloud.uid) ? Cloud.uid : 'guest'
         };
         
         try {
@@ -2789,6 +2790,9 @@ let pushBtnText = pushCantAfford ? `<i data-lucide="lock"></i> Algorithmic Push 
 
         try {
             const parsed = JSON.parse(saveRaw);
+            if (typeof Cloud !== 'undefined' && Cloud.uid && parsed.ownerId && parsed.ownerId !== 'guest' && parsed.ownerId !== Cloud.uid) {
+                throw new Error("Security Lock: This local save belongs to another Firebase account.");
+            }
             const state = parsed.state;
             
             if (!state || !state.player) throw new Error("Malformed save structure.");
