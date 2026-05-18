@@ -883,31 +883,61 @@ input[type="number"] {
         font-weight: 800 !important;
         text-transform: uppercase;
         letter-spacing: 1px;
-        /* Un look plus "bouton" et moins "discret" */
         background: var(--bg-card) !important; 
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
         box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
     }
 
-    /* Feedback visuel au toucher */
     .hud-actions button:active {
         transform: scale(0.95);
         background: rgba(176, 91, 255, 0.1) !important;
         border-color: var(--accent-purple) !important;
     }
     
-   .hud-time { order: 1 !important; }
+    .hud-time { order: 1 !important; }
     .hud-vitals { order: 2 !important; }
     
     #status-tray { 
         width: 100% !important; 
-        order: 3 !important; /* Passe en 3ème position, juste sous le bloc Stress/Energy */
-        margin-top: 5px !important;
-        margin-bottom: 5px !important; 
-        justify-content: center !important; /* Centre les icônes sur l'écran mobile pour le style */
+        order: 3 !important; 
+        margin-bottom: 4px !important; 
+        display: flex !important;
+        justify-content: flex-start !important; 
+        gap: 6px !important;
+        position: relative !important;
+        z-index: 3500 !important;
+    }
+
+    #status-tray:empty {
+        display: none !important;
     }
     
-    .hud-actions { order: 4 !important; margin-top: 8px !important; }
+    .hud-actions { 
+        order: 4 !important; 
+        margin-top: 4px !important; 
+    }
+
+
+    .status-tooltip {
+        bottom: auto !important;
+        top: calc(100% + 8px) !important;
+        left: 0 !important; 
+        transform: none !important; 
+        background: var(--bg-card) !important; 
+        border: 1px solid var(--border-color) !important;
+        backdrop-filter: none !important; 
+        width: max-content;
+        max-width: 220px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+        opacity: 0 !important; 
+        pointer-events: none !important;
+    }
+
+    .status-icon:hover .status-tooltip,
+    .status-icon:active .status-tooltip {
+        opacity: 1 !important;
+        transform: translateY(0) !important;
+    }
 
     .grid-3-col, .grid-4-col, .studio-grid { grid-template-columns: 1fr; gap: 15px; }
     .split-layout { flex-direction: column; }
@@ -916,18 +946,18 @@ input[type="number"] {
     .profile-info { align-items: center; margin: 15px 0; }
     .market-trend-box { width: 100%; align-items: center; text-align: center; }
     
-    /* --- REDESIGN DES CARTES DE DISCOGRAPHIE (MOBILE) --- */
+
     
     .release-manage-card { 
         display: grid !important; 
-        grid-template-columns: 75px 1fr !important; /* Pochette 75px, le reste prend la place */
+        grid-template-columns: 75px 1fr !important; 
         gap: 15px !important; 
         align-items: start !important; 
         text-align: left !important; 
         padding: 15px !important; 
     }
     
-    /* 1. Pochette en haut à gauche */
+
     .release-cover-art { 
         grid-column: 1 !important; 
         grid-row: 1 !important; 
@@ -935,7 +965,7 @@ input[type="number"] {
         height: 75px !important; 
     }
     
-    /* 2. Infos (Titre, tags, tracklist) en haut à droite */
+
     .release-manage-card > .flex-col:nth-child(2) { 
         grid-column: 2 !important; 
         grid-row: 1 !important; 
@@ -943,16 +973,16 @@ input[type="number"] {
         align-items: flex-start !important; 
     }
     
-    /* Réparation de la Tracklist */
+
     .release-tracklist { 
         width: 100% !important; 
         text-align: left !important; 
         margin-top: 8px !important; 
     }
     
-    /* 3. Stats (Ligne compacte en dessous) */
+
     .release-stats-group { 
-        grid-column: 1 / -1 !important; /* Prend toute la largeur */
+        grid-column: 1 / -1 !important; 
         border-right: none !important; 
         border-bottom: none !important; 
         border-top: 1px dashed rgba(255,255,255,0.1) !important; 
@@ -967,13 +997,11 @@ input[type="number"] {
         text-align: left !important; 
     }
     
-    /* Disposition magique des stats */
     .release-stats-group > div:nth-child(1) { width: 100% !important; margin-bottom: 0 !important; } /* DSP Streams (Titre) */
     .release-stats-group > div:nth-child(2) { font-size: 1.15rem !important; margin-bottom: 0 !important; } /* Nombre de streams */
     .release-stats-group > div:nth-child(3) { margin-left: auto !important; font-size: 1rem !important; margin-bottom: 0 !important; } /* Argent */
     .release-stats-group > div:nth-child(4) { width: 100% !important; margin-top: 0 !important; } /* Trending */
 
-    /* 4. Boutons d'actions (Côte à côte tout en bas) */
     .release-manage-card > .flex-col:last-child { 
         grid-column: 1 / -1 !important; 
         flex-direction: row !important; 
@@ -1086,39 +1114,31 @@ input[type="number"] {
         pointer-events: none !important;
     }
 
-    /* --- 7. CONSISTANCE DES TAILLES (SIZING OVERHAUL) --- */
     
-    /* 1. iOS Anti-Zoom & Touch Targets */
-    /* Obligatoire sur iPhone : 16px sur les champs évite le zoom forcé de l'écran */
+
     input[type="text"], input[type="number"], select, .custom-select-trigger {
         font-size: 16px !important; 
         padding: 0 12px !important;
     }
 
-    /* 2. Sizing des Modales */
-    /* On utilise calc() pour garantir un bel espacement sur les bords sans déborder */
+
     .modal {
         width: calc(100vw - 30px) !important;
         max-width: 400px !important; 
     }
-    /* On réduit le padding PC (25px) à un padding Mobile (15px) pour libérer l'espace */
+
     .modal-header, .modal-footer { padding: 15px !important; }
     .modal-body { padding: 15px !important; gap: 12px !important; }
 
-    /* 3. Panneaux et Cartes (Data Nodes) */
-    /* Uniformisation absolue de toutes les marges internes à 15px */
     .panel-content, .data-node { padding: 15px !important; }
     .panel-header { padding: 12px 15px !important; }
     .empty-state { padding: 25px 15px !important; min-height: 100px !important; }
 
-    /* 4. Le Menu (Sidebar) */
-    /* Alignement parfait de la liste avec l'en-tête "ICON Studio" */
+
     .nav-menu { padding: 15px !important; gap: 6px !important; }
     .nav-btn { min-height: 44px !important; font-size: 1.05rem !important; }
     .sidebar-bottom { padding: 15px !important; }
 
-    /* 5. Le Top HUD (Vitals) */
-    /* Resserre légèrement les cartes d'énergie et de stress */
     .vital-stat { padding: 12px !important; }
     #money-container { padding: 12px 15px !important; }
 
@@ -1131,7 +1151,6 @@ input[type="number"] {
         gap: 15px !important; 
     }
     
-    /* Avatar un poil plus grand (80px) pour englober le texte aéré */
     .avatar-wrapper { 
         width: 80px !important; 
         height: 80px !important; 
@@ -1148,24 +1167,21 @@ input[type="number"] {
         justify-content: center !important;
     }
     
-    /* 1. Espace sous le Trait */
     #profile-perk-display { 
         font-size: 0.7rem !important; 
         margin-bottom: 6px !important; 
     }
     
-    /* 2. Espace sous le Nom */
     .profile-info h2 { 
         font-size: 1.3rem !important; 
         margin-bottom: 6px !important; 
         line-height: 1.1 !important; 
     }
     
-    /* 3. Espace sous la Bio (avant la ligne en pointillés) */
     input[type="text"].bio-input { 
         font-size: 0.9rem !important; 
         margin-top: 0 !important; 
-        padding: 0 0 6px 0 !important; /* Le 6px ici fait respirer la ligne ! */
+        padding: 0 0 6px 0 !important;
         background: transparent !important;
         border: none !important;
         border-bottom: 1px dashed rgba(255,255,255,0.15) !important;
@@ -1177,7 +1193,6 @@ input[type="number"] {
         border-bottom: 1px solid var(--accent-purple) !important;
     }
     
-    /* Radar */
     .market-trend-box { 
         width: 100% !important; 
         flex-direction: column !important; 
@@ -1192,36 +1207,27 @@ input[type="number"] {
     .trend-data { font-size: 0.85rem !important; margin-bottom: 4px !important; padding: 6px 12px !important; }
     .trend-footer { display: block !important; font-size: 0.75rem !important; text-align: center; width: 100%; opacity: 0.7; margin-top: 6px; }
     
-    /* On réduit un peu la barre de temps pour laisser de l'air aux boutons */
     .time-bar-bg { height: 2px !important; }
 
     .sync-container { width: 90vw !important; max-width: 350px !important; padding: 30px 20px !important; }
 
-    /* =========================================
-   🛠️ MASTER Z-INDEX HIERARCHY 🛠️
-   ========================================= */
-
-/* 1. Tooltips et HUD (Base) */
 .status-tooltip { z-index: 2500 !important; }
 .top-hud { z-index: 3000 !important; }
 
-/* 2. Menu Mobile */
 #mobile-menu-overlay { z-index: 4000 !important; }
 #mobile-menu-fab { z-index: 5000 !important; }
 .sidebar { z-index: 6000 !important; }
 
-/* 3. Fenêtres de jeu standards (Modales) */
+
 .overlay { z-index: 8000 !important; }
 
-/* 4. Alertes Système (Passent TOUJOURS par-dessus les autres modales) */
+
 #system-alert-modal, 
 #system-confirm-modal { z-index: 9000 !important; }
 
-/* 5. Minijeu de rythme & Écran de chargement (Bloquent absolument tout) */
 .sync-overlay { z-index: 9500 !important; }
 #action-blocker { z-index: 9800 !important; }
 
-/* 6. Menus déroulants (Doivent toujours flotter au sommet absolu) */
 .custom-options.body-appended { z-index: 99999 !important; }
     
 }
