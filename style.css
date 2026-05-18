@@ -139,6 +139,22 @@ button:disabled.btn-cant-afford, .btn-cant-afford {
     transform: none !important;
 }
 
+#btn-google-login {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #ffffff !important;
+    transition: all 0.2s ease;
+}
+
+#btn-google-login:hover {
+    background: #e2e8f0 !important; 
+    border-color: #e2e8f0 !important;
+}
+
+#btn-google-login:active {
+    transform: scale(0.98);
+}
+
 .badge { 
     display: inline-flex; align-items: center; gap: 6px; 
     padding: 0 10px; border-radius: var(--radius-s); font-size: 11px; height: 26px; 
@@ -154,7 +170,7 @@ button:disabled.btn-cant-afford, .btn-cant-afford {
 
 .input-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; min-width: 0; }
 .input-group label { font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.8rem; }
-input[type="text"], input[type="number"], select { 
+input[type="text"], input[type="number"], input[type="email"], input[type="password"], select {
     background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: #fff; 
     padding: 0 15px; border-radius: var(--radius-m); transition: 0.2s; min-height: var(--btn-height); font-size: 0.9rem;
 }

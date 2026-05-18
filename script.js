@@ -265,6 +265,7 @@ const Engine = {
         
         try {
             localStorage.setItem('studioOS_save', JSON.stringify(saveData));
+            if (typeof Cloud !== 'undefined' && Cloud.uid) { Cloud.saveToCloud(saveData); }
             
             if (!silent) {
                 UI.showAlert("Game Saved", "Your progress has been stored locally.");
@@ -1740,6 +1741,12 @@ let btnText = cantAfford ? `<i data-lucide="lock"></i> $${s.cost.toLocaleString(
         document.querySelector(`.nav-btn[onclick="UI.switchTab('${tabId}')"]`).classList.add('active');
         document.body.classList.remove('menu-open');
         if(tabId === 'dashboard' && Engine.chart) Engine.chart.resize();
+    },
+    switchSettingsTab(tab) {
+        document.getElementById('btn-settings-game').className = tab === 'game' ? 'market-top-tab active' : 'market-top-tab';
+        document.getElementById('btn-settings-account').className = tab === 'account' ? 'market-top-tab active' : 'market-top-tab';
+        document.getElementById('settings-tab-game').classList.toggle('hidden', tab !== 'game');
+        document.getElementById('settings-tab-account').classList.toggle('hidden', tab !== 'account');
     },
     async runCountdown() {
         const blocker = document.getElementById('action-blocker');

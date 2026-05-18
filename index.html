@@ -10,7 +10,43 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div id="onboarding-modal" class="overlay active-overlay">
+    <div id="auth-modal" class="overlay active-overlay" style="z-index: 9000; background: #0a0a0e;">
+        <div class="modal" style="width: 400px; text-align: center; padding: 40px 30px;">
+            <div style="margin-bottom: 30px;">
+                <i data-lucide="disc-3" class="text-purple" style="width: 48px; height: 48px; margin-bottom: 10px;"></i>
+                <h1 style="margin: 0; font-size: 1.8rem; letter-spacing: -1px;">ICON Studio</h1>
+                <span class="text-muted" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px;">Music Career Simulator</span>
+            </div>
+            
+            
+            
+            
+            <div class="input-group" style="text-align: left;">
+                <label>Email Address</label>
+                <input type="email" id="auth-email" placeholder="ceo@label.com">
+            </div>
+            <div class="input-group" style="text-align: left;">
+                <label>Password</label>
+                <input type="password" id="auth-password" placeholder="••••••••">
+            </div>
+            <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+                <span style="padding: 0 10px; font-size: 0.8rem; color: var(--text-muted);">OR</span>
+                <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+            </div>
+            <button class="btn-outline w-100" id="btn-google-login" style="margin-bottom: 20px;">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width: 18px; margin-right: 8px;" alt="Google">
+                Continue with Google
+            </button>
+            
+            <div class="flex-col gap-10 mt-10">
+                <button class="btn-primary w-100" id="btn-login">Login</button>
+                <button class="btn-outline w-100" id="btn-signup">Create Account</button>
+            </div>
+            <div id="auth-error" class="text-red hidden" style="margin-top: 15px; font-size: 0.85rem;"></div>
+        </div>
+    </div>
+    <div id="onboarding-modal" class="overlay">
         <div class="modal" style="width: 480px;">
             <div class="modal-header">Profile selection</div>
             <div class="modal-body">
@@ -534,22 +570,67 @@
     <div id="settings-modal" class="overlay hidden" style="z-index: 1500;">
         <div class="modal">
             <div class="modal-header">
-                <span><i data-lucide="settings"></i> System Settings</span>
+                <span><i data-lucide="settings"></i> Settings</span>
                 <i data-lucide="x" class="close-icon" onclick="UI.closeModal('settings-modal')"></i>
             </div>
-            <div class="modal-body">
-                <div class="data-node flex-col" style="margin-bottom: 15px; padding: 15px;">
-                    <strong style="margin-bottom: 10px;">Save Data Management</strong>
-                    <button id="btn-toggle-autosave" class="btn-outline-green w-100" style="margin-bottom: 10px;" onclick="UI.toggleAutosave()"><i data-lucide="check-circle"></i> Autosave: ON</button>
-                    <button class="btn-outline-red w-100" onclick="Engine.resetGame()"><i data-lucide="alert-triangle"></i> Hard Reset</button>
-                </div>
-                <div class="input-group">
-                    <label>Admin Terminal</label>
-                    <div class="flex-row gap-10">
-                        <input type="text" id="admin-code-input" placeholder="Type AUTH <password> to unlock..." style="flex:1;">
-                        <button class="btn-outline-purple" onclick="Engine.executeCheat()">Run</button>
+            <div class="modal-body" style="padding: 20px;">
+                
+                <div class="market-controls-wrapper" style="margin: 0 0 15px 0; padding: 10px;">
+                    <div class="market-top-tabs">
+                        <button id="btn-settings-game" class="market-top-tab active" onclick="UI.switchSettingsTab('game')">
+                            <i data-lucide="gamepad-2"></i> Game
+                        </button>
+                        <button id="btn-settings-account" class="market-top-tab" onclick="UI.switchSettingsTab('account')">
+                            <i data-lucide="user"></i> Account
+                        </button>
                     </div>
                 </div>
+
+                <div id="settings-tab-game">
+                    <div class="data-node flex-col" style="margin-bottom: 15px; padding: 15px;">
+                        <strong style="margin-bottom: 10px;">Save Data Management</strong>
+                        <button id="btn-toggle-autosave" class="btn-outline-green w-100" style="margin-bottom: 10px;" onclick="UI.toggleAutosave()">
+                            <i data-lucide="check-circle"></i> Autosave: ON
+                        </button>
+                        <button class="btn-outline-red w-100" onclick="Engine.resetGame()">
+                            <i data-lucide="alert-triangle"></i> Hard Reset
+                        </button>
+                    </div>
+                    <div class="data-node flex-col" style="padding: 15px;">
+                        <div class="input-group" style="margin: 0;">
+                            <label>Admin Terminal</label>
+                            <div class="flex-row gap-10">
+                                <input type="text" id="admin-code-input" placeholder="Type AUTH <password> to unlock..." style="flex:1;">
+                                <button class="btn-outline-purple" onclick="Engine.executeCheat()">Run</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="settings-tab-account" class="hidden">
+                    <div class="data-node flex-col" style="margin-bottom: 15px; padding: 15px;">
+                        <div class="text-muted" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">Logged in as</div>
+                        <div id="account-email-display" style="font-size: 1rem; margin-bottom: 15px; color: var(--accent-purple);">Local Guest</div>
+                        
+                        <button id="btn-cloud-save" class="btn-outline-blue w-100" style="margin-bottom: 10px;">
+                            <i data-lucide="upload-cloud"></i> Force Cloud Sync
+                        </button>
+                        <button id="btn-change-password" class="btn-outline w-100" style="margin-bottom: 10px;">
+                            <i data-lucide="key"></i> Reset Password
+                        </button>
+                        <button id="btn-logout" class="btn-outline w-100" style="margin-bottom: 10px;">
+                            <i data-lucide="log-out"></i> Disconnect
+                        </button>
+                    </div>
+
+                    <div class="data-node flex-col" style="padding: 15px; border-color: rgba(255, 94, 87, 0.3);">
+                        <strong class="text-red" style="margin-bottom: 10px;">Danger Zone</strong>
+                        <button id="btn-delete-account" class="btn-outline-red w-100">
+                            <i data-lucide="trash-2"></i> Delete Account
+                        </button>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -756,6 +837,13 @@
         <i data-lucide="menu"></i>
     </button>
 
+    <script src="script.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
+    <script src="cloud.js"></script>
+    
     <script src="script.js"></script>
 </body>
 </html>
