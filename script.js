@@ -265,16 +265,18 @@ const Engine = {
         
         try {
             localStorage.setItem('studioOS_save', JSON.stringify(saveData));
-            if (typeof Cloud !== 'undefined' && Cloud.uid) { Cloud.saveToCloud(saveData); }
+            
+            if (typeof Cloud !== 'undefined' && Cloud.uid) { 
+                Cloud.saveToCloud(JSON.stringify(saveData)); 
+            }
             
             if (!silent) {
-                UI.showAlert("Game Saved", "Your progress has been stored locally.");
+                UI.showAlert("Game Saved", "Your progress has been stored locally and synced to the Cloud Network.");
             }
         } catch (error) {
             console.error("Save failed:", error);
-            
             if (error.name === 'QuotaExceededError' || error.code === 22) {
-                UI.showAlert("Save Failed: Storage Full", "Your save file is too large! This usually happens when uploading high-resolution custom cover arts. Try using smaller images.");
+                UI.showAlert("Save Failed: Storage Full", "Your save file is too large! Try using smaller custom images.");
             } else {
                 UI.showAlert("Save Failed", "An unknown error prevented the game from saving. Check the console.");
             }
@@ -282,10 +284,14 @@ const Engine = {
     },
     loadGame(fromBoot = false) {
         if (!Game.isLoaded) return console.error("Cannot load game. Config not loaded.");
+        
+        
         let saveData = localStorage.getItem('studioOS_save');
-        if(!saveData) return UI.showAlert("No Save Found", "There is no saved data on this browser.");
+        if(!saveData) return UI.showAlert("No Save Found", "There is no saved data detected for this account.");
+        
         let parsed = JSON.parse(saveData);
         this.state = parsed.state;
+        
         if(!this.state.cooldowns) this.state.cooldowns = { jobChange: 0, work: 0, sleep: 0 };
         if(!this.state.flags) this.state.flags = {};
         if(!this.state.preferences) this.state.preferences = { autosave: true };
@@ -303,36 +309,56 @@ const Engine = {
         if(!this.state.stats.merchHistory) this.state.stats.merchHistory = [0, 0, 0, 0, 0, 0, 0];
         if(!this.state.staff) this.state.staff = [];
         if(!this.state.inventoryVelocity) this.state.inventoryVelocity = {};
+        
         this.state.tracks = this.state.tracks.map(t => Object.assign(new Track(t.title, t.genre, t.bpm, t.vibe), t));
         this.state.releases = this.state.releases.map(r => {
             r.tracks = r.tracks.map(t => Object.assign(new Track(t.title, t.genre, t.bpm, t.vibe), t));
             return Object.assign(new Release(r.title, r.format, r.tracks, r.artData, r.platforms, r.distroId, r.dropDay, r.visualBoost, r.visualName), r);
         });
+        
         Game.config.gear = parsed.gear;
         parsed.achievements.forEach(loadedAch => {
             let original = Game.config.achievements.find(a => a.id === loadedAch.id);
             if(original) original.unlocked = loadedAch.unlocked;
         });
-        if(fromBoot) this.initGame(false); 
+
+        UI.closeModal('onboarding-modal');
         UI.closeModal('settings-modal');
+        document.getElementById('os-environment').classList.remove('hidden');
+        
+        lucide.createIcons(); 
+        UI.initChart(); 
+        UI.updateClock(); 
         UI.updateVitals(); 
         UI.renderStudio(); 
         UI.renderVault(); 
         UI.renderReleases(); 
         UI.renderGear();
-        UI.updateClock(); 
-        UI.updateChart(0);
+        UI.renderLeaderboard();
+        UI.renderMilestones();
         UI.renderStatuses();
         UI.renderContracts();
         UI.renderSettings();
         UI.renderPromos();
         UI.renderHQ();
         UI.renderMerch();
-        UI.showAlert("Game Loaded", "Welcome back, " + this.state.player.name);
+        UI.updateChart(0);
+        Progression.check();
+        
+        UI.showAlert("Workspace Connected", "Cloud session loaded successfully for " + this.state.player.name);
     },
     resetGame() {
-        UI.showConfirm("Hard Reset", "Are you sure? This will permanently wipe all local save data.", () => {
+        UI.showConfirm("Hard Reset", "Are you sure? This will permanently wipe your local save AND your cloud backup profile.", async () => {
+            if (typeof Cloud !== 'undefined' && Cloud.uid) {
+                try {
+                    await Cloud.deleteSaveFromCloud();
+                } catch (err) {
+                    console.error("Failed to wipe cloud save during reset:", err);
+                }
+            }
+
             localStorage.removeItem('studioOS_save');
+            
             location.reload();
         });
     },
@@ -2745,6 +2771,57 @@ let pushBtnText = pushCantAfford ? `<i data-lucide="lock"></i> Algorithmic Push 
             this.showAlert("Invalid Title", "Track title cannot be empty.");
         }
     },
+    scanLocalSaveForOnboarding() {
+        const statusBadge = document.getElementById('profile-card-status');
+        const readoutZone = document.getElementById('profile-card-readout');
+        const emptyZone = document.getElementById('profile-card-empty');
+        const saveRaw = localStorage.getItem('studioOS_save');
+
+        if (!statusBadge || !readoutZone || !emptyZone) return;
+
+        if (!saveRaw) {
+            statusBadge.className = "badge badge-outline";
+            statusBadge.innerText = "EMPTY";
+            readoutZone.classList.add('hidden');
+            emptyZone.classList.remove('hidden');
+            return;
+        }
+
+        try {
+            const parsed = JSON.parse(saveRaw);
+            const state = parsed.state;
+            
+            if (!state || !state.player) throw new Error("Malformed save structure.");
+
+            let jobTitle = "Independent Artist";
+            if (state.player.jobId && Game.config && Game.config.jobs) {
+                const foundJob = Game.config.jobs.find(j => j.id === state.player.jobId);
+                if (foundJob) jobTitle = foundJob.title;
+            }
+
+            document.getElementById('profile-card-name').innerText = state.player.name || "Unknown Identity";
+            document.getElementById('profile-card-job').innerText = jobTitle;
+            document.getElementById('profile-card-money').innerText = `$${(state.player.money || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('profile-card-fans').innerText = `${(state.player.followers || 0).toLocaleString()} Fans`;
+            
+            if (state.player.avatar) {
+                document.getElementById('profile-card-avatar').src = state.player.avatar;
+            }
+
+            statusBadge.className = "badge badge-green";
+            statusBadge.innerText = "ONLINE";
+            emptyZone.classList.add('hidden');
+            readoutZone.classList.remove('hidden');
+
+        } catch (err) {
+            console.error("Diagnostic scanner error handling local string file:", err);
+            statusBadge.className = "badge badge-red";
+            statusBadge.innerText = "CORRUPTED";
+            readoutZone.classList.add('hidden');
+            emptyZone.innerText = "System error parsing data nodes on this hardware unit.";
+            emptyZone.classList.remove('hidden');
+        }
+    },
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -2752,6 +2829,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     UI.populateDropdowns();
     UI.renderServices();
     UI.initCustomSelects();
+    
+    UI.scanLocalSaveForOnboarding();
     
     document.addEventListener('focusout', (e) => {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {

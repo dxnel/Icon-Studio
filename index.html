@@ -18,8 +18,16 @@
                 <span class="text-muted" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px;">Music Career Simulator</span>
             </div>
             
-            
-            
+            <button class="btn-outline w-100" id="btn-google-login" style="margin-bottom: 20px;">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width: 18px; margin-right: 8px;" alt="Google">
+                Continue with Google
+            </button>
+
+            <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+                <span style="padding: 0 10px; font-size: 0.8rem; color: var(--text-muted);">OR</span>
+                <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+            </div>
             
             <div class="input-group" style="text-align: left;">
                 <label>Email Address</label>
@@ -29,15 +37,6 @@
                 <label>Password</label>
                 <input type="password" id="auth-password" placeholder="••••••••">
             </div>
-            <div style="display: flex; align-items: center; margin-bottom: 20px;">
-                <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
-                <span style="padding: 0 10px; font-size: 0.8rem; color: var(--text-muted);">OR</span>
-                <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
-            </div>
-            <button class="btn-outline w-100" id="btn-google-login" style="margin-bottom: 20px;">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width: 18px; margin-right: 8px;" alt="Google">
-                Continue with Google
-            </button>
             
             <div class="flex-col gap-10 mt-10">
                 <button class="btn-primary w-100" id="btn-login">Login</button>
@@ -46,12 +45,56 @@
             <div id="auth-error" class="text-red hidden" style="margin-top: 15px; font-size: 0.85rem;"></div>
         </div>
     </div>
-    <div id="onboarding-modal" class="overlay">
-        <div class="modal" style="width: 480px;">
-            <div class="modal-header">Profile selection</div>
-            <div class="modal-body">
+
+    <div id="onboarding-modal" class="overlay hidden" style="z-index: 8500;">
+        <div class="modal" style="width: 460px;">
+            <div class="modal-header" style="justify-content: center; padding: 20px 0 10px 0; border: none; background: transparent;">
+                <div style="text-align: center;">
+                    <i data-lucide="disc-3" class="text-purple" style="width: 40px; height: 40px; margin-bottom: 8px;"></i>
+                    <h2 style="margin: 0; font-size: 1.5rem; letter-spacing: -1px;">ICON Studio</h2>
+                    <span class="text-muted" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px;">Identity Management</span>
+                </div>
+            </div>
+            
+            <div class="modal-body" style="padding: 20px 25px 25px 25px;">
+                <div id="local-profile-card" class="data-node flex-col" style="margin-bottom: 10px; background: rgba(0,0,0,0.25); border-color: rgba(176, 91, 255, 0.15);">
+                    <div class="flex-row-between" style="margin-bottom: 12px;">
+                        <span class="text-purple font-bold" style="font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">
+                            <i data-lucide="hard-drive" style="width: 14px; margin-right: 4px;"></i> System Save Readout
+                        </span>
+                        <span id="profile-card-status" class="badge badge-purple" style="height: 20px; font-size: 10px;">SCANNING...</span>
+                    </div>
+                    
+                    <div id="profile-card-readout" class="flex-col gap-10 hidden">
+                        <div class="flex-row gap-15">
+                            <img id="profile-card-avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50'><rect width='50' height='50' fill='%23222'/></svg>" style="width: 50px; height: 50px; border-radius: 6px; border: 1px solid var(--border-color); object-fit: cover;">
+                            <div class="flex-col" style="flex: 1;">
+                                <h3 id="profile-card-name" style="margin: 0; font-size: 1.1rem; font-weight: 800;">Unknown Identity</h3>
+                                <span id="profile-card-job" class="text-muted" style="font-size: 0.8rem;">Freelancer</span>
+                            </div>
+                        </div>
+                        <div style="font-family: var(--font-mono); font-size: 0.8rem; margin: 5px 0; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <div class="text-muted">Net Worth: <span id="profile-card-money" class="text-green" style="font-weight: bold;">$0.00</span></div>
+                            <div class="text-muted">Network: <span id="profile-card-fans" class="text-blue" style="font-weight: bold;">0 Fans</span></div>
+                        </div>
+                        <button class="btn-primary w-100" style="min-height: 38px; font-size: 0.85rem;" onclick="Engine.loadGame(true)">
+                            <i data-lucide="download"></i> Load Active Workspace
+                        </button>
+                    </div>
+
+                    <div id="profile-card-empty" class="text-muted" style="text-align: center; padding: 15px 0; font-style: italic; font-size: 0.9rem;">
+                        No local system profile detected on this hardware core.
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; margin: 15px 0;">
+                    <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+                    <span style="padding: 0 10px; font-size: 0.75rem; color: var(--text-muted); font-weight: bold; letter-spacing: 1px;">OR RUN NEW PROFILE</span>
+                    <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+                </div>
+
                 <div class="input-group">
-                    <label>Artist Name</label>
+                    <label>Artist Alias</label>
                     <input type="text" id="artist-name" placeholder="e.g. Kendrick Lamar">
                 </div>
                 <div class="flex-row gap-15">
@@ -64,10 +107,9 @@
                         <select id="player-job"></select>
                     </div>
                 </div>
-                <button class="btn-primary w-100 mt-10" onclick="Engine.initGame(true)">Initialize Workspace</button>
-                <div class="text-muted" style="text-align:center; font-size: 0.75rem; margin-top: 15px;">
-                    Or <a href="#" onclick="Engine.loadGame(true)" style="color:var(--accent-purple); cursor:pointer;">Load Saved Game</a>
-                </div>
+                <button class="btn-outline w-100 mt-10" style="border-color: var(--accent-purple); color: #fff; font-weight: 700;" onclick="Engine.initGame(true)">
+                    <i data-lucide="plus-circle"></i> Initialize New Workspace
+                </button>
             </div>
         </div>
     </div>

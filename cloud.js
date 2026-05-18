@@ -1,3 +1,4 @@
+// 1. YOUR FIREBASE CONFIG (Vos clés API officielles de la console Google Cloud)
 const firebaseConfig = {
   apiKey: "AIzaSyDtCybmYjWpoCczFvIGtBgOjBb95_WSnRY",
   authDomain: "icon-studio-simulator.firebaseapp.com",
@@ -7,23 +8,32 @@ const firebaseConfig = {
   appId: "1:804178879068:web:65b5ad93ce6c2c7d5e3c99"
 };
 
+// 2. INITIALIZATION
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+// 3. CLOUD ENGINE
 const Cloud = {
     uid: null,
 
     init() {
+        // Surveille en temps réel l'état de connexion du joueur
         auth.onAuthStateChanged(user => {
             if (user) {
-                document.getElementById('account-email-display').innerText = user.email || "Google Connected";
                 this.uid = user.uid;
+                document.getElementById('account-email-display').innerText = user.email || "Google Connected";
+                
+                // Étape 1 validée : On ferme le menu de connexion Google/Email
                 document.getElementById('auth-modal').classList.remove('active-overlay');
+                
+                // Étape 2 : On va scanner les données pour l'écran de sélection de profil
                 this.checkCloudSave();
             } else {
                 this.uid = null;
+                // Si déconnecté, on reverrouille tout sur l'écran d'accueil noir
                 document.getElementById('auth-modal').classList.add('active-overlay');
+                document.getElementById('onboarding-modal').classList.add('hidden');
                 document.getElementById('os-environment').classList.add('hidden');
             }
         });
@@ -31,17 +41,20 @@ const Cloud = {
     },
 
     bindEvents() {
+        // BOUTON : Connexion avec Google Pop-up
         document.getElementById('btn-google-login').onclick = () => {
             const provider = new firebase.auth.GoogleAuthProvider();
             auth.signInWithPopup(provider).catch(err => this.showError(err.message));
         };
 
+        // BOUTON : Connexion Email classique
         document.getElementById('btn-login').onclick = () => {
             const email = document.getElementById('auth-email').value;
             const pass = document.getElementById('auth-password').value;
             auth.signInWithEmailAndPassword(email, pass).catch(err => this.showError("Invalid credentials."));
         };
 
+        // BOUTON : Inscription Email classique
         document.getElementById('btn-signup').onclick = () => {
             const email = document.getElementById('auth-email').value;
             const pass = document.getElementById('auth-password').value;
@@ -49,6 +62,7 @@ const Cloud = {
             auth.createUserWithEmailAndPassword(email, pass).catch(err => this.showError(err.message));
         };
 
+        // BOUTON : Déconnexion (dans l'onglet Account des paramètres)
         const btnLogout = document.getElementById('btn-logout');
         if (btnLogout) {
             btnLogout.onclick = () => {
@@ -56,6 +70,7 @@ const Cloud = {
             };
         }
 
+        // BOUTON : Force Cloud Sync (sauvegarde immédiate)
         const btnCloudSave = document.getElementById('btn-cloud-save');
         if (btnCloudSave) {
             btnCloudSave.onclick = () => {
@@ -63,6 +78,7 @@ const Cloud = {
             };
         }
 
+        // BOUTON : Réinitialiser le mot de passe par Email
         const btnChangePwd = document.getElementById('btn-change-password');
         if (btnChangePwd) {
             btnChangePwd.onclick = () => {
@@ -78,6 +94,7 @@ const Cloud = {
             };
         }
 
+        // BOUTON : Supprimer définitivement le compte cloud
         const btnDeleteAcc = document.getElementById('btn-delete-account');
         if (btnDeleteAcc) {
             btnDeleteAcc.onclick = () => {
@@ -101,18 +118,34 @@ const Cloud = {
         errDiv.classList.remove('hidden');
     },
 
+    // RECHERCHE DE LA SAUVEGARDE SUR FIRESTORE
     async checkCloudSave() {
         try {
             const docRef = db.collection("players").doc(this.uid);
             const doc = await docRef.get();
             
+            // On s'assure que la fenêtre Onboarding est bien visible et active
+            const onboarding = document.getElementById('onboarding-modal');
+            if (onboarding) {
+                onboarding.classList.remove('hidden');
+                onboarding.classList.add('active-overlay');
+            }
+
             if (doc.exists && doc.data().saveString) {
+                // Sauvegarde trouvée en ligne -> On la synchronise temporairement en local
                 localStorage.setItem('studioOS_save', doc.data().saveString);
-                Engine.loadGame(true);
-                console.log("Cloud save loaded successfully.");
+                
+                // On demande à l'interface de scanner le fichier pour afficher les stats en vert (ONLINE)
+                if (typeof UI !== 'undefined' && UI.scanLocalSaveForOnboarding) {
+                    UI.scanLocalSaveForOnboarding();
+                }
+                console.log("Cloud save mapped to local diagnostics card.");
             } else {
-                document.getElementById('onboarding-modal').classList.add('active-overlay');
-                console.log("No cloud save found. Initializing new workspace.");
+                // Pas de sauvegarde en ligne -> La carte passera automatiquement en mode "No local profile detected"
+                if (typeof UI !== 'undefined' && UI.scanLocalSaveForOnboarding) {
+                    UI.scanLocalSaveForOnboarding();
+                }
+                console.log("No cloud save found. Standing by for initial profile setup.");
             }
         } catch (error) {
             console.error("Cloud load error:", error);
@@ -120,6 +153,7 @@ const Cloud = {
         }
     },
 
+    // TRANSFERT DE LA SAUVEGARDE VERS LE CLOUD
     async saveToCloud(saveString) {
         if (!this.uid) return;
         try {
@@ -134,4 +168,5 @@ const Cloud = {
     }
 };
 
+// Lancement automatique du script au démarrage
 document.addEventListener('DOMContentLoaded', () => { Cloud.init(); });
