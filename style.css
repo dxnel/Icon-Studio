@@ -531,7 +531,7 @@ input:focus, select:focus { border-color: var(--accent-purple); background: rgba
 .modal-header i, .modal-header svg { cursor: pointer; }
 .modal-body { padding: 25px; display: flex; flex-direction: column; gap: 15px; flex-grow: 1; overflow-y: auto; min-height: 0; }
 .modal-footer { padding: 20px 25px; border-top: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.2); border-radius: 0 0 var(--radius-l) var(--radius-l); }
-#system-alert-modal, #system-confirm-modal { z-index: 3000; }
+#system-alert-modal, #system-confirm-modal { z-index: 9999 !important; }
 
     input[type="range"].custom-range { 
         -webkit-appearance: none; 
