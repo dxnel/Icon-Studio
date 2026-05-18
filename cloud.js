@@ -165,6 +165,17 @@ const Cloud = {
         } catch (error) {
             console.error("Cloud save error:", error);
         }
+    },
+    async deleteSaveFromCloud() {
+        if (!this.uid) return;
+        try {
+            // On supprime carrément le document unique du joueur dans la collection "players"
+            await db.collection("players").doc(this.uid).delete();
+            console.log("☁️ Sauvegarde Cloud supprimée définitivement de Firestore.");
+        } catch (error) {
+            console.error("Erreur lors de la suppression Cloud:", error);
+            throw error;
+        }
     }
 };
 
