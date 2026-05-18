@@ -1229,10 +1229,4 @@ input[type="number"] {
 #action-blocker { z-index: 9800 !important; }
 
 .custom-options.body-appended { z-index: 99999 !important; }
-
-#auth-modal .modal {
-            width: 90% !important;
-            padding: 30px 15px !important;
-        }
-    
 }
