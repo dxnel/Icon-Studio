@@ -1229,4 +1229,11 @@ input[type="number"] {
 #action-blocker { z-index: 9800 !important; }
 
 .custom-options.body-appended { z-index: 99999 !important; }
+
+#auth-modal .game-desc-home {
+                    display: none !important;
+                }
+                #auth-modal div[style*="position: absolute"] {
+                    bottom: 15px !important; 
+                }
 }
