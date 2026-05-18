@@ -182,10 +182,32 @@ class Release {
         });
         rawQual /= tracks.length;
 
+        let lastRel = Engine.state.releases.slice().reverse().find(r => r.status === 'Scheduled' || r.status === 'Live');
+        let daysSince = lastRel ? (this.dropDay - lastRel.dropDay) : 999;
+        this.saturationPenalty = 1.0;
+        
+        if (daysSince < 7) {
+            this.saturationPenalty = 0.4; 
+        } else if (daysSince < 12) {
+            this.saturationPenalty = 0.8; 
+        }
+
+        let formatMultiplier = formatMult; 
+        let currentHype = Engine.state.player.hype;
+
+        if (this.format === 'Album') {
+            if (currentHype < 1.0) formatMultiplier *= 0.5; 
+            else if (currentHype > 2.5) formatMultiplier *= 2.5; 
+        } else if (this.format === 'EP') {
+            if (currentHype < 1.0) formatMultiplier *= 0.8;
+            else if (currentHype > 2.0) formatMultiplier *= 1.5;
+        }
+
         let variance = (Math.random() * 0.1) - 0.05; 
         this.retentionRate = Math.min(0.99, 0.45 + (rawQual / 250) + variance); 
-        let socialMult = Engine.state.player.hype + (Engine.state.player.followers / 2500); 
-        this.hypeRating = rawQual * formatMult * distroBoost * socialMult * visualBoost;
+        let socialMult = currentHype + (Engine.state.player.followers / 2500); 
+        
+        this.hypeRating = rawQual * formatMultiplier * distroBoost * socialMult * visualBoost * this.saturationPenalty;
         this.activeMultiplier = 1.0;
     }
 }
@@ -1091,7 +1113,7 @@ const PlayerActions = {
             let rec = hours * 8; 
             if(Engine.state.player.perkId === 'sleeper') rec *= 1.2;
             Engine.modifyStat('energy', rec); 
-            Engine.modifyStat('burnout', -(hours * 6)); 
+            Engine.modifyStat('burnout', -(hours * 2)); 
             Engine.state.cooldowns.sleep = 8; 
         }
         else if (this.currentAction === 'pass') {
@@ -1439,7 +1461,8 @@ const DistroEngine = {
         
         let distroObj = Game.config.distroOptions.find(d => d.id === dspVal);
         let visualObj = Game.config.visualOptions.find(v => v.id === visualStr);
-        if (!distroObj || !visualObj) return;
+        let formatObj = Game.config.releaseFormats.find(f => f.id === formatStr);
+        if (!distroObj || !visualObj || !formatObj) return;
 
         let trackCount = Engine.pendingTracklist.length;
         let trackPremium = distroObj.cost > 0 ? (trackCount * 3) : 0;
@@ -1451,13 +1474,59 @@ const DistroEngine = {
         let playerMoney = Engine.state.player.money;
         let costClass = playerMoney >= totalCost ? 'text-green' : 'text-red';
 
+        let newDropDay = Engine.state.day + distroObj.delay;
+        let lastRel = Engine.state.releases.slice().reverse().find(r => r.status === 'Scheduled' || r.status === 'Live');
+        let daysSince = lastRel ? (newDropDay - lastRel.dropDay) : 999;
+        
+        let saturationHtml = '';
+        let saturationPenalty = 1.0;
+        
+        if (daysSince < 7) {
+            saturationHtml = `<div class="text-red" style="font-size: 0.8rem; margin-top: 4px; display: flex; align-items: center; gap: 4px;"><i data-lucide="alert-triangle" style="width: 12px;"></i> Audience Saturation (-60% streams)</div>`;
+            saturationPenalty = 0.4;
+        } else if (daysSince < 12) {
+            saturationHtml = `<div class="text-orange" style="font-size: 0.8rem; margin-top: 4px; display: flex; align-items: center; gap: 4px;"><i data-lucide="alert-circle" style="width: 12px;"></i> Audience Fatigue (-20% streams)</div>`;
+            saturationPenalty = 0.8;
+        } else {
+            saturationHtml = `<div class="text-muted" style="font-size: 0.8rem; margin-top: 4px; display: flex; align-items: center; gap: 4px;"><i data-lucide="check-circle" style="width: 12px;"></i> Audience is hungry</div>`;
+        }
+
+        let socialMult = Engine.state.player.hype + (Engine.state.player.followers / 2500); 
+        let estimatedHype = (formatObj.hypeMult || 1.0) * distroObj.distroBoost * visualObj.hypeBoost * socialMult * saturationPenalty;
+        
+        let hypeState = "Average Reach"; let hypeColor = "text-yellow";;
+        if (estimatedHype < 1.5) { hypeState = "Low Impact"; hypeColor = "text-muted"; } 
+        else if (estimatedHype > 8.0) { hypeState = "Massive Hit"; hypeColor = "text-purple";} 
+        else if (estimatedHype > 4.0) { hypeState = "Strong Reach"; hypeColor = "text-green"; }
+
+        if (saturationPenalty < 1.0) { 
+            hypeColor = "text-red"; 
+            hypeState = "-Reach"; 
+        }
+
         invoiceBox.innerHTML = `
-            <div style="font-weight: 700; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-family: var(--font-ui);">Project invoice</div>
-            <div class="flex-row-between text-muted" style="margin-bottom: 6px;">Plan Base Cost: <span class="text-main">$${distroObj.cost}</span></div>
-            <div class="flex-row-between text-muted" style="margin-bottom: 6px;">Track Vol. Fee (${trackCount} tracks): <span class="text-main">+$${trackPremium}</span></div>
-            <div class="flex-row-between text-muted" style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed rgba(255,255,255,0.1);">Visual Budget: <span class="text-main">+$${visualObj.cost}</span></div>
-            <div class="flex-row-between" style="font-weight: bold; font-size: 0.95rem;">Total Cost: <span class="${costClass}">$${totalCost.toLocaleString()}</span></div>
+            <div class="flex-col gap-10">
+                <div class="flex-row-between" style="border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 12px;">
+                    <div class="flex-col">
+                        <span class="text-muted" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Project Cost</span>
+                        <span style="font-size: 0.8rem; margin-top: 4px; color: var(--text-muted); font-family: var(--font-mono);">Base $${distroObj.cost} + Trk $${trackPremium} + Vis $${visualObj.cost}</span>
+                    </div>
+                    <div class="${costClass}" style="font-size: 1.4rem; font-weight: 800; font-family: var(--font-mono);">$${totalCost.toLocaleString()}</div>
+                </div>
+                
+                <div class="flex-row-between" style="align-items: flex-start; padding-top: 4px;">
+                    <div class="flex-col">
+                        <span class="text-muted" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Algorithm Forecast</span>
+                        ${saturationHtml}
+                    </div>
+                    <div class="${hypeColor}" style="display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 1.05rem;">
+                        ${hypeState}
+                    </div>
+                </div>
+            </div>
         `;
+        
+        if(window.lucide) lucide.createIcons();
     },
     selectDistro(type) {
         let opt = Game.config.distroOptions.find(d => d.id === type);
@@ -2014,7 +2083,7 @@ let btnText = cantAfford ? `<i data-lucide="lock"></i> $${s.cost.toLocaleString(
             let nrg = val * 8;
             if(Engine.state.player.perkId === 'sleeper') nrg *= 1.2;
             document.getElementById('life-impact-1').innerHTML = `<span class="text-green">+${nrg}% Energy</span>`;
-            document.getElementById('life-impact-2').innerHTML = `<span class="text-green">-${val * 6}% Stress</span>`;
+            document.getElementById('life-impact-2').innerHTML = `<span class="text-green">-${val * 2}% Stress</span>`;
         }
        else if (PlayerActions.currentAction === 'pass') {
             document.getElementById('life-impact-1').innerHTML = ''; 
@@ -2810,6 +2879,8 @@ let pushBtnText = pushCantAfford ? `<i data-lucide="lock"></i> Algorithmic Push 
             
             if (state.player.avatar) {
                 document.getElementById('profile-card-avatar').src = state.player.avatar;
+            } else {
+                document.getElementById('profile-card-avatar').src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50'><rect width='50' height='50' fill='%23222'/></svg>";
             }
 
             statusBadge.className = "badge badge-green";
