@@ -812,26 +812,24 @@ input[type="number"] {
     .top-hud {
         display: flex !important;
         flex-direction: column !important;
-        padding: 12px 15px 15px 15px !important; /* On donne un peu plus de place en bas */
+        padding: 12px 15px 15px 15px !important; 
         gap: 10px !important;
-        background: #0a0a0e !important; /* Noir solide, finit le bug transparent ! */
+        background: #0a0a0e !important;
         border-bottom: 1px solid rgba(255,255,255,0.05) !important;
-        position: relative !important; /* On retire le sticky qui casse tout sur iPhone */
+        position: relative !important; 
         z-index: 3000 !important;
         flex-shrink: 0 !important;
         height: auto !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important; /* Bordure plus visible */
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important; 
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
     }
     
     .vital-separator { display: none !important; }
     
-    /* Ligne 1 : Temps très fin */
     .hud-time { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 15px !important; width: 100% !important; }
     .time-text { font-size: 0.8rem !important; margin: 0 !important; color: var(--text-muted); width: auto !important; }
     .time-bar-bg { flex-grow: 1 !important; height: 3px !important; margin: 0 !important; }
     
-    /* Ligne 2 : Stats */
     .hud-vitals { 
         display: flex !important; 
         flex-wrap: wrap !important; 
