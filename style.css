@@ -763,16 +763,26 @@ input:focus, select:focus { border-color: var(--accent-purple); background: rgba
 
     .sidebar {
         position: fixed;
-        bottom: -100%; left: 0; width: 100%; height: 85vh;
-        background: var(--bg-base); z-index: 4000;
-        transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        bottom: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 85vh;
+        background: var(--bg-base); 
+        z-index: 6000 !important;
         border-radius: 25px 25px 0 0;
-        border-right: none; border-top: 1px solid var(--border-color);
+        border-right: none; 
+        border-top: 1px solid var(--border-color);
         padding-bottom: 20px;
+
+        will-change: transform;
+        transform: translateY(100%); 
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
     }
     .sidebar .modal-header .close-icon { display: block !important; }
 
-    body.menu-open .sidebar { bottom: 0; }
+    body.menu-open .sidebar { 
+        transform: translateY(0); 
+    }
     .nav-menu { padding: 30px 20px; }
     .nav-btn { font-size: 1.1rem; min-height: 50px; }
 
