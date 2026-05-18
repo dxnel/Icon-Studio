@@ -839,6 +839,29 @@ input[type="number"] {
         width: 100% !important; 
         margin: 0 !important; 
     }
+
+    .hud-time {
+        min-width: 140px; 
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 8px; 
+    }
+    
+    .hud-time .time-text {
+        white-space: nowrap !important; 
+        font-size: 0.95rem !important; 
+        letter-spacing: 0.5px;
+    }
+
+    .hud-time .time-bar-bg {
+        height: 6px !important; 
+        border-radius: 4px !important;
+    }
+    
+    .hud-time .time-bar-fill {
+        border-radius: 4px !important;
+    }
     
     #money-container, .vital-stat {
         background: transparent !important; 
