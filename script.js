@@ -203,7 +203,7 @@ const Engine = {
             statuses: [], challenges: [] 
         },
         flags: {},
-        preferences: { autosave: false },
+        preferences: { autosave: true },
         cooldowns: { jobChange: 0, work: 0, sleep: 0 },
         stats: { singles: 0, eps: 0, mixtapes: 0, albums: 0, doubles: 0, totalStreams: 0, totalRevenue: 0, completedChallenges: 0, merchRevenue: 0, merchItemsSold: 0, merchHistory: [0, 0, 0, 0, 0, 0, 0] },
         tracks: [], releases: [], chartHistory: [0, 0, 0, 0, 0, 0, 0], bots: [],
