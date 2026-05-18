@@ -1234,6 +1234,6 @@ input[type="number"] {
                     display: none !important;
                 }
                 #auth-modal div[style*="position: absolute"] {
-                    bottom: 15px !important; 
+                    bottom: 35px !important; 
                 }
 }
