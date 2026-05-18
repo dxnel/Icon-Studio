@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - ICON Studio</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --bg-base: #0a0a0e; 
+            --bg-card: #121218;
+            --border-color: rgba(255, 255, 255, 0.08); 
+            --text-main: #e8e8ed; 
+            --text-muted: #a1a1aa; 
+            --accent-purple: #b05bff; 
+            --font-ui: 'Inter', system-ui, sans-serif; 
+            --radius-m: 8px;   
+            --radius-l: 12px;  
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body { 
+            background: radial-gradient(circle at 50% 0%, #1a1a24 0%, #0a0a0e 100%);
+            color: var(--text-main);
+            font-family: var(--font-ui);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-l);
+            padding: 40px 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-purple), #6c5ce7);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .icon-wrapper {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            background: rgba(176, 91, 255, 0.05);
+            border: 1px solid rgba(176, 91, 255, 0.2);
+            border-radius: 50%;
+            margin-bottom: 15px;
+            color: var(--accent-purple);
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            letter-spacing: -0.5px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        section {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius-m);
+            padding: 20px;
+        }
+
+        h2 {
+            font-size: 1.05rem;
+            color: var(--accent-purple);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 35px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--border-color);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        .footer a {
+            color: var(--accent-purple);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <div class="icon-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <h1>Privacy Policy</h1>
+            <div class="subtitle">ICON Studio</div>
+        </div>
+
+        <div class="content">
+            <p>Your privacy is critically important to us. This Privacy Policy document outlines the types of personal information collected and recorded by ICON Studio and how we manage it.</p>
+
+            <section>
+                <h2>1. Data Collection & Firebase Authentication</h2>
+                <p>ICON Studio uses Firebase Authentication to manage secure user authentication profiles. When you authenticate using Google Sign-In or Email/Password, we securely store your unique User ID (UID), email address, and profile credentials to initialize and map your encrypted game cloud save state.</p>
+            </section>
+
+            <section>
+                <h2>2. Firestore Database & Game Progress</h2>
+                <p>We store your simulation data and game progress (money, tracks, stats, studio tier) inside a secure Google Cloud Firestore instance. This structural data is restricted entirely via server-side rules and is uniquely tied to your authenticated account ID. No other players can read, intercept, or overwrite your save data.</p>
+            </section>
+
+            <section>
+                <h2>3. Third-Party Services</h2>
+                <p>Our infrastructure relies exclusively on standard Google Cloud Platform features (Firebase Auth & Cloud Firestore). These systems do not distribute, trade, or monitor your registration credentials to external marketing corporations or track metrics for third-party networks.</p>
+            </section>
+
+            <section>
+                <h2>4. Data Retention & Deletion</h2>
+                <p>Your cloud files are retained as long as your application profile exists. If you wish to wipe your remote telemetry database and clear all sync logs, you can request an account wipe or clear your credentials via the internal save configuration panel.</p>
+            </section>
+        </div>
+
+        <div class="footer">
+            © 2026 ICON Studio • Return to <a href="index.html">Game</a>
+        </div>
+    </div>
+
+</body>
+</html>
