@@ -345,10 +345,10 @@ const Engine = {
         UI.updateChart(0);
         Progression.check();
         
-        UI.showAlert("Workspace Connected", "Cloud session loaded successfully for " + this.state.player.name);
+        UI.showAlert("Welcome Back", "Successfully loaded career for " + this.state.player.name);
     },
     resetGame() {
-        UI.showConfirm("Hard Reset", "Are you sure? This will permanently wipe your local save AND your cloud backup profile.", async () => {
+       UI.showConfirm("Delete Career", "Are you entirely sure? This will permanently wipe your local save and your cloud backup. You will start from scratch.", async () => {
             if (typeof Cloud !== 'undefined' && Cloud.uid) {
                 try {
                     await Cloud.deleteSaveFromCloud();
@@ -2818,7 +2818,7 @@ let pushBtnText = pushCantAfford ? `<i data-lucide="lock"></i> Algorithmic Push 
             statusBadge.className = "badge badge-red";
             statusBadge.innerText = "CORRUPTED";
             readoutZone.classList.add('hidden');
-            emptyZone.innerText = "System error parsing data nodes on this hardware unit.";
+            emptyZone.innerText = "Error loading save file. The data might be corrupted.";
             emptyZone.classList.remove('hidden');
         }
     },

@@ -52,6 +52,7 @@
                 <div style="text-align: center;">
                     <i data-lucide="disc-3" class="text-purple" style="width: 40px; height: 40px; margin-bottom: 8px;"></i>
                     <h2 style="margin: 0; font-size: 1.5rem; letter-spacing: -1px;">ICON Studio</h2>
+                    <span class="text-muted" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px;">Career Selection</span>
                 </div>
             </div>
             
@@ -59,9 +60,9 @@
                 <div id="local-profile-card" class="data-node flex-col" style="margin-bottom: 10px; background: rgba(0,0,0,0.25); border-color: rgba(176, 91, 255, 0.15);">
                     <div class="flex-row-between" style="margin-bottom: 12px;">
                         <span class="text-purple font-bold" style="font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">
-                            <i data-lucide="hard-drive" style="width: 14px; margin-right: 4px;"></i> System Save found
+                            <i data-lucide="save" style="width: 14px; margin-right: 4px;"></i> Saved Profile
                         </span>
-                        <span id="profile-card-status" class="badge badge-purple" style="height: 20px; font-size: 10px;">SCANNING...</span>
+                        <span id="profile-card-status" class="badge badge-purple" style="height: 20px; font-size: 10px;">CHECKING...</span>
                     </div>
                     
                     <div id="profile-card-readout" class="flex-col gap-10 hidden">
@@ -77,18 +78,18 @@
                             <div class="text-muted">Network: <span id="profile-card-fans" class="text-blue" style="font-weight: bold;">0 Fans</span></div>
                         </div>
                         <button class="btn-primary w-100" style="min-height: 38px; font-size: 0.85rem;" onclick="Engine.loadGame(true)">
-                            <i data-lucide="download"></i> Load Active Workspace
+                            <i data-lucide="play"></i> Resume Career
                         </button>
                     </div>
 
                     <div id="profile-card-empty" class="text-muted" style="text-align: center; padding: 15px 0; font-style: italic; font-size: 0.9rem;">
-                        No local system profile detected on this hardware core.
+                        No saved career found. Create a new artist below.
                     </div>
                 </div>
 
                 <div style="display: flex; align-items: center; margin: 15px 0;">
                     <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
-                    <span style="padding: 0 10px; font-size: 0.75rem; color: var(--text-muted); font-weight: bold; letter-spacing: 1px;">OR RUN NEW PROFILE</span>
+                    <span style="padding: 0 10px; font-size: 0.75rem; color: var(--text-muted); font-weight: bold; letter-spacing: 1px;">START A NEW JOURNEY</span>
                     <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
                 </div>
 
@@ -107,7 +108,7 @@
                     </div>
                 </div>
                 <button class="btn-outline w-100" style="border-color: var(--accent-purple); color: #fff; font-weight: 700;" onclick="Engine.initGame(true)">
-                    <i data-lucide="plus-circle"></i> New Career
+                    <i data-lucide="plus-circle"></i> Start Career
                 </button>
             </div>
         </div>
@@ -629,12 +630,12 @@
 
                 <div id="settings-tab-game">
                     <div class="data-node flex-col" style="margin-bottom: 15px; padding: 15px;">
-                        <strong style="margin-bottom: 10px;">Save Data Management</strong>
+                        <strong>Game Progress</strong>
                         <button id="btn-toggle-autosave" class="btn-outline-green w-100" style="margin-bottom: 10px;" onclick="UI.toggleAutosave()">
                             <i data-lucide="check-circle"></i> Autosave: ON
                         </button>
                         <button class="btn-outline-red w-100" onclick="Engine.resetGame()">
-                            <i data-lucide="alert-triangle"></i> Hard Reset
+                            <i data-lucide="trash-2"></i> Delete Career
                         </button>
                     </div>
                     <div class="data-node flex-col" style="padding: 15px;">
@@ -654,7 +655,7 @@
                         <div id="account-email-display" style="font-size: 1rem; margin-bottom: 15px; color: var(--accent-purple);">Local Guest</div>
                         
                         <button id="btn-cloud-save" class="btn-outline-blue w-100" style="margin-bottom: 10px;">
-                            <i data-lucide="upload-cloud"></i> Force Cloud Sync
+                         <i data-lucide="cloud"></i> Manual Cloud Save
                         </button>
                         <button id="btn-change-password" class="btn-outline w-100" style="margin-bottom: 10px;">
                             <i data-lucide="key"></i> Reset Password
