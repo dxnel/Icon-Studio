@@ -520,7 +520,7 @@ input:focus, select:focus { border-color: var(--accent-purple); background: rgba
 
 .modal { 
     background: var(--bg-card); border: 1px solid var(--border-color); 
-    border-radius: var(--radius-l); width: 420px; max-width: 90vw; max-height: 70vh;
+    border-radius: var(--radius-l); width: 420px; max-width: 90vw; max-height: 90vh;
     box-shadow: 0 25px 80px rgba(0,0,0,0.8); display: flex; flex-direction: column;
     will-change: transform;
     transform: scale(0.95) translateY(10px); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
