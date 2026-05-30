@@ -585,6 +585,27 @@
         </div>
     </div>
 
+    <div id="hospital-modal" class="overlay hidden" style="z-index: 9200;">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="text-red font-bold"><i data-lucide="activity"></i> MEDICAL EMERGENCY</span>
+                </div>
+            <div class="modal-body" style="text-align: center; padding: 25px;">
+                <p style="font-size: 1.05rem; margin-bottom: 20px; line-height: 1.5;">You pushed yourself way too hard and collapsed from exhaustion.<br><br>You were <strong>hospitalized for 2 days</strong> to recover.</p>
+                
+                <div class="data-node flex-col" style="border-color: rgba(255, 94, 87, 0.4); background: rgba(255, 94, 87, 0.05); padding: 15px; margin-bottom: 20px; text-align: left; font-family: var(--font-mono); font-size: 0.85rem;">
+                    <strong class="text-red" style="margin-bottom: 12px; font-family: var(--font-ui); text-transform: uppercase; letter-spacing: 1px;">Hospital Invoice</strong>
+                    <div class="flex-row-between text-muted" style="margin-bottom: 8px;">Ambulance Ride <span class="text-main">$450</span></div>
+                    <div class="flex-row-between text-muted" style="margin-bottom: 8px;">IV Fluids & Meds <span class="text-main">$300</span></div>
+                    <div class="flex-row-between text-muted" style="margin-bottom: 8px;">Bed Occupancy (2 Days) <span class="text-main">$500</span></div>
+                    <div class="flex-row-between text-main" style="border-top: 1px dashed rgba(255, 94, 87, 0.3); padding-top: 10px; margin-top: 5px; font-weight: bold;">TOTAL BALANCE <span class="text-red">$1,250</span></div>
+                </div>
+                
+                <button class="btn-outline-red w-100" onclick="UI.payHospitalBill()">PAY $1,250 INVOICE</button>
+            </div>
+        </div>
+    </div>
+
     <div id="release-modal" class="overlay hidden">
         <div class="modal" style="width: 660px; max-height: 85vh;"> <div class="modal-header">
                 <span><i data-lucide="disc"></i> Package Release</span>

@@ -687,13 +687,13 @@ const TimeManager = {
         if (Engine.state.player.burnout >= 100) {
             Engine.modifyStat('burnout', -100); 
             Engine.modifyStat('energy', 100);
-            Engine.log("CRITICAL BURNOUT! Hospitalised. You lost 2 days.");
+            Engine.log("CRITICAL BURNOUT! Hospitalized. You lost 2 days and received a medical bill.");
+            setTimeout(() => this.passTime(48, "Hospital Recovery"), 500); 
             
-            // On affiche la modale d'alerte !
-            UI.showAlert("CRITICAL BURNOUT", "You pushed yourself way too hard and collapsed from exhaustion.<br><br>You are being <strong>hospitalized for 2 days</strong> to recover. Take care of your mental health!");
-            
-            // Le temps passera en arrière-plan pendant que la modale est affichée
-            setTimeout(() => this.passTime(48, "Hospitalized"), 500); 
+            setTimeout(() => {
+                UI.openModal('hospital-modal');
+                if(window.lucide) lucide.createIcons();
+            }, 800);
         }
         if (Engine.state.preferences && Engine.state.preferences.autosave) {
             Engine.saveGame(true);
@@ -744,11 +744,14 @@ const TimeManager = {
             Engine.log("DEBT PENALTY: Financial stress is mounting. (+10 Stress)");
         }
         if (Engine.state.day > 1 && Engine.state.day % Game.config.settings.rentIntervalDays === 0) { 
-            Engine.modifyStat('money', -Game.config.settings.rentCost); 
-            Engine.rollWeeklyTrend(); 
-            UI.showAlert("Rent Due", `Another month passed. $${Game.config.settings.rentCost} was deducted for rent & bills. (If you drop below $0, you will rapidly gain stress).`);
-            Engine.log(`Monthly Rent Deducted: -$${Game.config.settings.rentCost}`);
-        } else if (Engine.state.day % 7 === 0) {
+    let currentProp = Game.config.properties.find(p => p.id === Engine.state.player.propertyId);
+    let actualRent = currentProp ? currentProp.rent : 0;
+
+    Engine.modifyStat('money', -actualRent); 
+    Engine.rollWeeklyTrend(); 
+    UI.showAlert("Rent Due", `Another month passed. $${actualRent} was deducted for rent & bills. (If you drop below $0, you will rapidly gain stress).`);
+    Engine.log(`Monthly Rent Deducted: -$${actualRent}`);
+} else if (Engine.state.day % 7 === 0) {
             Engine.rollWeeklyTrend(); 
         }
         Engine.state.releases.forEach(rel => {
@@ -1248,7 +1251,7 @@ const MusicEngine = {
             }
         });
     },
-    startSyncMinigame(trackTitle) {
+    startSyncMinigame(trackTitle, bpm) {
         return new Promise((resolve) => {
             const overlay = document.getElementById('sync-minigame');
             const container = overlay.querySelector('.sync-container');
@@ -1270,7 +1273,7 @@ const MusicEngine = {
                 const targetLeft = Math.floor(Math.random() * (maxLeft - minLeft)) + minLeft;
                 target.style.left = targetLeft + 'px';
                 let pos = 0;
-                let speed = 4.5 + (Math.random() * 2); 
+                let speed = (bpm / 25) + (Math.random() * 1.0);
                 let animFrame;
                 let done = false;
                 function animate() {
@@ -1305,7 +1308,7 @@ const MusicEngine = {
         if(Engine.state.player.energy < nrgCost) return UI.showAlert("Energy Low", "You don't have enough energy for this session.");
         let track = Engine.state.tracks.find(t => t.id === id);
         await UI.runCountdown();
-        const success = await this.startSyncMinigame(track.title);
+        const success = await this.startSyncMinigame(track.title, track.bpm); 
         await TimeManager.passTime(hours, `Studio: ${track.title}`);
         Engine.modifyStat('energy', -nrgCost); 
         Engine.modifyStat('burnout', hours * Game.config.settings.studioStressGainPerHour); 
@@ -1634,6 +1637,21 @@ const UI = {
         Game.config.settings.genres.forEach(g => genreSel.innerHTML += `<option value="${g}">${g}</option>`);
         const vibeSel = document.getElementById('track-vibe'); vibeSel.innerHTML = '';
         Game.config.settings.moods.forEach(v => vibeSel.innerHTML += `<option value="${v}">${v}</option>`);
+    },
+    payHospitalBill() {
+        const cost = 1250; 
+        Engine.modifyStat('money', -cost);
+        
+        this.closeModal('hospital-modal');
+        Engine.log(`Paid Hospital Bill: -$${cost}`);
+        
+        setTimeout(() => {
+            if (Engine.state.player.money < 0) {
+                this.showAlert("Medical Debt", "Your bank account has dropped below zero. The mounting financial stress will cause you to gain Burnout every single day until you are back in the green.");
+            } else {
+                this.showAlert("Discharged", "You have paid your medical bill and been discharged. Take better care of your health moving forward!");
+            }
+        }, 400);
     },
     renderServices() {
         const categories = ['writing', 'recording', 'mixing'];
